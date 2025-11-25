@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import Layout from '../../components/Layout';
 import { Link, useNavigate } from 'react-router-dom';
 import PhotoUploadArea from '../../components/PhotoUploadArea';
+import DateInput from '../../components/DateInput';
 
 const AddStaff = () => {
   const [activeTab, setActiveTab] = useState('basic-info');
@@ -78,6 +79,7 @@ const AddStaff = () => {
       otherNames: '',
       gender: '',
       dateOfBirth: '',
+      employmentDate: '',
       address: '',
       qualification: '',
       contact: '',
@@ -275,13 +277,13 @@ const AddStaff = () => {
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
                   Date of Birth <span className="text-red-500">*</span>
                 </label>
-                <input 
-                  type="date" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
+                <DateInput
                   name="dateOfBirth"
                   value={formData.dateOfBirth}
                   onChange={handleChange}
-                  required 
+                  placeholder="YYYY-MM-DD"
+                  required
+                  className="text-sm"
                 />
               </div>
               <div>
@@ -627,9 +629,12 @@ const AddStaff = () => {
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Employment Date</label>
-                <input 
-                  type="date" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
+                <DateInput
+                  name="employmentDate"
+                  value={formData.employmentDate || ''}
+                  onChange={handleChange}
+                  placeholder="YYYY-MM-DD"
+                  className="text-sm"
                 />
               </div>
               <div>

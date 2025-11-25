@@ -84,27 +84,31 @@ const PhotoUploadModal = ({ isOpen, onClose, onImageSelect, currentPreview }) =>
 
   return (
     <div 
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-center sm:items-center items-end p-0 sm:p-4 bg-black/60 backdrop-blur-sm"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="photo-upload-title"
     >
       <div 
-        className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-auto"
+        className="bg-white rounded-t-2xl sm:rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Upload Photo</h2>
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 flex-shrink-0">
+          <h2 id="photo-upload-title" className="text-xl sm:text-2xl font-bold text-gray-900">Upload Photo</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 transition-colors"
+            className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 transition-all duration-200 hover:rotate-90 min-w-[2rem] min-h-[2rem] sm:min-w-[2.5rem] sm:min-h-[2.5rem]"
             aria-label="Close modal"
+            type="button"
           >
             <i className="fas fa-times"></i>
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="p-4 sm:p-6">
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1 -webkit-overflow-scrolling-touch">
           {/* Drop Zone / Preview Area */}
           <div
             onDragEnter={handleDragEnter}
@@ -220,27 +224,31 @@ const PhotoUploadModal = ({ isOpen, onClose, onImageSelect, currentPreview }) =>
             )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 mt-6">
-            <button
-              onClick={onClose}
-              className="flex-1 px-6 py-3 bg-gray-100 text-gray-900 rounded-md font-semibold hover:bg-gray-200 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={() => {
-                if (preview) {
-                  onClose();
-                } else {
-                  handleSelectClick();
-                }
-              }}
-              className="flex-1 px-6 py-3 rounded-md font-semibold transition-colors bg-primary text-white hover:bg-primary-dark shadow-md hover:shadow-lg"
-            >
-              {preview ? 'Done' : 'Select Photo'}
-            </button>
-          </div>
+        </div>
+        
+        {/* Modal Footer */}
+        <div className="flex flex-col sm:flex-row gap-3 p-4 sm:p-6 border-t border-gray-200 flex-shrink-0">
+          <button
+            onClick={onClose}
+            className="flex-1 sm:flex-none px-6 py-3 bg-gray-100 text-gray-900 rounded-md font-semibold hover:bg-gray-200 transition-colors min-h-[48px] sm:min-h-auto"
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              if (preview) {
+                onClose();
+              } else {
+                handleSelectClick();
+              }
+            }}
+            className="flex-1 sm:flex-none px-6 py-3 rounded-md font-semibold transition-colors bg-primary-500 text-white hover:bg-primary-700 shadow-md hover:shadow-lg min-h-[48px] sm:min-h-auto"
+            type="button"
+          >
+            {preview ? 'Done' : 'Select Photo'}
+          </button>
+        </div>
         </div>
       </div>
     </div>
