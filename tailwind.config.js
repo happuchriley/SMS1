@@ -7,11 +7,23 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#28a745',
-          dark: '#218838',
-          light: '#34ce57',
+          DEFAULT: '#10b981', // Emerald-500
+          dark: '#047857', // Emerald-700
+          light: '#34d399', // Emerald-400
+          50: '#f0fdf4',
+          100: '#dcfce7',
+          200: '#bbf7d0',
+          300: '#86efac',
+          400: '#34d399',
+          500: '#10b981',
+          600: '#059669',
+          700: '#047857',
         },
-        secondary: '#20c997',
+        secondary: {
+          DEFAULT: '#14b8a6', // Teal-500
+          500: '#14b8a6',
+          600: '#0d9488',
+        },
       },
       spacing: {
         'sidebar': '260px',

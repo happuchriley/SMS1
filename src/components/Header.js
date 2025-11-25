@@ -41,14 +41,14 @@ const Header = ({ toggleSidebar }) => {
       </div>
       <div className="flex items-center gap-4">
         <button 
-          className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center cursor-pointer relative text-gray-600 transition-all duration-200 ease-in-out border border-gray-200 hover:from-gray-100 hover:to-gray-200 hover:-translate-y-0.5 hover:shadow-sm hover:text-primary active:scale-[0.97] active:opacity-80"
+          className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center cursor-pointer relative text-gray-600 transition-all duration-200 ease-in-out border border-gray-200 hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-sm hover:text-primary active:scale-[0.97] active:opacity-80"
           type="button" 
           aria-label="Search"
         >
           <i className="fas fa-search transition-transform duration-200"></i>
         </button>
         <button 
-          className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center cursor-pointer relative text-gray-600 transition-all duration-200 ease-in-out border border-gray-200 hover:from-gray-100 hover:to-gray-200 hover:-translate-y-0.5 hover:shadow-sm hover:text-primary active:scale-[0.97] active:opacity-80"
+          className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center cursor-pointer relative text-gray-600 transition-all duration-200 ease-in-out border border-gray-200 hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-sm hover:text-primary active:scale-[0.97] active:opacity-80"
           type="button" 
           aria-label="Messages"
         >
@@ -56,7 +56,7 @@ const Header = ({ toggleSidebar }) => {
           <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white rounded-full px-1.5 py-0.5 text-[10px] font-semibold">0</span>
         </button>
         <button 
-          className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center cursor-pointer relative text-gray-600 transition-all duration-200 ease-in-out border border-gray-200 hover:from-gray-100 hover:to-gray-200 hover:-translate-y-0.5 hover:shadow-sm hover:text-primary active:scale-[0.97] active:opacity-80"
+          className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center cursor-pointer relative text-gray-600 transition-all duration-200 ease-in-out border border-gray-200 hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-sm hover:text-primary active:scale-[0.97] active:opacity-80"
           type="button" 
           aria-label="Notifications"
         >
@@ -64,7 +64,7 @@ const Header = ({ toggleSidebar }) => {
           <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white rounded-full px-1.5 py-0.5 text-[10px] font-semibold">0</span>
         </button>
         <div className="flex items-center gap-2.5 cursor-pointer px-2.5 py-1.5 rounded transition-all duration-200 ease-in-out hover:bg-gray-100 active:scale-[0.98] active:opacity-80">
-          <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center text-white font-semibold text-xs">
+          <div className="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-semibold text-xs">
             {initials}
           </div>
           <i className="fas fa-chevron-down text-xs"></i>

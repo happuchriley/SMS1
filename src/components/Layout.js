@@ -64,7 +64,7 @@ const Layout = ({ children }) => {
       />
       {isMobile && sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-[999] transition-opacity duration-500 ease-in-out backdrop-blur-sm"
+          className="fixed inset-0 bg-black/50 z-[999] transition-opacity duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] backdrop-blur-sm"
           onClick={() => {
             setSidebarOpen(false);
             document.body.style.overflow = "";
@@ -73,8 +73,8 @@ const Layout = ({ children }) => {
         />
       )}
       <main
-        className={`w-full min-h-screen min-h-[calc(var(--vh,1vh)*100)] transition-all duration-500 ease-in-out flex flex-col flex-1 ${
-          isMobile ? "ml-0" : sidebarCollapsed ? "ml-[70px]" : "ml-[260px]"
+        className={`w-full min-h-screen min-h-[calc(var(--vh,1vh)*100)] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col flex-1 ${
+          isMobile ? "ml-0" : sidebarCollapsed ? "ml-[72px]" : "ml-[280px]"
         }`}
       >
         <Header toggleSidebar={toggleSidebar} />

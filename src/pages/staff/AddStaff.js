@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import Layout from '../../components/Layout';
 import { Link, useNavigate } from 'react-router-dom';
+import PhotoUploadArea from '../../components/PhotoUploadArea';
 
 const AddStaff = () => {
   const [activeTab, setActiveTab] = useState('basic-info');
@@ -47,6 +48,19 @@ const AddStaff = () => {
     }
   };
 
+  const handleImageSelect = (file, preview) => {
+    if (file && preview) {
+      setFormData({...formData, photo: file});
+      setPhotoPreview(preview);
+    } else {
+      setFormData({...formData, photo: null});
+      setPhotoPreview(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle form submission here
@@ -82,6 +96,30 @@ const AddStaff = () => {
     }
   };
 
+  // Tab navigation handlers
+  const handleNext = () => {
+    const tabs = ['basic-info', 'next-of-kin', 'admin-info'];
+    const currentIndex = tabs.indexOf(activeTab);
+    if (currentIndex < tabs.length - 1) {
+      setActiveTab(tabs[currentIndex + 1]);
+      // Scroll to top of form
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handlePrevious = () => {
+    const tabs = ['basic-info', 'next-of-kin', 'admin-info'];
+    const currentIndex = tabs.indexOf(activeTab);
+    if (currentIndex > 0) {
+      setActiveTab(tabs[currentIndex - 1]);
+      // Scroll to top of form
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const isLastTab = activeTab === 'admin-info';
+  const isFirstTab = activeTab === 'basic-info';
+
   return (
     <Layout>
       {/* Page Header */}
@@ -96,7 +134,7 @@ const AddStaff = () => {
         </div>
         <Link 
           to="/staff/all" 
-          className="px-4 py-2 gradient-primary text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center gap-2 no-underline hover:-translate-y-0.5 hover:shadow-lg"
+          className="px-4 py-2 bg-primary-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center gap-2 no-underline hover:-translate-y-0.5 hover:shadow-lg"
         >
           <i className="fas fa-users"></i> Staff List
         </Link>
@@ -112,7 +150,7 @@ const AddStaff = () => {
         >
           Basic Information
           {activeTab === 'basic-info' && (
-            <span className="absolute bottom-0 left-0 right-0 h-0.5 gradient-primary"></span>
+            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500"></span>
           )}
         </button>
         <button 
@@ -123,7 +161,7 @@ const AddStaff = () => {
         >
           Next of Kin Info
           {activeTab === 'next-of-kin' && (
-            <span className="absolute bottom-0 left-0 right-0 h-0.5 gradient-primary"></span>
+            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500"></span>
           )}
         </button>
         <button 
@@ -134,7 +172,7 @@ const AddStaff = () => {
         >
           Admin Info
           {activeTab === 'admin-info' && (
-            <span className="absolute bottom-0 left-0 right-0 h-0.5 gradient-primary"></span>
+            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500"></span>
           )}
         </button>
       </div>
@@ -161,7 +199,7 @@ const AddStaff = () => {
                   Staff Title <span className="text-red-500">*</span>
                 </label>
                 <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
@@ -181,7 +219,7 @@ const AddStaff = () => {
                 </label>
                 <input 
                   type="text" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleChange}
@@ -195,7 +233,7 @@ const AddStaff = () => {
                 </label>
                 <input 
                   type="text" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   name="surname"
                   value={formData.surname}
                   onChange={handleChange}
@@ -209,7 +247,7 @@ const AddStaff = () => {
                 </label>
                 <input 
                   type="text" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   name="otherNames"
                   value={formData.otherNames}
                   onChange={handleChange}
@@ -222,7 +260,7 @@ const AddStaff = () => {
                   Gender <span className="text-red-500">*</span>
                 </label>
                 <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   name="gender"
                   value={formData.gender}
                   onChange={handleChange}
@@ -239,7 +277,7 @@ const AddStaff = () => {
                 </label>
                 <input 
                   type="date" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   name="dateOfBirth"
                   value={formData.dateOfBirth}
                   onChange={handleChange}
@@ -250,7 +288,7 @@ const AddStaff = () => {
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Address</label>
                 <input 
                   type="text" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
@@ -262,7 +300,7 @@ const AddStaff = () => {
                   Staff Qualification <span className="text-red-500">*</span>
                 </label>
                 <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   name="qualification"
                   value={formData.qualification}
                   onChange={handleChange}
@@ -282,7 +320,7 @@ const AddStaff = () => {
                 </label>
                 <input 
                   type="tel" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   name="contact"
                   value={formData.contact}
                   onChange={handleChange}
@@ -294,7 +332,7 @@ const AddStaff = () => {
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Email</label>
                 <input 
                   type="email" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
@@ -304,7 +342,7 @@ const AddStaff = () => {
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">National</label>
                 <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   name="national"
                   value={formData.national}
                   onChange={handleChange}
@@ -317,7 +355,7 @@ const AddStaff = () => {
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Country of Residence</label>
                 <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   name="countryOfResidence"
                   value={formData.countryOfResidence}
                   onChange={handleChange}
@@ -332,7 +370,7 @@ const AddStaff = () => {
                   Home Town <span className="text-red-500">*</span>
                 </label>
                 <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   name="homeTown"
                   value={formData.homeTown}
                   onChange={handleChange}
@@ -351,7 +389,7 @@ const AddStaff = () => {
                 </label>
                 <input 
                   type="text" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   name="currentCity"
                   value={formData.currentCity}
                   onChange={handleChange}
@@ -362,7 +400,7 @@ const AddStaff = () => {
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Religion</label>
                 <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   name="religion"
                   value={formData.religion}
                   onChange={handleChange}
@@ -372,13 +410,28 @@ const AddStaff = () => {
                   <option>Islam</option>
                   <option>Other</option>
                 </select>
+                <div className="mt-5">
+                  <label className="block mb-2 font-semibold text-gray-900 text-sm">Photo</label>
+                  <PhotoUploadArea
+                    onImageSelect={handleImageSelect}
+                    currentPreview={photoPreview}
+                  />
+                  {/* Hidden file input for backward compatibility */}
+                  <input 
+                    ref={fileInputRef}
+                    type="file" 
+                    className="hidden" 
+                    accept="image/*" 
+                    onChange={handlePhotoChange}
+                  />
+                </div>
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
                   Staff Category <span className="text-red-500">*</span>
                 </label>
                 <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
@@ -391,59 +444,48 @@ const AddStaff = () => {
                   <option>Security</option>
                 </select>
               </div>
-              <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">Photo</label>
-                <input 
-                  ref={fileInputRef}
-                  type="file" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)]" 
-                  accept="image/*" 
-                  onChange={handlePhotoChange}
-                />
-                <small className="text-gray-600 text-xs mt-1 block">
-                  {formData.photo ? formData.photo.name : 'No file chosen'}
-                </small>
-                {photoPreview && (
-                  <div className="mt-4">
-                    <div className="relative inline-block">
-                      <img 
-                        src={photoPreview} 
-                        alt="Preview" 
-                        className="w-32 h-32 object-cover rounded-lg border-2 border-gray-200 shadow-md"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPhotoPreview(null);
-                          setFormData({...formData, photo: null});
-                          if (fileInputRef.current) {
-                            fileInputRef.current.value = '';
-                          }
-                        }}
-                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors shadow-md"
-                        title="Remove image"
-                      >
-                        <i className="fas fa-times"></i>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 justify-end mt-6 pt-6 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row gap-3 justify-between items-center mt-6 pt-6 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                {!isFirstTab && (
+                  <button 
+                    type="button"
+                    onClick={handlePrevious}
+                    className="px-5 py-2.5 bg-transparent border-2 border-gray-300 text-gray-700 rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:bg-gray-50 hover:border-gray-400"
+                  >
+                    <i className="fas fa-chevron-left"></i> Previous
+                  </button>
+                )}
+                <button 
+                  type="button"
+                  onClick={() => navigate('/staff/all')}
+                  className="px-5 py-2.5 bg-transparent border-2 border-gray-200 text-gray-900 rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:bg-gray-50"
+                >
+                  <i className="fas fa-times"></i> Close
+                </button>
+                <button 
+                  type="button"
+                  onClick={handleClear}
+                  className="px-5 py-2.5 bg-gray-200 text-gray-900 rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:bg-gray-300"
+                >
+                  <i className="fas fa-redo"></i> Clear All
+                </button>
+              </div>
               <button 
-                type="button"
-                onClick={() => navigate('/staff/all')}
-                className="px-5 py-2.5 bg-transparent border-2 border-gray-200 text-gray-900 rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:bg-gray-50"
+                type={isLastTab ? "submit" : "button"}
+                onClick={isLastTab ? undefined : handleNext}
+                form={isLastTab ? undefined : undefined}
+                className="px-6 py-2.5 bg-primary-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:shadow-lg hover:-translate-y-0.5 w-full sm:w-auto"
               >
-                <i className="fas fa-times"></i> Close
-              </button>
-              <button 
-                type="button"
-                onClick={handleClear}
-                className="px-5 py-2.5 bg-gray-200 text-gray-900 rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:bg-gray-300"
-              >
-                <i className="fas fa-redo"></i> Clear All
+                {isLastTab ? (
+                  <>
+                    <i className="fas fa-check"></i> Submit
+                  </>
+                ) : (
+                  <>
+                    Next <i className="fas fa-chevron-right"></i>
+                  </>
+                )}
               </button>
             </div>
           </form>
@@ -464,7 +506,7 @@ const AddStaff = () => {
                 </label>
                 <input 
                   type="text" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   placeholder="Name *" 
                   required 
                 />
@@ -474,7 +516,7 @@ const AddStaff = () => {
                   Relationship <span className="text-red-500">*</span>
                 </label>
                 <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   required
                 >
                   <option value="">Select Relationship</option>
@@ -490,7 +532,7 @@ const AddStaff = () => {
                 </label>
                 <input 
                   type="tel" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   placeholder="Contact *" 
                   required 
                 />
@@ -499,7 +541,7 @@ const AddStaff = () => {
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Email</label>
                 <input 
                   type="email" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   placeholder="Email" 
                 />
               </div>
@@ -507,25 +549,52 @@ const AddStaff = () => {
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Address</label>
                 <input 
                   type="text" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   placeholder="Address" 
                 />
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 justify-end mt-6 pt-6 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row gap-3 justify-between items-center mt-6 pt-6 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                {!isFirstTab && (
+                  <button 
+                    type="button"
+                    onClick={handlePrevious}
+                    className="px-5 py-2.5 bg-transparent border-2 border-gray-300 text-gray-700 rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:bg-gray-50 hover:border-gray-400"
+                  >
+                    <i className="fas fa-chevron-left"></i> Previous
+                  </button>
+                )}
+                <button 
+                  type="button"
+                  onClick={() => navigate('/staff/all')}
+                  className="px-5 py-2.5 bg-transparent border-2 border-gray-200 text-gray-900 rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:bg-gray-50"
+                >
+                  <i className="fas fa-times"></i> Close
+                </button>
+                <button 
+                  type="button"
+                  onClick={handleClear}
+                  className="px-5 py-2.5 bg-gray-200 text-gray-900 rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:bg-gray-300"
+                >
+                  <i className="fas fa-redo"></i> Clear All
+                </button>
+              </div>
               <button 
-                type="button"
-                onClick={() => navigate('/staff/all')}
-                className="px-5 py-2.5 bg-transparent border-2 border-gray-200 text-gray-900 rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:bg-gray-50"
+                type={isLastTab ? "submit" : "button"}
+                onClick={isLastTab ? undefined : handleNext}
+                form={isLastTab ? undefined : undefined}
+                className="px-6 py-2.5 bg-primary-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:shadow-lg hover:-translate-y-0.5 w-full sm:w-auto"
               >
-                <i className="fas fa-times"></i> Close
-              </button>
-              <button 
-                type="button"
-                onClick={handleClear}
-                className="px-5 py-2.5 bg-gray-200 text-gray-900 rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:bg-gray-300"
-              >
-                <i className="fas fa-redo"></i> Clear All
+                {isLastTab ? (
+                  <>
+                    <i className="fas fa-check"></i> Submit
+                  </>
+                ) : (
+                  <>
+                    Next <i className="fas fa-chevron-right"></i>
+                  </>
+                )}
               </button>
             </div>
           </form>
@@ -545,7 +614,7 @@ const AddStaff = () => {
                   Department <span className="text-red-500">*</span>
                 </label>
                 <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   required
                 >
                   <option value="">Select Department</option>
@@ -560,13 +629,13 @@ const AddStaff = () => {
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Employment Date</label>
                 <input 
                   type="date" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5" 
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                 />
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Status</label>
                 <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(40,167,69,0.1)] focus:-translate-y-0.5"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5"
                 >
                   <option>Active</option>
                   <option>Inactive</option>
@@ -577,7 +646,7 @@ const AddStaff = () => {
             <div className="flex flex-col sm:flex-row gap-3 justify-end mt-6 pt-6 border-t border-gray-200">
               <button 
                 type="submit"
-                className="px-5 py-2.5 gradient-primary text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-md hover:-translate-y-0.5 hover:shadow-lg"
+                className="px-5 py-2.5 bg-primary-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-md hover:-translate-y-0.5 hover:shadow-lg"
               >
                 <i className="fas fa-save"></i> Save
               </button>

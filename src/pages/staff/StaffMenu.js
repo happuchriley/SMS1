@@ -79,22 +79,22 @@ const StaffMenu = () => {
         <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">Staff Statistics</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           <div className="bg-white rounded-lg p-5 md:p-6 shadow-md border-l-4 border-blue-500 transition-all duration-300 relative overflow-hidden hover:-translate-y-1 hover:shadow-lg group">
-            <div className="absolute top-0 left-0 right-0 h-0.5 gradient-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             <div className="text-xs text-gray-600 mb-2 font-medium">TOTAL STAFF</div>
             <div className="text-3xl md:text-4xl font-bold text-gray-900">22</div>
           </div>
           <div className="bg-white rounded-lg p-5 md:p-6 shadow-md border-l-4 border-green-500 transition-all duration-300 relative overflow-hidden hover:-translate-y-1 hover:shadow-lg group">
-            <div className="absolute top-0 left-0 right-0 h-0.5 gradient-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             <div className="text-xs text-gray-600 mb-2 font-medium">ACTIVE STAFF</div>
             <div className="text-3xl md:text-4xl font-bold text-gray-900">19</div>
           </div>
           <div className="bg-white rounded-lg p-5 md:p-6 shadow-md border-l-4 border-red-500 transition-all duration-300 relative overflow-hidden hover:-translate-y-1 hover:shadow-lg group">
-            <div className="absolute top-0 left-0 right-0 h-0.5 gradient-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             <div className="text-xs text-gray-600 mb-2 font-medium">INACTIVE STAFF</div>
             <div className="text-3xl md:text-4xl font-bold text-gray-900">3</div>
           </div>
           <div className="bg-white rounded-lg p-5 md:p-6 shadow-md border-l-4 border-orange-500 transition-all duration-300 relative overflow-hidden hover:-translate-y-1 hover:shadow-lg group">
-            <div className="absolute top-0 left-0 right-0 h-0.5 gradient-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             <div className="text-xs text-gray-600 mb-2 font-medium">NEW STAFF (CURRENT TERM)</div>
             <div className="text-3xl md:text-4xl font-bold text-gray-900">1</div>
           </div>
