@@ -3,7 +3,7 @@ import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 
 const NewsPage = () => {
-  const [news, setNews] = useState([
+  const [news] = useState([
     { id: 1, title: 'School Reopening Announcement', category: 'Announcement', content: 'We are pleased to announce that school will reopen on February 1st, 2024. All students are expected to resume classes...', author: 'Principal', date: '2024-01-25', views: 234, priority: 'high' },
     { id: 2, title: 'Annual Sports Day Registration', category: 'Event', content: 'Registration for the Annual Sports Day is now open. All students are encouraged to participate...', author: 'Sports Coordinator', date: '2024-01-28', views: 156, priority: 'medium' },
     { id: 3, title: 'Parent-Teacher Meeting Schedule', category: 'Meeting', content: 'The next Parent-Teacher Meeting is scheduled for February 15th, 2024. Parents are requested to attend...', author: 'Academic Coordinator', date: '2024-02-01', views: 189, priority: 'high' },

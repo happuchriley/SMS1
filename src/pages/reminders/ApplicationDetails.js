@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 import remindersService from '../../services/remindersService';
@@ -7,7 +7,7 @@ import { useModal } from '../../components/ModalProvider';
 
 const ApplicationDetails = () => {
   const { toast } = useModal();
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [allStudents, setAllStudents] = useState([]);
   const [formData, setFormData] = useState({
     academicYear: '',

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 import academicService from '../../services/academicService';
@@ -7,7 +7,7 @@ import { useModal } from '../../components/ModalProvider';
 const ReportsFootnote = () => {
   const { toast, showDeleteModal } = useModal();
   const [footnotes, setFootnotes] = useState([]);
-  const [loading, setLoading] = useState(true); // Used in loadFootnotes
+  const [, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     symbol: '',

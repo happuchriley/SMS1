@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 import remindersService from '../../services/remindersService';
@@ -7,7 +7,7 @@ import { useModal } from '../../components/ModalProvider';
 
 const StaffReminder = () => {
   const { toast } = useModal();
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [allStaff, setAllStaff] = useState([]);
   const [formData, setFormData] = useState({
     reminderType: 'sms',

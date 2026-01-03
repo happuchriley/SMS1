@@ -3,7 +3,7 @@ import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 
 const Courses = () => {
-  const [courses, setCourses] = useState([
+  const [courses] = useState([
     { id: 1, code: 'MATH101', title: 'Mathematics Fundamentals', instructor: 'Mr. John Doe', level: 'Basic 1', students: 25, status: 'active' },
     { id: 2, code: 'ENG101', title: 'English Language', instructor: 'Ms. Jane Smith', level: 'Basic 1', students: 28, status: 'active' },
     { id: 3, code: 'SCI101', title: 'Integrated Science', instructor: 'Dr. Peter Brown', level: 'JHS 1', students: 32, status: 'active' },

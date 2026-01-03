@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 import tlmsService from '../../services/tlmsService';
@@ -7,7 +7,7 @@ import { useModal } from '../../components/ModalProvider';
 const TLMsCategories = () => {
   const { toast, showDeleteModal } = useModal();
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true); // Used in loadCategories
+  const [, setLoading] = useState(true);
 
   const [showModal, setShowModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);

@@ -3,7 +3,7 @@ import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 
 const AcademicCalendar = () => {
-  const [events, setEvents] = useState([
+  const [events] = useState([
     { id: 1, title: 'School Reopening', date: '2024-02-01', type: 'Holiday', description: 'First term begins' },
     { id: 2, title: 'Mid-Term Break', date: '2024-03-15', type: 'Holiday', description: 'One week mid-term break' },
     { id: 3, title: 'End of Term Exams', date: '2024-04-20', type: 'Exam', description: 'Term 1 examinations' },

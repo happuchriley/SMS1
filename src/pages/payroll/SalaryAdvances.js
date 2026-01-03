@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 import payrollService from '../../services/payrollService';
@@ -51,7 +51,7 @@ const SalaryAdvances = () => {
 
     setLoading(true);
     try {
-      const staff = allStaff.find(s => s.id === formData.staff);
+      allStaff.find(s => s.id === formData.staff);
       await payrollService.createAdvance({
         staffId: formData.staff,
         amount: parseFloat(formData.advanceAmount),

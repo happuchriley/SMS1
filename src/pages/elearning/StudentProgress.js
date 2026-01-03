@@ -3,7 +3,7 @@ import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 
 const StudentProgress = () => {
-  const [students, setStudents] = useState([
+  const [students] = useState([
     { id: 1, name: 'John Doe', studentId: 'STU001', course: 'Mathematics Fundamentals', assignments: 8, completed: 7, quizzes: 5, avgScore: 85, progress: 87 },
     { id: 2, name: 'Jane Smith', studentId: 'STU002', course: 'English Language', assignments: 8, completed: 8, quizzes: 5, avgScore: 92, progress: 100 },
     { id: 3, name: 'Peter Brown', studentId: 'STU003', course: 'Integrated Science', assignments: 10, completed: 6, quizzes: 6, avgScore: 78, progress: 60 },

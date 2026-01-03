@@ -3,7 +3,7 @@ import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 
 const Quizzes = () => {
-  const [quizzes, setQuizzes] = useState([
+  const [quizzes] = useState([
     { id: 1, title: 'Mathematics Quiz - Chapter 5', course: 'Mathematics Fundamentals', date: '2024-02-10', duration: 30, questions: 20, attempts: 25, status: 'completed' },
     { id: 2, title: 'English Grammar Quiz', course: 'English Language', date: '2024-02-15', duration: 20, questions: 15, attempts: 28, status: 'active' },
     { id: 3, title: 'Science Knowledge Test', course: 'Integrated Science', date: '2024-02-18', duration: 45, questions: 30, attempts: 0, status: 'scheduled' },

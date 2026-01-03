@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 import setupService from '../../services/setupService';
@@ -7,7 +7,7 @@ import { useModal } from '../../components/ModalProvider';
 const ManageClasses = () => {
   const { toast, showDeleteModal } = useModal();
   const [classes, setClasses] = useState([]);
-  const [loading, setLoading] = useState(true); // Used in loadClasses
+  const [, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     className: '',

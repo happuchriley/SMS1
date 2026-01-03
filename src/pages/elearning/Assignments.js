@@ -3,7 +3,7 @@ import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 
 const Assignments = () => {
-  const [assignments, setAssignments] = useState([
+  const [assignments] = useState([
     { id: 1, title: 'Mathematics Homework - Chapter 5', course: 'Mathematics Fundamentals', dueDate: '2024-02-15', status: 'active', submissions: 18, total: 25 },
     { id: 2, title: 'English Essay Writing', course: 'English Language', dueDate: '2024-02-20', status: 'active', submissions: 22, total: 28 },
     { id: 3, title: 'Science Project', course: 'Integrated Science', dueDate: '2024-02-18', status: 'active', submissions: 15, total: 32 },

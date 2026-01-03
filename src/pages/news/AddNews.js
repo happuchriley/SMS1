@@ -7,7 +7,7 @@ import { useModal } from '../../components/ModalProvider';
 const AddNews = () => {
   const navigate = useNavigate();
   const { toast } = useModal();
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     category: '',

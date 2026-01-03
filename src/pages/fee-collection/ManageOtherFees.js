@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 import billingService from '../../services/billingService';
@@ -7,7 +7,7 @@ import { useModal } from '../../components/ModalProvider';
 const ManageOtherFees = () => {
   const { toast, showDeleteModal } = useModal();
   const [fees, setFees] = useState([]);
-  const [loading, setLoading] = useState(true); // Used in loadFees
+  const [, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     name: '',

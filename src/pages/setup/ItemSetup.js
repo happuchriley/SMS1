@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 import setupService from '../../services/setupService';
@@ -7,7 +7,7 @@ import { useModal } from '../../components/ModalProvider';
 const ItemSetup = () => {
   const { toast, showDeleteModal } = useModal();
   const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true); // Used in loadItems
+  const [, setLoading] = useState(true);
 
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);

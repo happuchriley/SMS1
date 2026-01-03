@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import Layout from '../../components/Layout';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const GenerateLedger = () => {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     account: '',
     dateFrom: '',

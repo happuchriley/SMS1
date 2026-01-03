@@ -20,7 +20,6 @@ const EventReminder = () => {
 
   // Sample data
   const classes = ['Basic 1', 'Basic 2', 'Basic 3', 'Basic 4', 'Basic 5', 'Basic 6', 'JHS 1', 'JHS 2', 'JHS 3'];
-  const recipientTypes = ['All Students', 'Specific Class', 'Staff Only', 'All (Students & Staff)'];
 
   // Default message template
   const defaultMessage = `Dear Parent/Guardian,
