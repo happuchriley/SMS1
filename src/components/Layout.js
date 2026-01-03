@@ -79,9 +79,7 @@ const Layout = ({ children }) => {
       >
         <Header toggleSidebar={toggleSidebar} />
         <div
-          className={`flex-1 w-full overflow-x-hidden box-border ${
-            isMobile ? "p-4" : "p-8"
-          }`}
+          className={`flex-1 w-full overflow-x-hidden box-border p-4 sm:p-5 md:p-6 lg:p-8 max-w-full`}
         >
           {children}
         </div>

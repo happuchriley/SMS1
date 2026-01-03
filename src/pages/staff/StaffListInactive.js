@@ -1,32 +1,100 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
+import staffService from '../../services/staffService';
+import { useModal } from '../../components/ModalProvider';
 
 const StaffListInactive = () => {
+  const [staff, setStaff] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const { toast } = useModal();
+
+  const loadStaff = useCallback(async () => {
+    try {
+      setLoading(true);
+      const inactiveStaff = await staffService.getInactive();
+      setStaff(inactiveStaff);
+    } catch (error) {
+      console.error('Error loading inactive staff:', error);
+      toast.showError('Failed to load inactive staff');
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    loadStaff();
+  }, [loadStaff]);
+
+  const getStaffName = (s) => `${s.firstName || ''} ${s.surname || ''} ${s.otherNames || ''}`.trim() || 'N/A';
+
+  const filtered = useMemo(() => {
+    if (!searchTerm) return staff;
+    const term = searchTerm.toLowerCase();
+    return staff.filter(s => getStaffName(s).toLowerCase().includes(term) || (s.staffId || s.id || '').toLowerCase().includes(term));
+  }, [staff, searchTerm]);
+
   return (
     <Layout>
-      <div className="page-header">
-        <h1>Staff List (Inactive)</h1>
-        <div className="breadcrumb">
-          <Link to="/">Home</Link>
+      <div className="mb-5">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Inactive Staff</h1>
+        <div className="flex items-center gap-2 text-gray-600 text-sm">
+          <Link to="/" className="hover:text-primary">Home</Link>
           <span>/</span>
-          <span>Staff List (Inactive)</span>
+          <span>Staff</span>
+          <span>/</span>
+          <span>Inactive Staff</span>
         </div>
       </div>
-      <div className="card">
-        <div className="card-header"><h3>Inactive Staff</h3></div>
-        <div className="table-container">
-          <table>
-            <thead><tr><th>Staff ID</th><th>Name</th><th>Department</th><th>Status</th><th>Action</th></tr></thead>
-            <tbody>
-              <tr><td>STF003</td><td>Inactive Staff</td><td>English</td><td><span className="badge badge-danger">Inactive</span></td><td><button className="btn btn-sm btn-outline">View</button></td></tr>
-            </tbody>
-          </table>
-        </div>
+      <div className="bg-white rounded-lg p-6 shadow-md mb-4">
+        <input
+          type="text"
+          placeholder="Search staff..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full px-4 py-2 border-2 border-gray-200 rounded-md mb-4"
+        />
+        <div className="text-sm text-gray-600">Total Inactive: {filtered.length}</div>
+      </div>
+      <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+        {loading ? (
+          <div className="p-8 text-center text-gray-500">
+            <i className="fas fa-spinner fa-spin text-4xl mb-3"></i>
+            <div>Loading...</div>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="p-8 text-center text-gray-500">
+            <i className="fas fa-inbox text-4xl mb-3"></i>
+            <div>No inactive staff found</div>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-primary-500">
+                <tr>
+                  <th className="p-3 text-left text-white text-xs uppercase">Staff ID</th>
+                  <th className="p-3 text-left text-white text-xs uppercase">Name</th>
+                  <th className="p-3 text-left text-white text-xs uppercase">Position</th>
+                  <th className="p-3 text-left text-white text-xs uppercase">Department</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((s) => (
+                  <tr key={s.id} className="border-b border-gray-200 hover:bg-gray-50">
+                    <td className="p-3 text-sm">{s.staffId || s.id}</td>
+                    <td className="p-3 text-sm">{getStaffName(s)}</td>
+                    <td className="p-3 text-sm">{s.position || 'N/A'}</td>
+                    <td className="p-3 text-sm">{s.department || 'N/A'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </Layout>
   );
 };
 
 export default StaffListInactive;
-

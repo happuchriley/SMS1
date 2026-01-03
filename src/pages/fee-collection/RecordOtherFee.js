@@ -1,0 +1,319 @@
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import Layout from '../../components/Layout';
+import { Link } from 'react-router-dom';
+import billingService from '../../services/billingService';
+import studentsService from '../../services/studentsService';
+import { useModal } from '../../components/ModalProvider';
+
+const RecordOtherFee = () => {
+  const { toast } = useModal();
+  const [, setLoading] = useState(false);
+  const [allStudents, setAllStudents] = useState([]);
+  const [otherFeeTypes, setOtherFeeTypes] = useState([]);
+  const [formData, setFormData] = useState({
+    academicYear: '',
+    term: '',
+    class: '',
+    student: '',
+    feeType: '',
+    paymentDate: '',
+    paymentMethod: '',
+    referenceNumber: '',
+    amount: ''
+  });
+
+  // Sample data
+  const academicYears = ['2023/2024', '2024/2025', '2025/2026'];
+  const terms = ['1st Term', '2nd Term', '3rd Term'];
+  const classes = ['Basic 1', 'Basic 2', 'Basic 3'];
+  const paymentMethods = ['Cash', 'Cheque', 'Bank Transfer', 'Mobile Money', 'Card'];
+
+  const loadData = useCallback(async () => {
+    try {
+      const [students, fees] = await Promise.all([
+        studentsService.getAll(),
+        billingService.getAllOtherFees()
+      ]);
+      setAllStudents(students);
+      setOtherFeeTypes(fees.map(f => ({ id: f.id, name: f.name, amount: parseFloat(f.amount) || 0 })));
+    } catch (error) {
+      console.error('Error loading data:', error);
+      toast.showError('Failed to load data');
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Filter students by selected class
+  const filteredStudents = useMemo(() => {
+    if (!formData.class) return [];
+    return allStudents
+      .filter(s => s.class === formData.class)
+      .map(s => ({
+        id: s.id,
+        name: `${s.firstName || ''} ${s.surname || ''} ${s.otherNames || ''}`.trim(),
+        class: s.class,
+        studentId: s.studentId || s.id
+      }));
+  }, [formData.class, allStudents]);
+
+  // Auto-fill amount when fee type is selected
+  useEffect(() => {
+    if (formData.feeType) {
+      const fee = otherFeeTypes.find(f => f.id.toString() === formData.feeType);
+      if (fee) {
+        setFormData(prev => ({ ...prev, amount: fee.amount.toString() }));
+      }
+    }
+  }, [formData.feeType, otherFeeTypes]);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.academicYear || !formData.term || !formData.class || !formData.student ||
+        !formData.feeType || !formData.paymentDate || !formData.paymentMethod || !formData.amount) {
+      toast.showError('Please fill in all required fields.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const fee = otherFeeTypes.find(f => f.id.toString() === formData.feeType);
+      await billingService.recordPayment({
+        studentId: formData.student,
+        amount: parseFloat(formData.amount),
+        paymentDate: formData.paymentDate,
+        paymentMethod: formData.paymentMethod,
+        referenceNumber: formData.referenceNumber,
+        academicYear: formData.academicYear,
+        term: formData.term,
+        feeType: formData.feeType,
+        feeName: fee?.name
+      });
+
+      toast.showSuccess(`Other fee payment of GHS ${parseFloat(formData.amount).toFixed(2)} recorded successfully!`);
+      handleClear();
+    } catch (error) {
+      console.error('Error recording other fee:', error);
+      toast.showError(error.message || 'Failed to record other fee payment');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClear = () => {
+    setFormData({ academicYear: '', term: '', class: '', student: '', feeType: '', paymentDate: '', paymentMethod: '', referenceNumber: '', amount: '' });
+  };
+
+  return (
+    <Layout>
+      <div className="mb-5 sm:mb-6 md:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3">
+          <div>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Record Other Fee</h1>
+            <div className="flex items-center gap-2 text-gray-600 text-xs sm:text-sm">
+              <Link to="/" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">Home</Link>
+              <span>/</span>
+              <Link to="/fee-collection" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">Fee Collection</Link>
+              <span>/</span>
+              <span className="text-gray-900 font-medium">Record Other Fee</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg p-4 sm:p-5 md:p-6 shadow-md border border-gray-200">
+        <div className="mb-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Other Fee Payment Information</h2>
+          <p className="text-sm text-gray-600">Record payment for other fees (library fines, late registration, etc.).</p>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-6">
+            <div>
+              <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                Academic Year <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="academicYear"
+                value={formData.academicYear}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+              >
+                <option value="">Select Academic Year</option>
+                {academicYears.map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                Term <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="term"
+                value={formData.term}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+              >
+                <option value="">Select Term</option>
+                {terms.map(term => (
+                  <option key={term} value={term}>{term}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                Class <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="class"
+                value={formData.class}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+              >
+                <option value="">Select Class</option>
+                {classes.map(cls => (
+                  <option key={cls} value={cls}>{cls}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="sm:col-span-2 lg:col-span-3">
+              <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                Student <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="student"
+                value={formData.student}
+                onChange={handleChange}
+                required
+                disabled={!formData.class}
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] disabled:bg-gray-100 disabled:cursor-not-allowed"
+              >
+                <option value="">{formData.class ? 'Select Student' : 'Select Class First'}</option>
+                {filteredStudents.map(student => (
+                  <option key={student.id} value={student.id}>{student.id} - {student.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="sm:col-span-2 lg:col-span-3">
+              <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                Fee Type <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="feeType"
+                value={formData.feeType}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+              >
+                <option value="">Select Fee Type</option>
+                {otherFeeTypes.map(fee => (
+                  <option key={fee.id} value={fee.id}>{fee.name} - GHS {fee.amount}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                Payment Date <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                name="paymentDate"
+                value={formData.paymentDate}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                Payment Method <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="paymentMethod"
+                value={formData.paymentMethod}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+              >
+                <option value="">Select Payment Method</option>
+                {paymentMethods.map(method => (
+                  <option key={method} value={method}>{method}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                Amount (GHS) <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                name="amount"
+                value={formData.amount}
+                onChange={handleChange}
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                required
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+              />
+            </div>
+
+            <div className="sm:col-span-2 lg:col-span-3">
+              <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                Reference Number
+              </label>
+              <input
+                type="text"
+                name="referenceNumber"
+                value={formData.referenceNumber}
+                onChange={handleChange}
+                placeholder="Enter reference number"
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+              />
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={handleClear}
+              className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-all duration-300"
+            >
+              Clear
+            </button>
+            <button
+              type="submit"
+              className="px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-all duration-300 shadow-md hover:shadow-lg"
+            >
+              <i className="fas fa-save mr-2"></i>
+              Record Payment
+            </button>
+          </div>
+        </form>
+      </div>
+    </Layout>
+  );
+};
+
+export default RecordOtherFee;

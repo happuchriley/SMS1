@@ -3,12 +3,16 @@ import Layout from '../../components/Layout';
 import { Link, useNavigate } from 'react-router-dom';
 import PhotoUploadArea from '../../components/PhotoUploadArea';
 import DateInput from '../../components/DateInput';
+import studentsService from '../../services/studentsService';
+import { useModal } from '../../components/ModalProvider';
 
 const AddStudent = () => {
   const [activeTab, setActiveTab] = useState('basic-info');
   const navigate = useNavigate();
   const [photoPreview, setPhotoPreview] = useState(null);
   const fileInputRef = useRef(null);
+  const { toast } = useModal();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     studentId: 'Excelz Int. School',
     existingId: '',
@@ -63,12 +67,52 @@ const AddStudent = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Form submitted:', formData);
-    alert('Student registered successfully!');
-    navigate('/students/all');
+    
+    // Validation
+    if (!formData.firstName || !formData.surname) {
+      toast.showError('First name and surname are required');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Convert photo to base64 if present
+      let photoData = null;
+      if (formData.photo) {
+        photoData = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(formData.photo);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+        });
+      }
+
+      // Prepare student data
+      const studentData = {
+        ...formData,
+        photo: photoData,
+        admissionDate: formData.admissionDate || new Date().toISOString().split('T')[0],
+        status: 'active'
+      };
+
+      await studentsService.create(studentData);
+      toast.showSuccess('Student registered successfully!');
+      
+      // Reset form
+      handleClear();
+      
+      // Navigate after a short delay
+      setTimeout(() => {
+        navigate('/students/all');
+      }, 1000);
+    } catch (error) {
+      console.error('Error creating student:', error);
+      toast.showError(error.message || 'Failed to register student. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClear = () => {
@@ -188,7 +232,7 @@ const AddStudent = () => {
             <h3 className="text-lg font-semibold text-gray-900">Basic Info</h3>
           </div>
           <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
                   Student ID <span className="text-red-500">*</span>
@@ -480,7 +524,15 @@ const AddStudent = () => {
               >
                 {isLastTab ? (
                   <>
-                    <i className="fas fa-check"></i> Submit
+                    {isSubmitting ? (
+                      <>
+                        <i className="fas fa-spinner fa-spin mr-2"></i> Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-check mr-2"></i> Submit
+                      </>
+                    )}
                   </>
                 ) : (
                   <>
@@ -500,7 +552,7 @@ const AddStudent = () => {
             <h3 className="text-lg font-semibold text-gray-900">Guardian Info</h3>
           </div>
           <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
                   Guardian Name <span className="text-red-500">*</span>
@@ -597,7 +649,15 @@ const AddStudent = () => {
               >
                 {isLastTab ? (
                   <>
-                    <i className="fas fa-check"></i> Submit
+                    {isSubmitting ? (
+                      <>
+                        <i className="fas fa-spinner fa-spin mr-2"></i> Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-check mr-2"></i> Submit
+                      </>
+                    )}
                   </>
                 ) : (
                   <>
@@ -617,7 +677,7 @@ const AddStudent = () => {
             <h3 className="text-lg font-semibold text-gray-900">Admin Info</h3>
           </div>
           <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
                   Class <span className="text-red-500">*</span>
@@ -664,9 +724,18 @@ const AddStudent = () => {
             <div className="flex flex-col sm:flex-row gap-3 justify-end mt-6 pt-6 border-t border-gray-200">
               <button 
                 type="submit"
-                className="px-5 py-2.5 bg-primary-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-md hover:-translate-y-0.5 hover:shadow-lg"
+                disabled={isSubmitting}
+                className="px-5 py-2.5 bg-primary-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-md hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <i className="fas fa-save"></i> Save
+                {isSubmitting ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin"></i> Saving...
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-save"></i> Save
+                  </>
+                )}
               </button>
             </div>
           </form>

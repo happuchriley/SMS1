@@ -3,12 +3,16 @@ import Layout from '../../components/Layout';
 import { Link, useNavigate } from 'react-router-dom';
 import PhotoUploadArea from '../../components/PhotoUploadArea';
 import DateInput from '../../components/DateInput';
+import staffService from '../../services/staffService';
+import { useModal } from '../../components/ModalProvider';
 
 const AddStaff = () => {
   const [activeTab, setActiveTab] = useState('basic-info');
   const navigate = useNavigate();
   const [photoPreview, setPhotoPreview] = useState(null);
   const fileInputRef = useRef(null);
+  const { toast } = useModal();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     staffId: 'Excelz Int. School/STF/0023',
     title: '',
@@ -62,12 +66,52 @@ const AddStaff = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Form submitted:', formData);
-    alert('Staff registered successfully!');
-    navigate('/staff/all');
+    
+    // Validation
+    if (!formData.firstName || !formData.surname) {
+      toast.showError('First name and surname are required');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Convert photo to base64 if present
+      let photoData = null;
+      if (formData.photo) {
+        photoData = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(formData.photo);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+        });
+      }
+
+      // Prepare staff data
+      const staffData = {
+        ...formData,
+        photo: photoData,
+        employmentDate: formData.employmentDate || new Date().toISOString().split('T')[0],
+        status: 'active'
+      };
+
+      await staffService.create(staffData);
+      toast.showSuccess('Staff registered successfully!');
+      
+      // Reset form
+      handleClear();
+      
+      // Navigate after a short delay
+      setTimeout(() => {
+        navigate('/staff/all');
+      }, 1000);
+    } catch (error) {
+      console.error('Error creating staff:', error);
+      toast.showError(error.message || 'Failed to register staff. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClear = () => {
@@ -186,7 +230,7 @@ const AddStaff = () => {
             <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
           </div>
           <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Staff ID</label>
                 <input 
@@ -477,7 +521,8 @@ const AddStaff = () => {
                 type={isLastTab ? "submit" : "button"}
                 onClick={isLastTab ? undefined : handleNext}
                 form={isLastTab ? undefined : undefined}
-                className="px-6 py-2.5 bg-primary-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:shadow-lg hover:-translate-y-0.5 w-full sm:w-auto"
+                disabled={isLastTab && isSubmitting}
+                className="px-6 py-2.5 bg-primary-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:shadow-lg hover:-translate-y-0.5 w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLastTab ? (
                   <>
@@ -501,7 +546,7 @@ const AddStaff = () => {
             <h3 className="text-lg font-semibold text-gray-900">Next of Kin Info</h3>
           </div>
           <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
                   Next of Kin Name <span className="text-red-500">*</span>
@@ -586,7 +631,8 @@ const AddStaff = () => {
                 type={isLastTab ? "submit" : "button"}
                 onClick={isLastTab ? undefined : handleNext}
                 form={isLastTab ? undefined : undefined}
-                className="px-6 py-2.5 bg-primary-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:shadow-lg hover:-translate-y-0.5 w-full sm:w-auto"
+                disabled={isLastTab && isSubmitting}
+                className="px-6 py-2.5 bg-primary-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:shadow-lg hover:-translate-y-0.5 w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLastTab ? (
                   <>
@@ -610,7 +656,7 @@ const AddStaff = () => {
             <h3 className="text-lg font-semibold text-gray-900">Admin Info</h3>
           </div>
           <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
                   Department <span className="text-red-500">*</span>
@@ -651,9 +697,10 @@ const AddStaff = () => {
             <div className="flex flex-col sm:flex-row gap-3 justify-end mt-6 pt-6 border-t border-gray-200">
               <button 
                 type="submit"
-                className="px-5 py-2.5 bg-primary-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-md hover:-translate-y-0.5 hover:shadow-lg"
+                disabled={isSubmitting}
+                className="px-5 py-2.5 bg-primary-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-md hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <i className="fas fa-save"></i> Save
+                <i className="fas fa-save"></i> {isSubmitting ? 'Saving...' : 'Save'}
               </button>
             </div>
           </form>

@@ -62,3 +62,8 @@ const PhotoPreviewCard = ({ preview, onRemove, onEdit, fileName }) => {
 
 export default PhotoPreviewCard;
 
+
+
+
+
+

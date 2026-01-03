@@ -4,14 +4,38 @@ import { Link } from 'react-router-dom';
 const Sidebar = ({ collapsed, open = false, toggleSidebar, currentPath, isMobile = false }) => {
   const [expandedMenus, setExpandedMenus] = useState({
     students: currentPath.startsWith('/students'),
-    staff: currentPath.startsWith('/staff')
+    staff: currentPath.startsWith('/staff'),
+    reports: currentPath.startsWith('/reports'),
+    billing: currentPath.startsWith('/billing'),
+    feeCollection: currentPath.startsWith('/fee-collection'),
+    payroll: currentPath.startsWith('/payroll'),
+    finance: currentPath.startsWith('/finance'),
+    financialReports: currentPath.startsWith('/financial-reports'),
+    reminders: currentPath.startsWith('/reminders'),
+    news: currentPath.startsWith('/news'),
+    tlms: currentPath.startsWith('/tlms'),
+    elearning: currentPath.startsWith('/elearning'),
+    setup: currentPath.startsWith('/setup'),
+    documents: currentPath.startsWith('/documents')
   });
   
   // Update expanded menus when path changes
   useEffect(() => {
     setExpandedMenus({
       students: currentPath.startsWith('/students'),
-      staff: currentPath.startsWith('/staff')
+      staff: currentPath.startsWith('/staff'),
+      reports: currentPath.startsWith('/reports'),
+      billing: currentPath.startsWith('/billing'),
+      feeCollection: currentPath.startsWith('/fee-collection'),
+      payroll: currentPath.startsWith('/payroll'),
+      finance: currentPath.startsWith('/finance'),
+      financialReports: currentPath.startsWith('/financial-reports'),
+      reminders: currentPath.startsWith('/reminders'),
+      news: currentPath.startsWith('/news'),
+      tlms: currentPath.startsWith('/tlms'),
+      elearning: currentPath.startsWith('/elearning'),
+      setup: currentPath.startsWith('/setup'),
+      documents: currentPath.startsWith('/documents')
     });
   }, [currentPath]);
   
@@ -34,7 +58,12 @@ const Sidebar = ({ collapsed, open = false, toggleSidebar, currentPath, isMobile
   const username = sessionStorage.getItem('username') || 'DTeye';
   const userRole = sessionStorage.getItem('userType') || 'admin';
 
-  const isActive = (path) => currentPath === path;
+  const isActive = (path) => {
+    if (path === currentPath) return true;
+    // Also check if currentPath starts with the path for nested routes
+    if (currentPath.startsWith(path) && path !== '/') return true;
+    return false;
+  };
 
   const sidebarClasses = `fixed left-0 top-0 w-[280px] h-screen h-[calc(var(--vh,1vh)*100)] bg-[#0f172a] text-white overflow-y-auto overflow-x-hidden z-[1000] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] border-r border-white/5 backdrop-blur-xl ${
     isMobile 
@@ -319,35 +348,1100 @@ const Sidebar = ({ collapsed, open = false, toggleSidebar, currentPath, isMobile
           )}
         </li>
 
-        {/* Other Menu Items */}
-        {[
-          { icon: 'fa-chart-pie', text: 'Reports & Assmnt.', path: '/' },
-          { icon: 'fa-file-invoice-dollar', text: 'Billing', path: '/billing' },
-          { icon: 'fa-wallet', text: 'Fee Collection', path: '/fee-collection' },
-          { icon: 'fa-coins', text: 'Payroll', path: '/' },
-          { icon: 'fa-calculator', text: 'Finance Entries', path: '/' },
-          { icon: 'fa-chart-line', text: 'Financial Reports', path: '/' },
-          { icon: 'fa-envelope-open-text', text: 'SMS/Email Reminder', path: '/' },
-          { icon: 'fa-bullhorn', text: 'News/Notices', path: '/' },
-          { icon: 'fa-book-open', text: 'TLMs', path: '/' },
-          { icon: 'fa-graduation-cap', text: 'E-Learning', path: '/' },
-          { icon: 'fa-sliders-h', text: 'School Setup', path: '/' },
-          { icon: 'fa-archive', text: 'My Documents', path: '/' },
-          { icon: 'fa-user-cog', text: 'My Account', path: '/' },
-        ].map((item, index) => (
-          <li key={index} className="my-1">
-            <Link 
-              to={item.path} 
-              className={`flex items-center px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline hover:bg-white/10 hover:text-white mx-2 ${
-                collapsed ? 'justify-center px-3 mx-2' : ''
-              } ${isActive(item.path) ? 'bg-white/10 text-white border-l-2 border-primary' : ''}`}
-              onClick={handleLinkClick}
-            >
-              <i className={`fas ${item.icon} mr-3 w-5 text-center text-sm`}></i>
-              {!collapsed && <span className="text-sm font-medium">{item.text}</span>}
-            </Link>
-          </li>
-        ))}
+        {/* Reports & Assessment */}
+        <li className="my-1">
+          <button
+            type="button"
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
+              expandedMenus.reports ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
+            onClick={() => toggleSubmenu('reports')}
+          >
+            <div className="flex items-center">
+              <i className="fas fa-chart-pie mr-3 w-5 text-center text-sm"></i>
+              {!collapsed && <span className="text-sm font-medium">Reports & Assmnt.</span>}
+            </div>
+            {!collapsed && (
+              <i className={`fas fa-chevron-right text-xs transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                expandedMenus.reports ? 'rotate-90' : ''
+              }`}></i>
+            )}
+          </button>
+          {!collapsed && (
+            <ul className={`list-none ${expandedMenus.reports ? 'block' : 'hidden'} py-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
+              <li>
+                <Link 
+                  to="/reports/populate-course-class" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/reports/populate-course-class') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Populate Course - Class
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/reports/populate-course-student" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/reports/populate-course-student') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Populate Course - Student
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/reports/enter-academic-result" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/reports/enter-academic-result') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Enter Academic Result
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/reports/student-promotion" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/reports/student-promotion') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Student Promotion
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/reports/end-term-remark" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/reports/end-term-remark') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  End of Term Remark
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/reports/footnote" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/reports/footnote') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Reports Footnote
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/reports/print-group-report" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/reports/print-group-report') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Print Group Report
+                </Link>
+              </li>
+            </ul>
+          )}
+        </li>
+
+        {/* Billing */}
+        <li className="my-1">
+          <button
+            type="button"
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
+              expandedMenus.billing ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
+            onClick={() => toggleSubmenu('billing')}
+          >
+            <div className="flex items-center">
+              <i className="fas fa-file-invoice-dollar mr-3 w-5 text-center text-sm"></i>
+              {!collapsed && <span className="text-sm font-medium">Billing</span>}
+            </div>
+            {!collapsed && (
+              <i className={`fas fa-chevron-right text-xs transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                expandedMenus.billing ? 'rotate-90' : ''
+              }`}></i>
+            )}
+          </button>
+          {!collapsed && (
+            <ul className={`list-none ${expandedMenus.billing ? 'block' : 'hidden'} py-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
+              <li>
+                <Link 
+                  to="/billing/create-single" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/billing/create-single') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Create Single Bill
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/billing/create-group" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/billing/create-group') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Create Group Bill
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/billing/scholarship-list" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/billing/scholarship-list') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Scholarship List
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/billing/debtors-report" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/billing/debtors-report') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Debtors Report
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/billing/creditors-report" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/billing/creditors-report') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Creditors Report
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/billing/print-group-bill" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/billing/print-group-bill') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Print Group Bill
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/billing/print-group-statement" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/billing/print-group-statement') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Print Group Statement
+                </Link>
+              </li>
+            </ul>
+          )}
+        </li>
+
+        {/* Fee Collection */}
+        <li className="my-1">
+          <button
+            type="button"
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
+              expandedMenus.feeCollection ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
+            onClick={() => toggleSubmenu('feeCollection')}
+          >
+            <div className="flex items-center">
+              <i className="fas fa-wallet mr-3 w-5 text-center text-sm"></i>
+              {!collapsed && <span className="text-sm font-medium">Fee Collection</span>}
+            </div>
+            {!collapsed && (
+              <i className={`fas fa-chevron-right text-xs transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                expandedMenus.feeCollection ? 'rotate-90' : ''
+              }`}></i>
+            )}
+          </button>
+          {!collapsed && (
+            <ul className={`list-none ${expandedMenus.feeCollection ? 'block' : 'hidden'} py-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
+              <li>
+                <Link 
+                  to="/fee-collection/record-single" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/fee-collection/record-single') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Record Single Payment
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/fee-collection/record-all" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/fee-collection/record-all') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Record All Payments
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/fee-collection/manage-other-fees" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/fee-collection/manage-other-fees') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Manage Other Fees
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/fee-collection/record-other-fee" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/fee-collection/record-other-fee') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Record Other Fee
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/fee-collection/receive-other-fee" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/fee-collection/receive-other-fee') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Receive Other Fee
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/fee-collection/debtors-report" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/fee-collection/debtors-report') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Debtors Report
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/fee-collection/creditors-report" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/fee-collection/creditors-report') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Creditors Report
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/fee-collection/print-group-bill" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/fee-collection/print-group-bill') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Print Group Bill
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/fee-collection/print-group-statement" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/fee-collection/print-group-statement') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Print Group Statement
+                </Link>
+              </li>
+            </ul>
+          )}
+        </li>
+
+        {/* Payroll */}
+        <li className="my-1">
+          <button
+            type="button"
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
+              expandedMenus.payroll ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
+            onClick={() => toggleSubmenu('payroll')}
+          >
+            <div className="flex items-center">
+              <i className="fas fa-coins mr-3 w-5 text-center text-sm"></i>
+              {!collapsed && <span className="text-sm font-medium">Payroll</span>}
+            </div>
+            {!collapsed && (
+              <i className={`fas fa-chevron-right text-xs transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                expandedMenus.payroll ? 'rotate-90' : ''
+              }`}></i>
+            )}
+          </button>
+          {!collapsed && (
+            <ul className={`list-none ${expandedMenus.payroll ? 'block' : 'hidden'} py-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
+              <li>
+                <Link 
+                  to="/payroll/overview" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/payroll/overview') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Payroll Overview
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/payroll/generate-payslip" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/payroll/generate-payslip') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Generate Payslip
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/payroll/schedule" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/payroll/schedule') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Payroll Schedule
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/payroll/bank-schedule" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/payroll/bank-schedule') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Bank Schedule
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/payroll/tax-reports" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/payroll/tax-reports') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Tax Reports
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/payroll/advances" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/payroll/advances') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Salary Advances
+                </Link>
+              </li>
+            </ul>
+          )}
+        </li>
+
+        {/* Finance Entries */}
+        <li className="my-1">
+          <button
+            type="button"
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
+              expandedMenus.finance ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
+            onClick={() => toggleSubmenu('finance')}
+          >
+            <div className="flex items-center">
+              <i className="fas fa-calculator mr-3 w-5 text-center text-sm"></i>
+              {!collapsed && <span className="text-sm font-medium">Finance Entries</span>}
+            </div>
+            {!collapsed && (
+              <i className={`fas fa-chevron-right text-xs transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                expandedMenus.finance ? 'rotate-90' : ''
+              }`}></i>
+            )}
+          </button>
+          {!collapsed && (
+            <ul className={`list-none ${expandedMenus.finance ? 'block' : 'hidden'} py-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
+              <li>
+                <Link 
+                  to="/finance/debtor-entry" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/finance/debtor-entry') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Debtor Entry
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/finance/creditor-entry" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/finance/creditor-entry') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Creditor Entry
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/finance/income-entry" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/finance/income-entry') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Income Entry
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/finance/expense-entry" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/finance/expense-entry') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Expense Entry
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/finance/general-journal" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/finance/general-journal') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  General Journal
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/finance/general-ledger" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/finance/general-ledger') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  General Ledger
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/finance/fixed-asset" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/finance/fixed-asset') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Fixed Asset
+                </Link>
+              </li>
+            </ul>
+          )}
+        </li>
+
+        {/* Financial Reports */}
+        <li className="my-1">
+          <button
+            type="button"
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
+              expandedMenus.financialReports ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
+            onClick={() => toggleSubmenu('financialReports')}
+          >
+            <div className="flex items-center">
+              <i className="fas fa-chart-line mr-3 w-5 text-center text-sm"></i>
+              {!collapsed && <span className="text-sm font-medium">Financial Reports</span>}
+            </div>
+            {!collapsed && (
+              <i className={`fas fa-chevron-right text-xs transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                expandedMenus.financialReports ? 'rotate-90' : ''
+              }`}></i>
+            )}
+          </button>
+          {!collapsed && (
+            <ul className={`list-none ${expandedMenus.financialReports ? 'block' : 'hidden'} py-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
+              <li>
+                <Link 
+                  to="/financial-reports/fee-collection" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/financial-reports/fee-collection') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Fee Collection Report
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/financial-reports/other-fee-all" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/financial-reports/other-fee-all') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Other Fee - All
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/financial-reports/other-fee-range" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/financial-reports/other-fee-range') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Other Fee - Range
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/financial-reports/expenditure" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/financial-reports/expenditure') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Expenditure Report
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/financial-reports/debtors" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/financial-reports/debtors') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Debtors Report
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/financial-reports/creditors" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/financial-reports/creditors') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Creditors Report
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/financial-reports/generate-ledger" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/financial-reports/generate-ledger') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Generate Ledger
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/financial-reports/trial-balance" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/financial-reports/trial-balance') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Trial Balance
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/financial-reports/income-statement" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/financial-reports/income-statement') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Income Statement
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/financial-reports/chart-of-accounts" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/financial-reports/chart-of-accounts') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Chart of Accounts
+                </Link>
+              </li>
+            </ul>
+          )}
+        </li>
+
+        {/* SMS/Email Reminders */}
+        <li className="my-1">
+          <button
+            type="button"
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
+              expandedMenus.reminders ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
+            onClick={() => toggleSubmenu('reminders')}
+          >
+            <div className="flex items-center">
+              <i className="fas fa-envelope-open-text mr-3 w-5 text-center text-sm"></i>
+              {!collapsed && <span className="text-sm font-medium">SMS/Email Reminder</span>}
+            </div>
+            {!collapsed && (
+              <i className={`fas fa-chevron-right text-xs transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                expandedMenus.reminders ? 'rotate-90' : ''
+              }`}></i>
+            )}
+          </button>
+          {!collapsed && (
+            <ul className={`list-none ${expandedMenus.reminders ? 'block' : 'hidden'} py-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
+              <li>
+                <Link 
+                  to="/reminders/bill-reminder" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/reminders/bill-reminder') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Bill Reminder
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/reminders/payment-notification" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/reminders/payment-notification') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Payment Notification
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/reminders/application-details" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/reminders/application-details') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Application Details
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/reminders/event-reminder" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/reminders/event-reminder') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Event Reminder
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/reminders/staff-reminder" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/reminders/staff-reminder') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Staff Reminder
+                </Link>
+              </li>
+            </ul>
+          )}
+        </li>
+
+        {/* News/Notices */}
+        <li className="my-1">
+          <button
+            type="button"
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
+              expandedMenus.news ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
+            onClick={() => toggleSubmenu('news')}
+          >
+            <div className="flex items-center">
+              <i className="fas fa-bullhorn mr-3 w-5 text-center text-sm"></i>
+              {!collapsed && <span className="text-sm font-medium">News/Notices</span>}
+            </div>
+            {!collapsed && (
+              <i className={`fas fa-chevron-right text-xs transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                expandedMenus.news ? 'rotate-90' : ''
+              }`}></i>
+            )}
+          </button>
+          {!collapsed && (
+            <ul className={`list-none ${expandedMenus.news ? 'block' : 'hidden'} py-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
+              <li>
+                <Link 
+                  to="/news/add" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/news/add') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Add News
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/news/page" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/news/page') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  News Page
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/news/academic-calendar" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/news/academic-calendar') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Academic Calendar
+                </Link>
+              </li>
+            </ul>
+          )}
+        </li>
+
+        {/* TLMs */}
+        <li className="my-1">
+          <button
+            type="button"
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
+              expandedMenus.tlms ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
+            onClick={() => toggleSubmenu('tlms')}
+          >
+            <div className="flex items-center">
+              <i className="fas fa-book-open mr-3 w-5 text-center text-sm"></i>
+              {!collapsed && <span className="text-sm font-medium">TLMs</span>}
+            </div>
+            {!collapsed && (
+              <i className={`fas fa-chevron-right text-xs transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                expandedMenus.tlms ? 'rotate-90' : ''
+              }`}></i>
+            )}
+          </button>
+          {!collapsed && (
+            <ul className={`list-none ${expandedMenus.tlms ? 'block' : 'hidden'} py-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
+              <li>
+                <Link 
+                  to="/tlms/library" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/tlms/library') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  TLMs Library
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/tlms/upload" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/tlms/upload') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Upload TLMs
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/tlms/categories" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/tlms/categories') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  TLMs Categories
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/tlms/my-materials" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/tlms/my-materials') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  My TLMs
+                </Link>
+              </li>
+            </ul>
+          )}
+        </li>
+
+        {/* E-Learning */}
+        <li className="my-1">
+          <button
+            type="button"
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
+              expandedMenus.elearning ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
+            onClick={() => toggleSubmenu('elearning')}
+          >
+            <div className="flex items-center">
+              <i className="fas fa-graduation-cap mr-3 w-5 text-center text-sm"></i>
+              {!collapsed && <span className="text-sm font-medium">E-Learning</span>}
+            </div>
+            {!collapsed && (
+              <i className={`fas fa-chevron-right text-xs transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                expandedMenus.elearning ? 'rotate-90' : ''
+              }`}></i>
+            )}
+          </button>
+          {!collapsed && (
+            <ul className={`list-none ${expandedMenus.elearning ? 'block' : 'hidden'} py-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
+              <li>
+                <Link 
+                  to="/elearning/courses" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/elearning/courses') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Courses
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/elearning/assignments" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/elearning/assignments') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Assignments
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/elearning/quizzes" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/elearning/quizzes') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Quizzes
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/elearning/progress" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/elearning/progress') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Students Progress
+                </Link>
+              </li>
+            </ul>
+          )}
+        </li>
+
+        {/* School Setup */}
+        <li className="my-1">
+          <button
+            type="button"
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
+              expandedMenus.setup ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
+            onClick={() => toggleSubmenu('setup')}
+          >
+            <div className="flex items-center">
+              <i className="fas fa-sliders-h mr-3 w-5 text-center text-sm"></i>
+              {!collapsed && <span className="text-sm font-medium">School Setup</span>}
+            </div>
+            {!collapsed && (
+              <i className={`fas fa-chevron-right text-xs transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                expandedMenus.setup ? 'rotate-90' : ''
+              }`}></i>
+            )}
+          </button>
+          {!collapsed && (
+            <ul className={`list-none ${expandedMenus.setup ? 'block' : 'hidden'} py-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
+              <li>
+                <Link 
+                  to="/setup/school-details" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/setup/school-details') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  School Details
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/setup/item-setup" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/setup/item-setup') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Item Setup
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/setup/class-list" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/setup/class-list') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Class List
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/setup/subject-course" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/setup/subject-course') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Subject/Course
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/setup/bill-item" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/setup/bill-item') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Bill Item
+                </Link>
+              </li>
+            </ul>
+          )}
+        </li>
+
+        {/* My Documents */}
+        <li className="my-1">
+          <button
+            type="button"
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
+              expandedMenus.documents ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
+            onClick={() => toggleSubmenu('documents')}
+          >
+            <div className="flex items-center">
+              <i className="fas fa-archive mr-3 w-5 text-center text-sm"></i>
+              {!collapsed && <span className="text-sm font-medium">My Documents</span>}
+            </div>
+            {!collapsed && (
+              <i className={`fas fa-chevron-right text-xs transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                expandedMenus.documents ? 'rotate-90' : ''
+              }`}></i>
+            )}
+          </button>
+          {!collapsed && (
+            <ul className={`list-none ${expandedMenus.documents ? 'block' : 'hidden'} py-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
+              <li>
+                <Link 
+                  to="/documents/my-uploads" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/documents/my-uploads') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  My Uploads
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/documents/shared" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/documents/shared') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Shared Documents
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/documents/categories" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/documents/categories') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Document Categories
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/documents/recent" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/documents/recent') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Recent Documents
+                </Link>
+              </li>
+            </ul>
+          )}
+        </li>
+
+        {/* My Account */}
+        <li className="my-1">
+          <Link 
+            to="/profile" 
+            className={`flex items-center px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline hover:bg-white/10 hover:text-white mx-2 ${
+              collapsed ? 'justify-center px-3 mx-2' : ''
+            } ${isActive('/profile') ? 'bg-white/10 text-white border-l-2 border-primary' : ''}`}
+            onClick={handleLinkClick}
+          >
+            <i className="fas fa-user-cog mr-3 w-5 text-center text-sm"></i>
+            {!collapsed && <span className="text-sm font-medium">My Account</span>}
+          </Link>
+        </li>
 
         {/* Logout */}
         <li className="my-1 mt-3 border-t border-white/5 pt-3">

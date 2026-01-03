@@ -72,9 +72,9 @@ const Login = () => {
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="w-full md:flex-[0_0_40%] lg:flex-[0_0_45%] bg-white flex flex-col p-4 sm:p-6 md:p-8 lg:p-12 justify-center md:shadow-[-4px_0_20px_rgba(0,0,0,0.1)]">
-        <div className="flex justify-between items-center mb-6 md:mb-8">
-          <h2 className="text-primary-600 text-xl md:text-2xl font-semibold">Administrator</h2>
+      <div className="w-full md:flex-[0_0_40%] lg:flex-[0_0_45%] xl:flex-[0_0_42%] bg-white flex flex-col p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 justify-center md:shadow-[-4px_0_20px_rgba(0,0,0,0.1)]">
+        <div className="flex justify-between items-center mb-5 sm:mb-6 md:mb-8 flex-wrap gap-3">
+          <h2 className="text-primary-600 text-lg sm:text-xl md:text-2xl font-semibold">Administrator</h2>
           <div className="flex gap-2.5">
             <a 
               href="#facebook" 
@@ -97,7 +97,7 @@ const Login = () => {
 
         <div className="text-center mb-6 md:mb-8">
           {/* School Crest Logo */}
-          <div className="w-36 h-36 md:w-44 md:h-44 lg:w-52 lg:h-52 mx-auto mb-4 flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl rounded-lg overflow-hidden bg-white p-2 md:p-3">
+          <div className="w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 lg:w-52 lg:h-52 mx-auto mb-4 sm:mb-5 md:mb-6 flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl rounded-lg overflow-hidden bg-white p-2 sm:p-2.5 md:p-3">
             <img 
               src="/images/crest.png" 
               alt="International College Academy Crest" 
