@@ -74,7 +74,6 @@ const FeeCollectionPrintGroupBill = () => {
     }
 
     window.print();
-    console.log('Printing bills:', billsToPrint);
   };
 
   const handlePreview = () => {

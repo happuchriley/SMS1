@@ -79,7 +79,6 @@ const PrintGroupStatement = () => {
     }
 
     window.print();
-    console.log('Printing statements for:', studentsToPrint);
   };
 
   const handlePreview = () => {
@@ -93,7 +92,6 @@ const PrintGroupStatement = () => {
     }
 
     alert(`Preview would show statements for ${studentsToPreview.length} student(s).`);
-    console.log('Preview statements for:', studentsToPreview);
   };
 
   const handleExport = () => {
@@ -107,7 +105,6 @@ const PrintGroupStatement = () => {
     }
 
     alert(`Exporting statements for ${studentsToExport.length} student(s) to PDF.`);
-    console.log('Export statements for:', studentsToExport);
   };
 
   return (

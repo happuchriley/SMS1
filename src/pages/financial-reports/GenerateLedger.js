@@ -37,7 +37,6 @@ const GenerateLedger = () => {
       return;
     }
 
-    console.log('Generating ledger for:', formData);
     alert(`Ledger report generated for ${formData.account} from ${formData.dateFrom} to ${formData.dateTo}`);
     // In real app, this would navigate to the ledger view or download PDF
   };

@@ -77,7 +77,6 @@ const FeeCollectionPrintGroupStatement = () => {
     }
 
     window.print();
-    console.log('Printing statements for:', studentsToPrint);
   };
 
   const handlePreview = () => {

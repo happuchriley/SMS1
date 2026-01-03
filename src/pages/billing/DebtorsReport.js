@@ -65,7 +65,6 @@ const DebtorsReport = () => {
 
   const handleExport = () => {
     alert('Exporting debtors report to Excel...');
-    console.log('Export:', filteredDebtors);
   };
 
   const handlePrint = () => {

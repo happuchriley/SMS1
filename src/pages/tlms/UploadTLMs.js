@@ -35,7 +35,6 @@ const UploadTLMs = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('TLM uploaded:', formData);
     alert('TLM uploaded successfully!');
     navigate('/tlms/library');
   };

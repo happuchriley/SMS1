@@ -65,7 +65,6 @@ const CreditorsReport = () => {
 
   const handleExport = () => {
     alert('Exporting creditors report to Excel...');
-    console.log('Export:', filteredCreditors);
   };
 
   const handlePrint = () => {

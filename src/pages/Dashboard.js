@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import studentsService from '../services/studentsService';
 import staffService from '../services/staffService';
 import billingService from '../services/billingService';
-import payrollService from '../services/payrollService';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -19,6 +18,7 @@ const Dashboard = () => {
     totalFees: 0,
     paidFees: 0,
     feeBalance: 0,
+    collectionRate: 0,
     studentsPerClass: []
   });
 
@@ -46,6 +46,7 @@ const Dashboard = () => {
       const totalFees = bills.reduce((sum, b) => sum + (parseFloat(b.total) || 0), 0);
       const paidFees = payments.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
       const feeBalance = totalFees - paidFees;
+      const collectionRate = totalFees > 0 ? (paidFees / totalFees) * 100 : 0;
 
       // Calculate students per class
       const classMap = new Map();
@@ -71,6 +72,7 @@ const Dashboard = () => {
         totalFees,
         paidFees,
         feeBalance,
+        collectionRate,
         studentsPerClass
       });
     } catch (error) {
@@ -217,10 +219,8 @@ const Dashboard = () => {
                 <div className="text-2xl md:text-3xl font-bold text-gray-900">GH¢ {stats.feeBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
               </div>
               <div>
-                <div className="text-xs text-red-500 mb-1 font-medium">COLLECTION RATE</div>
-                <div className="text-2xl md:text-3xl font-bold text-gray-900">
-                  {stats.totalFees > 0 ? ((stats.paidFees / stats.totalFees) * 100).toFixed(1) : 0}%
-                </div>
+                <div className="text-xs text-red-600 mb-1 font-medium">COLLECTION RATE</div>
+                <div className="text-3xl md:text-4xl font-bold text-gray-900">{stats.collectionRate.toFixed(2)}%</div>
               </div>
             </div>
           </Link>

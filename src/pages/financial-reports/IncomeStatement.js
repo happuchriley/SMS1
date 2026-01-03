@@ -38,7 +38,6 @@ const IncomeStatement = () => {
       alert('Please select date range.');
       return;
     }
-    console.log('Generating income statement from', dateFrom, 'to', dateTo);
     alert('Income statement generated successfully!');
   };
 
