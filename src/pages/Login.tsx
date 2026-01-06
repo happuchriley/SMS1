@@ -157,9 +157,9 @@ const Login: React.FC = () => {
               Select User Type
             </label>
             <div className="relative">
-              <i className="fas fa-user absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-primary-600 z-10 transition-all duration-300 text-lg sm:text-xl"></i>
+              <i className="fas fa-user absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-primary-600 z-10 transition-all duration-300 text-base sm:text-lg"></i>
               <select
-                className="login-select-dropdown w-full pl-12 sm:pl-14 pr-14 sm:pr-16 md:pr-14 py-4 sm:py-4.5 md:py-3 border-2 border-primary-200 rounded-xl text-lg sm:text-xl md:text-sm transition-all duration-300 bg-white hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-600 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.15)] min-h-[52px] sm:min-h-[56px] md:min-h-[48px] appearance-none cursor-pointer font-medium text-slate-900 active:bg-primary-50"
+                className="login-select-dropdown w-full pl-10 sm:pl-11 pr-10 sm:pr-11 md:pr-10 py-2.5 sm:py-3 md:py-2.5 border-2 border-primary-200 rounded-xl text-base sm:text-lg md:text-sm transition-all duration-300 bg-white hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-600 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.15)] min-h-[44px] sm:min-h-[48px] md:min-h-[44px] appearance-none cursor-pointer font-medium text-slate-900 active:bg-primary-50"
                 name="userType"
                 value={formData.userType}
                 title="Select User Type"
@@ -173,9 +173,9 @@ const Login: React.FC = () => {
                 <option value="student">Student</option>
               </select>
               {/* Custom dropdown arrow - Visible to differentiate from text inputs */}
-              <div className="absolute right-3 sm:right-4 md:right-3 top-1/2 -translate-y-1/2 pointer-events-none z-30">
-                <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-primary-100 rounded-full border-2 border-primary-400 shadow-md">
-                  <i className="fas fa-chevron-down text-primary-700 text-base sm:text-lg font-extrabold"></i>
+              <div className="absolute right-2.5 sm:right-3 md:right-2.5 top-1/2 -translate-y-1/2 pointer-events-none z-30">
+                <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 rounded-full border-2 border-primary-400 shadow-sm">
+                  <i className="fas fa-chevron-down text-primary-700 text-xs sm:text-sm font-extrabold"></i>
                 </div>
               </div>
             </div>

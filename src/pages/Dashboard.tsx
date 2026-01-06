@@ -240,12 +240,12 @@ const Dashboard: React.FC = () => {
         <div className="w-full">
           <div className="overflow-x-auto -mx-4 sm:mx-0">
             <div className="inline-block min-w-full align-middle px-4 sm:px-0">
-              <table className="min-w-full divide-y divide-slate-200">
+              <table className="min-w-full divide-y divide-slate-200 rounded-t-xl overflow-hidden">
                 <thead className="bg-gradient-to-r from-primary-600 to-primary-700">
                   <tr>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Class</th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider rounded-tl-xl">Class</th>
                     <th className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Number of Students</th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Action</th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider rounded-tr-xl">Action</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-slate-200">
