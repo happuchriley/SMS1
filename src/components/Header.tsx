@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, ChangeEvent, MouseEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useResponsive } from '../hooks/useResponsive';
 
 interface HeaderProps {
@@ -22,11 +22,17 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const initials = username.substring(0, 2).toUpperCase();
   const { isMobile } = useResponsive();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showGoToMenu, setShowGoToMenu] = useState<boolean>(false);
   const [showProfileMenu, setShowProfileMenu] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [clickedButton, setClickedButton] = useState<string | null>(null);
   const goToMenuRef = useRef<HTMLDivElement>(null);
   const profileMenuRef = useRef<HTMLDivElement>(null);
+  
+  // Check if we're on messages or notifications page
+  const isMessagesPage = location.pathname === '/messages';
+  const isNotificationsPage = location.pathname === '/notifications';
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | Event): void => {
@@ -277,7 +283,12 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
         </div>
         <Link
           to="/messages"
-          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-50 flex items-center justify-center cursor-pointer relative text-gray-600 transition-all duration-200 ease-in-out border border-gray-200 hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-sm hover:text-primary-500 active:scale-[0.97] active:opacity-80 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px]"
+          onClick={() => setClickedButton('messages')}
+          className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center cursor-pointer relative transition-all duration-200 ease-in-out border min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] ${
+            isMessagesPage || clickedButton === 'messages'
+              ? 'bg-primary-100 border-primary-400 text-primary-600 shadow-md ring-2 ring-primary-200'
+              : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-sm hover:text-primary-500 hover:border-primary-300'
+          } active:scale-[0.97] active:opacity-80`}
           aria-label="Messages"
         >
           <i className="fas fa-comments text-sm sm:text-base transition-transform duration-200"></i>
@@ -285,7 +296,12 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
         </Link>
         <Link
           to="/notifications"
-          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-50 flex items-center justify-center cursor-pointer relative text-gray-600 transition-all duration-200 ease-in-out border border-gray-200 hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-sm hover:text-primary-500 active:scale-[0.97] active:opacity-80 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px]"
+          onClick={() => setClickedButton('notifications')}
+          className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center cursor-pointer relative transition-all duration-200 ease-in-out border min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px] ${
+            isNotificationsPage || clickedButton === 'notifications'
+              ? 'bg-primary-100 border-primary-400 text-primary-600 shadow-md ring-2 ring-primary-200'
+              : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-sm hover:text-primary-500 hover:border-primary-300'
+          } active:scale-[0.97] active:opacity-80`}
           aria-label="Notifications"
         >
           <i className="fas fa-bell text-sm sm:text-base transition-transform duration-200"></i>

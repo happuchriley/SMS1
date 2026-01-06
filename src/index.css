@@ -153,8 +153,19 @@
 
   /* Ensure select dropdowns are touch-friendly on mobile */
   @media (max-width: 768px) {
-    select {
+    select:not(.login-select-dropdown) {
       font-size: 18px !important; /* Prevents zoom on iOS and improves readability */
+      min-height: 60px !important;
+      padding-left: 3.5rem !important;
+      padding-right: 3.5rem !important;
+      padding-top: 1rem !important;
+      padding-bottom: 1rem !important;
+      line-height: 1.5 !important;
+    }
+    
+    /* Login page select - preserve right padding for dropdown icon */
+    .login-select-dropdown {
+      font-size: 18px !important;
       min-height: 60px !important;
       padding-left: 3.5rem !important;
       padding-right: 3.5rem !important;
@@ -165,7 +176,14 @@
   }
 
   @media (min-width: 640px) and (max-width: 768px) {
-    select {
+    select:not(.login-select-dropdown) {
+      font-size: 20px !important;
+      min-height: 64px !important;
+      padding-left: 3.75rem !important;
+      padding-right: 3.75rem !important;
+    }
+    
+    .login-select-dropdown {
       font-size: 20px !important;
       min-height: 64px !important;
       padding-left: 3.75rem !important;

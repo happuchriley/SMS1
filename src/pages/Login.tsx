@@ -159,7 +159,7 @@ const Login: React.FC = () => {
             <div className="relative">
               <i className="fas fa-user absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-primary-600 z-10 transition-all duration-300 text-lg sm:text-xl"></i>
               <select
-                className="w-full pl-12 sm:pl-14 pr-12 sm:pr-14 py-4 sm:py-4.5 md:py-3 border-2 border-primary-300 rounded-xl text-lg sm:text-xl md:text-sm transition-all duration-300 bg-white hover:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-600 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.15)] min-h-[60px] sm:min-h-[64px] md:min-h-[48px] appearance-none cursor-pointer font-semibold text-slate-900 active:bg-primary-50"
+                className="login-select-dropdown w-full pl-12 sm:pl-14 pr-14 sm:pr-16 md:pr-14 py-4 sm:py-4.5 md:py-3 border-2 border-primary-200 rounded-xl text-lg sm:text-xl md:text-sm transition-all duration-300 bg-white hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-600 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.15)] min-h-[52px] sm:min-h-[56px] md:min-h-[48px] appearance-none cursor-pointer font-medium text-slate-900 active:bg-primary-50"
                 name="userType"
                 value={formData.userType}
                 title="Select User Type"
@@ -172,9 +172,11 @@ const Login: React.FC = () => {
                 <option value="staff">Staff</option>
                 <option value="student">Student</option>
               </select>
-              {/* Custom dropdown arrow */}
-              <div className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 pointer-events-none z-10">
-                <i className="fas fa-chevron-down text-primary-600 text-lg sm:text-xl"></i>
+              {/* Custom dropdown arrow - Visible to differentiate from text inputs */}
+              <div className="absolute right-3 sm:right-4 md:right-3 top-1/2 -translate-y-1/2 pointer-events-none z-30">
+                <div className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-primary-100 rounded-full border-2 border-primary-400 shadow-md">
+                  <i className="fas fa-chevron-down text-primary-700 text-base sm:text-lg font-extrabold"></i>
+                </div>
               </div>
             </div>
           </div>

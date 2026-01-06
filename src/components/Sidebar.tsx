@@ -1587,7 +1587,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
         <li className="my-1 mt-3 border-t border-white/5 pt-3">
           <button
             type="button"
-            className={`w-full text-left flex items-center px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
+            className={`w-full text-left flex items-center px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
               collapsed ? 'justify-center px-3 mx-2' : ''
             }`}
             onClick={() => {

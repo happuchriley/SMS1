@@ -237,48 +237,52 @@ const Dashboard: React.FC = () => {
         <div className="section-header">
           <h3 className="section-title">Students Per Class</h3>
         </div>
-        <div className="overflow-x-auto w-full -webkit-overflow-scrolling-touch -mx-4 sm:-mx-5 md:mx-0 px-4 sm:px-5 md:px-0">
-          <table className="table-modern min-w-[600px] sm:min-w-[700px]">
-            <thead>
-              <tr>
-                <th>Class</th>
-                <th>Number of Students</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.studentsPerClass.length === 0 ? (
-                <tr>
-                  <td colSpan={3} className="p-12 text-center text-slate-500">
-                    <div className="flex flex-col items-center justify-center">
-                      <i className="fas fa-inbox text-5xl mb-4 text-slate-300"></i>
-                      <div className="text-base font-medium">No class data available</div>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                stats.studentsPerClass.map((item, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}>
-                    <td className="font-semibold text-slate-800">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-primary-500"></div>
-                        {item.class}
-                      </div>
-                    </td>
-                    <td className="font-bold text-primary-600">{item.students} Students</td>
-                    <td>
-                      <Link 
-                        to={`/students/classes?class=${encodeURIComponent(item.class)}`}
-                        className="btn-ghost px-4 py-2 text-xs font-semibold inline-flex items-center gap-2 min-h-[36px] sm:min-h-auto hover:bg-primary-100 hover:text-primary-700"
-                      >
-                        <i className="fas fa-eye"></i> <span className="hidden sm:inline">View</span>
-                      </Link>
-                    </td>
+        <div className="w-full">
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <div className="inline-block min-w-full align-middle px-4 sm:px-0">
+              <table className="min-w-full divide-y divide-slate-200">
+                <thead className="bg-gradient-to-r from-primary-600 to-primary-700">
+                  <tr>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Class</th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Number of Students</th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">Action</th>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                </thead>
+                <tbody className="bg-white divide-y divide-slate-200">
+                  {stats.studentsPerClass.length === 0 ? (
+                    <tr>
+                      <td colSpan={3} className="px-3 sm:px-6 py-12 text-center text-slate-500">
+                        <div className="flex flex-col items-center justify-center">
+                          <i className="fas fa-inbox text-5xl mb-4 text-slate-300"></i>
+                          <div className="text-base font-medium">No class data available</div>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    stats.studentsPerClass.map((item, index) => (
+                      <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50/50 hover:bg-blue-50/50'}>
+                        <td className="px-3 sm:px-6 py-4 whitespace-normal sm:whitespace-nowrap text-sm font-semibold text-slate-800">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-primary-500 flex-shrink-0"></div>
+                            <span>{item.class}</span>
+                          </div>
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-normal sm:whitespace-nowrap text-sm font-bold text-primary-600">{item.students} Students</td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-normal sm:whitespace-nowrap text-sm">
+                          <Link 
+                            to={`/students/classes?class=${encodeURIComponent(item.class)}`}
+                            className="btn-ghost px-3 sm:px-4 py-2 text-xs font-semibold inline-flex items-center gap-2 min-h-[36px] sm:min-h-auto hover:bg-primary-100 hover:text-primary-700"
+                          >
+                            <i className="fas fa-eye"></i> <span className="hidden sm:inline">View</span>
+                          </Link>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </Layout>
