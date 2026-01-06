@@ -60,7 +60,10 @@ const Login: React.FC = () => {
   }, [navigate]);
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gradient-to-b from-primary-50 to-white md:bg-white">
+      {/* Mobile Primary Color Header Bar - Shown only on mobile */}
+      <div className="block md:hidden w-full bg-primary-600 h-1"></div>
+
       {/* Left Side - Background - Hidden on mobile, shown on tablet+ */}
       <div
         className="hidden md:flex flex-1 relative flex-col justify-between p-8 lg:p-12 text-white overflow-hidden login-bg-container"
@@ -93,7 +96,7 @@ const Login: React.FC = () => {
           alt="International College Academy"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-primary-600/20 to-black/40"></div>
         <div className="absolute inset-0 flex flex-col justify-center items-center text-white px-4 text-center z-10">
           <div className="text-xl sm:text-2xl font-extrabold mb-2 drop-shadow-lg">
             Brainhub School Management System
@@ -106,6 +109,9 @@ const Login: React.FC = () => {
 
       {/* Right Side - Login Form */}
       <div className="w-full md:flex-[0_0_40%] lg:flex-[0_0_45%] xl:flex-[0_0_42%] bg-white flex flex-col p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 justify-center md:shadow-[-4px_0_20px_rgba(0,0,0,0.1)]">
+        {/* Mobile Primary Color Accent Bar */}
+        <div className="block md:hidden w-20 h-1 bg-primary-600 rounded-full mx-auto mb-4"></div>
+
         <div className="flex justify-between items-center mb-5 sm:mb-6 md:mb-8 flex-wrap gap-3">
           <h2 className="text-primary-600 text-lg sm:text-xl md:text-2xl font-semibold">
             Login
@@ -147,17 +153,18 @@ const Login: React.FC = () => {
           className="space-y-4 md:space-y-5"
         >
           <div>
-            <label className="block mb-2 font-semibold text-slate-900 text-sm">
+            <label className="block mb-2 font-semibold text-slate-900 text-sm sm:text-base">
               Select User Type
             </label>
             <div className="relative">
-              <i className="fas fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 z-10 transition-all duration-300"></i>
+              <i className="fas fa-user absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 text-primary-600 z-10 transition-all duration-300 text-base sm:text-lg"></i>
               <select
-                className="w-full pl-10 pr-4 py-2.5 sm:py-3 md:py-3 border-2 border-slate-300 rounded-lg text-sm sm:text-base md:text-sm transition-all duration-300 bg-white hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.1)] min-h-[44px] sm:min-h-[48px]"
+                className="w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-3.5 md:py-3 border-2 border-primary-200 rounded-xl text-base sm:text-lg md:text-sm transition-all duration-300 bg-white hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-600 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.15)] min-h-[52px] sm:min-h-[56px] md:min-h-[48px] appearance-none cursor-pointer font-medium text-slate-900 active:bg-primary-50"
                 name="userType"
                 value={formData.userType}
                 title="Select User Type"
                 aria-label="Select User Type"
+                aria-required="true"
                 onChange={handleChange}
                 required
               >
@@ -165,18 +172,22 @@ const Login: React.FC = () => {
                 <option value="staff">Staff</option>
                 <option value="student">Student</option>
               </select>
+              {/* Custom dropdown arrow */}
+              <div className="absolute right-3.5 sm:right-4 top-1/2 -translate-y-1/2 pointer-events-none z-10">
+                <i className="fas fa-chevron-down text-primary-600 text-sm sm:text-base"></i>
+              </div>
             </div>
           </div>
 
           <div>
-            <label className="block mb-2 font-semibold text-slate-900 text-sm">
+            <label className="block mb-2 font-semibold text-slate-900 text-sm sm:text-base">
               Username
             </label>
             <div className="relative">
-              <i className="fas fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 z-10 transition-all duration-300"></i>
+              <i className="fas fa-user absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 text-primary-600 z-10 transition-all duration-300 text-base sm:text-lg"></i>
               <input
                 type="text"
-                className="w-full pl-10 pr-4 py-2.5 sm:py-3 md:py-3 border-2 border-slate-300 rounded-lg text-sm sm:text-base md:text-sm transition-all duration-300 bg-white hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.1)] min-h-[44px] sm:min-h-[48px]"
+                className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-3.5 md:py-3 border-2 border-primary-200 rounded-xl text-base sm:text-lg md:text-sm transition-all duration-300 bg-white hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-600 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.15)] min-h-[52px] sm:min-h-[56px] md:min-h-[48px]"
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
@@ -187,14 +198,14 @@ const Login: React.FC = () => {
           </div>
 
           <div>
-            <label className="block mb-2 font-semibold text-slate-900 text-sm">
+            <label className="block mb-2 font-semibold text-slate-900 text-sm sm:text-base">
               Password
             </label>
             <div className="relative">
-              <i className="fas fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 z-10 transition-all duration-300"></i>
+              <i className="fas fa-lock absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 text-primary-600 z-10 transition-all duration-300 text-base sm:text-lg"></i>
               <input
                 type="password"
-                className="w-full pl-10 pr-4 py-2.5 sm:py-3 md:py-3 border-2 border-slate-300 rounded-lg text-sm sm:text-base md:text-sm transition-all duration-300 bg-white hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.1)] min-h-[44px] sm:min-h-[48px]"
+                className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-3.5 md:py-3 border-2 border-primary-200 rounded-xl text-base sm:text-lg md:text-sm transition-all duration-300 bg-white hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-600 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.15)] min-h-[52px] sm:min-h-[56px] md:min-h-[48px]"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
@@ -206,7 +217,7 @@ const Login: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full py-4 bg-primary-600 text-white rounded-lg text-base font-bold cursor-pointer transition-all duration-300 mt-2.5 shadow-md tracking-wide uppercase hover:bg-primary-700 hover:-translate-y-1 hover:shadow-lg active:-translate-y-0.5"
+            className="w-full py-4 sm:py-4.5 md:py-4 bg-primary-600 text-white rounded-xl text-base sm:text-lg md:text-base font-bold cursor-pointer transition-all duration-300 mt-2.5 shadow-lg tracking-wide uppercase hover:bg-primary-700 hover:-translate-y-1 hover:shadow-xl active:-translate-y-0.5 active:bg-primary-800 min-h-[52px] sm:min-h-[56px] md:min-h-[48px]"
           >
             Login
           </button>

@@ -143,6 +143,30 @@
     }
   }
 
+  /* Mobile select dropdown improvements */
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: none;
+  }
+
+  /* Ensure select dropdowns are touch-friendly on mobile */
+  @media (max-width: 768px) {
+    select {
+      font-size: 16px !important; /* Prevents zoom on iOS */
+      min-height: 52px !important;
+      padding-left: 3rem !important;
+      padding-right: 3rem !important;
+    }
+  }
+
+  @media (min-width: 640px) and (max-width: 768px) {
+    select {
+      min-height: 56px !important;
+    }
+  }
+
   /* Input styles - Modern with focus states */
   .input-modern {
     @apply w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-colors duration-100 bg-white text-slate-900 placeholder:text-slate-400 hover:border-slate-300;
