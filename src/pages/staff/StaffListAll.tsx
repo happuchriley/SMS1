@@ -249,7 +249,7 @@ const StaffListAll: React.FC = () => {
 
       <div className="card-modern overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="table-bordered w-full">
+          <table className="table-modern w-full">
             <thead>
               <tr>
                 <th>Staff ID</th>

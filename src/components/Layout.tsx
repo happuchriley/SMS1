@@ -30,8 +30,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const toggleSidebar = (): void => {
     if (isMobile) {
-      setSidebarOpen(!sidebarOpen);
-      document.body.style.overflow = !sidebarOpen ? "hidden" : "";
+      const newOpenState = !sidebarOpen;
+      setSidebarOpen(newOpenState);
+      // Prevent background scroll when sidebar is open
+      if (newOpenState) {
+        document.body.style.overflow = "hidden";
+        document.body.style.position = "fixed";
+        document.body.style.width = "100%";
+      } else {
+        document.body.style.overflow = "";
+        document.body.style.position = "";
+        document.body.style.width = "";
+      }
     } else {
       const newState = !sidebarCollapsed;
       setSidebarCollapsed(newState);
@@ -50,6 +60,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       if (sidebar && !sidebar.contains(target) && !menuToggle) {
         setSidebarOpen(false);
         document.body.style.overflow = "";
+        document.body.style.position = "";
+        document.body.style.width = "";
       }
     };
 
@@ -72,20 +84,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           onClick={() => {
             setSidebarOpen(false);
             document.body.style.overflow = "";
+            document.body.style.position = "";
+            document.body.style.width = "";
           }}
           aria-label="Close sidebar"
         />
       )}
       <main
-        className={`w-full min-h-screen min-h-[calc(var(--vh,1vh)*100)] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col flex-1 ${
+        className={`w-full max-w-full min-h-screen min-h-[calc(var(--vh,1vh)*100)] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col flex-1 overflow-x-hidden ${
           isMobile ? "ml-0" : sidebarCollapsed ? "ml-[72px]" : "ml-[280px]"
         }`}
+        style={{ width: '100%', maxWidth: '100%', overflowX: 'hidden' }}
       >
         <Header toggleSidebar={toggleSidebar} />
         <div
-          className={`flex-1 w-full overflow-x-hidden box-border p-4 sm:p-5 md:p-6 lg:p-8 max-w-full`}
+          className={`flex-1 w-full max-w-full overflow-x-hidden box-border p-4 sm:p-5 md:p-6 lg:p-8`}
+          style={{ width: '100%', maxWidth: '100%' }}
         >
-          {children}
+          <div className="w-full max-w-full overflow-x-hidden">
+            {children}
+          </div>
         </div>
       </main>
       <ScrollToTop />

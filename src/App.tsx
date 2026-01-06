@@ -6,7 +6,12 @@ import {
   Navigate,
 } from "react-router-dom";
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import Notifications from "./pages/Notifications";
+import Messages from "./pages/Messages";
 import Dashboard from "./pages/Dashboard";
+import TeacherDashboard from "./pages/TeacherDashboard";
+import StudentDashboard from "./pages/StudentDashboard";
 import AddStudent from "./pages/students/AddStudent";
 import StudentsListAll from "./pages/students/StudentsListAll";
 import StudentsListActive from "./pages/students/StudentsListActive";
@@ -34,6 +39,7 @@ import StudentPromotion from "./pages/reports/StudentPromotion";
 import EndTermRemark from "./pages/reports/EndTermRemark";
 import ReportsFootnote from "./pages/reports/ReportsFootnote";
 import PrintGroupReport from "./pages/reports/PrintGroupReport";
+import StudentAcademicReport from "./pages/reports/StudentAcademicReport";
 // Billing
 import BillingMenu from "./pages/billing/BillingMenu";
 import CreateSingleBill from "./pages/billing/CreateSingleBill";
@@ -112,7 +118,10 @@ import CreateCourse from "./pages/elearning/CreateCourse";
 import Assignments from "./pages/elearning/Assignments";
 import CreateAssignment from "./pages/elearning/CreateAssignment";
 import Quizzes from "./pages/elearning/Quizzes";
+import QuizHome from "./pages/elearning/QuizHome";
 import CreateQuiz from "./pages/elearning/CreateQuiz";
+import TakeQuiz from "./pages/elearning/TakeQuiz";
+import QuizResults from "./pages/elearning/QuizResults";
 import StudentProgress from "./pages/elearning/StudentProgress";
 import ViewCourses from "./pages/elearning/ViewCourses";
 import MyCourses from "./pages/elearning/MyCourses";
@@ -151,11 +160,28 @@ const App: React.FC = () => {
       >
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route
           path="/"
           element={
             <PrivateRoute>
               <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/teacher-dashboard"
+          element={
+            <PrivateRoute>
+              <TeacherDashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/student-dashboard"
+          element={
+            <PrivateRoute>
+              <StudentDashboard />
             </PrivateRoute>
           }
         />
@@ -357,6 +383,14 @@ const App: React.FC = () => {
           element={
             <PrivateRoute>
               <ReportsFootnote />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/reports/student-academic-report"
+          element={
+            <PrivateRoute>
+              <StudentAcademicReport />
             </PrivateRoute>
           }
         />
@@ -949,7 +983,31 @@ const App: React.FC = () => {
           path="/elearning/quizzes"
           element={
             <PrivateRoute>
+              <QuizHome />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/elearning/quizzes/manage"
+          element={
+            <PrivateRoute>
               <Quizzes />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/elearning/quizzes/take/:id"
+          element={
+            <PrivateRoute>
+              <TakeQuiz />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/elearning/quizzes/results/:id"
+          element={
+            <PrivateRoute>
+              <QuizResults />
             </PrivateRoute>
           }
         />
@@ -1128,6 +1186,22 @@ const App: React.FC = () => {
           element={
             <PrivateRoute>
               <DownloadHistory />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <PrivateRoute>
+              <Notifications />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/messages"
+          element={
+            <PrivateRoute>
+              <Messages />
             </PrivateRoute>
           }
         />

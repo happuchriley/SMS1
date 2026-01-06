@@ -24,8 +24,6 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const navigate = useNavigate();
   const [showGoToMenu, setShowGoToMenu] = useState<boolean>(false);
   const [showProfileMenu, setShowProfileMenu] = useState<boolean>(false);
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-  const [showSearch, setShowSearch] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const goToMenuRef = useRef<HTMLDivElement>(null);
   const profileMenuRef = useRef<HTMLDivElement>(null);
@@ -51,13 +49,6 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
     }
   }, [showGoToMenu, showProfileMenu]);
 
-  const toggleFullscreen = (): void => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().then(() => setIsFullscreen(true));
-    } else {
-      document.exitFullscreen().then(() => setIsFullscreen(false));
-    }
-  };
 
   const handleLogout = (): void => {
     sessionStorage.clear();
@@ -198,7 +189,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   ];
 
   return (
-    <header className="bg-white/95 backdrop-blur-md h-14 sm:h-16 px-3 sm:px-4 md:px-6 lg:px-8 flex items-center justify-between shadow-sm sticky top-0 z-[100] border-b border-slate-200 w-full flex-shrink-0">
+    <header className="bg-white/95 backdrop-blur-md h-14 sm:h-16 px-3 sm:px-4 md:px-6 lg:px-8 flex items-center justify-between shadow-sm sticky top-0 z-[100] border-b border-slate-200 w-full flex-shrink-0" style={{ position: 'sticky' }}>
       <div className="flex items-center gap-3 sm:gap-4 md:gap-5">
         {isMobile && (
           <button
@@ -213,12 +204,6 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
         <div className="hidden md:flex items-center gap-3 lg:gap-5">
           <Link to="/" className="text-slate-900 no-underline text-sm font-medium hover:text-primary-600 transition-colors">
             Home
-          </Link>
-          <Link 
-            to="/profile"
-            className="text-slate-900 no-underline text-sm font-medium hover:text-primary-600 transition-colors"
-          >
-            Profile
           </Link>
           <a 
             href="#school" 
@@ -269,67 +254,43 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
         </div>
       </div>
       <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-        {showSearch && (
-          <div className="hidden md:flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500">
-            <i className="fas fa-search text-slate-400 text-sm"></i>
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchTerm}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-              className="bg-transparent border-none outline-none text-sm text-slate-700 w-40"
-              autoFocus
-            />
+        {/* Search Bar - Always visible on desktop, hidden on mobile */}
+        <div className="hidden md:flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500 transition-all duration-200 min-w-[200px] max-w-[300px]">
+          <i className="fas fa-search text-slate-400 text-sm"></i>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+            className="bg-transparent border-none outline-none text-sm text-slate-700 flex-1 w-full"
+          />
+          {searchTerm && (
             <button
-              onClick={() => setShowSearch(false)}
+              onClick={() => setSearchTerm('')}
               className="text-slate-400 hover:text-slate-600 transition-colors"
               type="button"
+              aria-label="Clear search"
             >
               <i className="fas fa-times text-xs"></i>
             </button>
-          </div>
-        )}
-        {!showSearch && (
-          <button 
-            onClick={() => setShowSearch(true)}
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-50 flex items-center justify-center cursor-pointer relative text-slate-600 transition-all duration-200 ease-in-out border border-slate-200 hover:bg-blue-50 hover:-translate-y-0.5 hover:shadow-sm hover:text-primary-600 hover:border-primary-300 active:scale-[0.97] active:opacity-80 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px]"
-            type="button" 
-            aria-label="Search"
-          >
-            <i className="fas fa-search text-sm sm:text-base transition-transform duration-200"></i>
-          </button>
-        )}
-        <button 
+          )}
+        </div>
+        <Link
+          to="/messages"
           className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-50 flex items-center justify-center cursor-pointer relative text-gray-600 transition-all duration-200 ease-in-out border border-gray-200 hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-sm hover:text-primary-500 active:scale-[0.97] active:opacity-80 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px]"
-          type="button" 
           aria-label="Messages"
         >
           <i className="fas fa-comments text-sm sm:text-base transition-transform duration-200"></i>
           <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white rounded-full px-1 sm:px-1.5 py-0.5 text-[9px] sm:text-[10px] font-semibold">0</span>
-        </button>
-        <button 
+        </Link>
+        <Link
+          to="/notifications"
           className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-50 flex items-center justify-center cursor-pointer relative text-gray-600 transition-all duration-200 ease-in-out border border-gray-200 hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-sm hover:text-primary-500 active:scale-[0.97] active:opacity-80 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px]"
-          type="button" 
           aria-label="Notifications"
         >
           <i className="fas fa-bell text-sm sm:text-base transition-transform duration-200"></i>
           <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white rounded-full px-1 sm:px-1.5 py-0.5 text-[9px] sm:text-[10px] font-semibold">0</span>
-        </button>
-        <button 
-          onClick={toggleFullscreen}
-          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-50 flex items-center justify-center cursor-pointer text-gray-600 transition-all duration-200 ease-in-out border border-gray-200 hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-sm hover:text-primary-500 active:scale-[0.97] active:opacity-80 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px]"
-          type="button" 
-          aria-label="Fullscreen"
-        >
-          <i className={`fas ${isFullscreen ? 'fa-compress' : 'fa-expand'} text-sm sm:text-base transition-transform duration-200`}></i>
-        </button>
-        <button 
-          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-50 flex items-center justify-center cursor-pointer text-gray-600 transition-all duration-200 ease-in-out border border-gray-200 hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-sm hover:text-primary-500 active:scale-[0.97] active:opacity-80 min-w-[36px] min-h-[36px] sm:min-w-[40px] sm:min-h-[40px]"
-          type="button" 
-          aria-label="Grid Menu"
-        >
-          <i className="fas fa-th text-sm sm:text-base transition-transform duration-200"></i>
-        </button>
+        </Link>
         <div className="relative" ref={profileMenuRef}>
           <div 
             onClick={() => setShowProfileMenu(!showProfileMenu)}

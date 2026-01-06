@@ -335,7 +335,7 @@ const AddStudent: React.FC = () => {
                   name="dateOfBirth"
                   value={formData.dateOfBirth}
                   onChange={handleChange}
-                  placeholder="YYYY-MM-DD"
+                  placeholder="DD/MM/YYYY"
                   required
                   className="text-sm"
                 />
@@ -717,7 +717,7 @@ const AddStudent: React.FC = () => {
                   name="admissionDate"
                   value={formData.admissionDate || ''}
                   onChange={handleChange}
-                  placeholder="YYYY-MM-DD"
+                  placeholder="DD/MM/YYYY"
                   className="text-sm"
                 />
               </div>

@@ -190,6 +190,27 @@ const elearningService = {
     return await apiService.query<QuizData & { id: string }>(QUIZZES_TYPE, (q: QuizData & { id: string }) => q.courseId === courseId);
   },
 
+  async submitQuizAttempt(attemptData: {
+    quizId: string;
+    answers: Record<string, string>;
+    score: number;
+    timeSpent: number;
+  }): Promise<void> {
+    // Store quiz attempt
+    const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
+    attempts.push({
+      ...attemptData,
+      id: Date.now().toString(),
+      submittedAt: new Date().toISOString()
+    });
+    localStorage.setItem('quizAttempts', JSON.stringify(attempts));
+  },
+
+  async getQuizAttempts(quizId: string): Promise<any[]> {
+    const attempts = JSON.parse(localStorage.getItem('quizAttempts') || '[]');
+    return attempts.filter((a: any) => a.quizId === quizId);
+  },
+
   // Student Progress
   async getAllProgress(): Promise<(ProgressData & { id: string })[]> {
     return await apiService.getAll<ProgressData & { id: string }>(STUDENT_PROGRESS_TYPE);

@@ -23,7 +23,7 @@ const DateInput: React.FC<DateInputProps> = ({
   name,
   value,
   onChange,
-  placeholder = 'YYYY-MM-DD',
+  placeholder = 'DD/MM/YYYY',
   required = false,
   disabled = false,
   min,
@@ -36,12 +36,18 @@ const DateInput: React.FC<DateInputProps> = ({
   const [inputType, setInputType] = useState<'text' | 'date'>('text');
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
-  useEffect(() => {
-    setInputValue(value || '');
-  }, [value]);
-
-  const formatDate = (dateString: string): string => {
+  // Convert DD/MM/YYYY to YYYY-MM-DD for date input value
+  const formatDateForInput = (dateString: string): string => {
     if (!dateString) return '';
+    // If already in YYYY-MM-DD format, return as is
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      return dateString;
+    }
+    // If in DD/MM/YYYY format, convert to YYYY-MM-DD
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
+      const [day, month, year] = dateString.split('/');
+      return `${year}-${month}-${day}`;
+    }
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return dateString;
     
@@ -51,13 +57,46 @@ const DateInput: React.FC<DateInputProps> = ({
     return `${year}-${month}-${day}`;
   };
 
+  // Convert YYYY-MM-DD to DD/MM/YYYY for display
+  const formatDateForDisplay = (dateString: string): string => {
+    if (!dateString) return '';
+    // If in YYYY-MM-DD format, convert to DD/MM/YYYY
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      const [year, month, day] = dateString.split('-');
+      return `${day}/${month}/${year}`;
+    }
+    // If already in DD/MM/YYYY format, return as is
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
+      return dateString;
+    }
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  useEffect(() => {
+    // Convert YYYY-MM-DD to DD/MM/YYYY for display
+    if (value) {
+      setInputValue(formatDateForDisplay(value));
+    } else {
+      setInputValue('');
+    }
+  }, [value]);
+
   const isValidDateFormat = (str: string): boolean => {
-    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    const regex = /^\d{2}\/\d{2}\/\d{4}$/;
     if (!regex.test(str)) return false;
     
-    const date = new Date(str);
+    const [day, month, year] = str.split('/').map(Number);
+    const date = new Date(year, month - 1, day);
     return date instanceof Date && !isNaN(date.getTime()) && 
-           str === formatDate(date.toISOString());
+           date.getDate() === day && 
+           date.getMonth() === month - 1 && 
+           date.getFullYear() === year;
   };
 
   const handleTextChange = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -65,22 +104,26 @@ const DateInput: React.FC<DateInputProps> = ({
     
     let formatted = newValue.replace(/\D/g, '');
     
-    if (formatted.length >= 5) {
-      formatted = formatted.slice(0, 4) + '-' + formatted.slice(4);
+    // Format as DD/MM/YYYY
+    if (formatted.length >= 3) {
+      formatted = formatted.slice(0, 2) + '/' + formatted.slice(2);
     }
-    if (formatted.length >= 8) {
-      formatted = formatted.slice(0, 7) + '-' + formatted.slice(7, 9);
+    if (formatted.length >= 6) {
+      formatted = formatted.slice(0, 5) + '/' + formatted.slice(5, 9);
     }
     
     setInputValue(formatted);
     
     if (formatted.length === 10 && isValidDateFormat(formatted)) {
+      // Convert DD/MM/YYYY to YYYY-MM-DD for the onChange handler
+      const [day, month, year] = formatted.split('/');
+      const isoDate = `${year}-${month}-${day}`;
       onChange({
         ...e,
         target: {
           ...e.target,
           name,
-          value: formatted
+          value: isoDate
         }
       } as ChangeEvent<HTMLInputElement>);
     } else if (formatted === '') {
@@ -97,7 +140,8 @@ const DateInput: React.FC<DateInputProps> = ({
 
   const handleDatePickerChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const newValue = e.target.value;
-    setInputValue(newValue);
+    // Convert YYYY-MM-DD to DD/MM/YYYY for display
+    setInputValue(formatDateForDisplay(newValue));
     onChange(e);
   };
 
@@ -140,7 +184,7 @@ const DateInput: React.FC<DateInputProps> = ({
           placeholder={placeholder}
           disabled={disabled}
           required={required}
-          pattern="\d{4}-\d{2}-\d{2}"
+          pattern="\d{2}/\d{2}/\d{4}"
           maxLength={10}
           className={baseClasses}
           {...props}
@@ -151,7 +195,7 @@ const DateInput: React.FC<DateInputProps> = ({
         <input
           type="date"
           name={name}
-          value={inputValue}
+          value={formatDateForInput(value || inputValue)}
           onChange={handleDatePickerChange}
           onFocus={handleFocus}
           onBlur={handleBlur}

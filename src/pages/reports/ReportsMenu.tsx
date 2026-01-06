@@ -55,8 +55,15 @@ const ReportsMenu: React.FC = () => {
       color: "border-indigo-500",
     },
     {
+      title: "Student Academic Report",
+      subtitle: "Generate single student academic report",
+      icon: "fa-user-graduate",
+      path: "/reports/student-academic-report",
+      color: "border-teal-500",
+    },
+    {
       title: "Print Group Report",
-      subtitle: "Print group reports",
+      subtitle: "Print group reports for classes",
       icon: "fa-print",
       path: "/reports/print-group-report",
       color: "border-red-500",

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 interface FormData {
   userType: string;
@@ -22,7 +22,15 @@ const Login: React.FC = () => {
       sessionStorage.setItem("isAuthenticated", "true");
       sessionStorage.setItem("userType", formData.userType);
       sessionStorage.setItem("username", formData.username);
-      navigate("/");
+
+      // Redirect based on user type
+      if (formData.userType === "staff") {
+        navigate("/teacher-dashboard");
+      } else if (formData.userType === "student") {
+        navigate("/student-dashboard");
+      } else {
+        navigate("/");
+      }
     }
   };
 
@@ -38,7 +46,16 @@ const Login: React.FC = () => {
   useEffect(() => {
     // Redirect if already authenticated
     if (sessionStorage.getItem("isAuthenticated") === "true") {
-      navigate("/");
+      const userType = sessionStorage.getItem("userType");
+      if (userType === "staff") {
+        navigate("/teacher-dashboard");
+      } else if (userType === "student") {
+        navigate("/student-dashboard");
+      } else if (userType === "administrator") {
+        navigate("/");
+      } else {
+        navigate("/login");
+      }
     }
   }, [navigate]);
 
@@ -46,18 +63,20 @@ const Login: React.FC = () => {
     <div className="flex flex-col md:flex-row min-h-screen">
       {/* Left Side - Background - Hidden on mobile, shown on tablet+ */}
       <div
-        className="hidden md:flex flex-1 relative flex-col justify-between p-8 lg:p-12 text-white overflow-hidden"
+        className="hidden md:flex flex-1 relative flex-col justify-between p-8 lg:p-12 text-white overflow-hidden login-bg-container"
+        // Inline style required to avoid webpack module resolution for public folder images
         style={
           {
-            "--login-bg-image": "url(/images/classroom.jpg)",
+            backgroundImage: "url('/images/classroom.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
           } as React.CSSProperties
         }
       >
-        {/* Classroom Background Image */}
-        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat login-bg-image">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
-        </div>
-        <div className="relative z-10">
+        {/* Classroom Background Image Overlay */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] z-10"></div>
+        <div className="relative z-20">
           <div className="text-3xl lg:text-4xl font-extrabold mb-5 drop-shadow-lg tracking-tight">
             Brainhub School Management System
           </div>
@@ -89,7 +108,7 @@ const Login: React.FC = () => {
       <div className="w-full md:flex-[0_0_40%] lg:flex-[0_0_45%] xl:flex-[0_0_42%] bg-white flex flex-col p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 justify-center md:shadow-[-4px_0_20px_rgba(0,0,0,0.1)]">
         <div className="flex justify-between items-center mb-5 sm:mb-6 md:mb-8 flex-wrap gap-3">
           <h2 className="text-primary-600 text-lg sm:text-xl md:text-2xl font-semibold">
-            Administrator
+            Login
           </h2>
           <div className="flex gap-2.5">
             <a
@@ -134,7 +153,7 @@ const Login: React.FC = () => {
             <div className="relative">
               <i className="fas fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 z-10 transition-all duration-300"></i>
               <select
-                className="w-full pl-10 pr-4 py-3 md:py-3 border-2 border-slate-300 rounded-lg text-base md:text-sm transition-all duration-300 bg-white hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.1)] focus:-translate-y-0.5"
+                className="w-full pl-10 pr-4 py-2.5 sm:py-3 md:py-3 border-2 border-slate-300 rounded-lg text-sm sm:text-base md:text-sm transition-all duration-300 bg-white hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.1)] min-h-[44px] sm:min-h-[48px]"
                 name="userType"
                 value={formData.userType}
                 title="Select User Type"
@@ -143,8 +162,8 @@ const Login: React.FC = () => {
                 required
               >
                 <option value="administrator">Administrator</option>
-                <option value="teacher">Teacher/Staff</option>
-                <option value="parent">Parent/Student</option>
+                <option value="staff">Staff</option>
+                <option value="student">Student</option>
               </select>
             </div>
           </div>
@@ -157,7 +176,7 @@ const Login: React.FC = () => {
               <i className="fas fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 z-10 transition-all duration-300"></i>
               <input
                 type="text"
-                className="w-full pl-10 pr-4 py-3 md:py-3 border-2 border-slate-300 rounded-lg text-base md:text-sm transition-all duration-300 bg-white hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.1)] focus:-translate-y-0.5"
+                className="w-full pl-10 pr-4 py-2.5 sm:py-3 md:py-3 border-2 border-slate-300 rounded-lg text-sm sm:text-base md:text-sm transition-all duration-300 bg-white hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.1)] min-h-[44px] sm:min-h-[48px]"
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
@@ -175,7 +194,7 @@ const Login: React.FC = () => {
               <i className="fas fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 z-10 transition-all duration-300"></i>
               <input
                 type="password"
-                className="w-full pl-10 pr-4 py-3 md:py-3 border-2 border-slate-300 rounded-lg text-base md:text-sm transition-all duration-300 bg-white hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.1)] focus:-translate-y-0.5"
+                className="w-full pl-10 pr-4 py-2.5 sm:py-3 md:py-3 border-2 border-slate-300 rounded-lg text-sm sm:text-base md:text-sm transition-all duration-300 bg-white hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.1)] min-h-[44px] sm:min-h-[48px]"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
@@ -208,13 +227,12 @@ const Login: React.FC = () => {
                 Remember Me
               </label>
             </div>
-            <a
-              href="#forgot"
-              className="text-primary-500 no-underline hover:text-primary-400 hover:underline text-sm"
-              onClick={(e) => e.preventDefault()}
+            <Link
+              to="/forgot-password"
+              className="text-primary-500 no-underline hover:text-primary-400 hover:underline text-sm transition-colors"
             >
               Forgot Password?
-            </a>
+            </Link>
           </div>
         </form>
 

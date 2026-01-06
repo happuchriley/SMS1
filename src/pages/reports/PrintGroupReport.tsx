@@ -1,15 +1,19 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
-import { printPage, exportToCSV } from '../../utils/printExport';
+import { printPage, exportToCSV, exportToPDF } from '../../utils/printExport';
 import { useModal } from '../../components/ModalProvider';
+import academicService from '../../services/academicService';
+import studentsService from '../../services/studentsService';
 
 interface StudentItem {
   id: string;
+  studentId?: string;
   name: string;
   class: string;
   averageScore: number;
   status: string;
+  report?: any;
 }
 
 interface FormData {
@@ -27,6 +31,7 @@ interface ReportType {
 const PrintGroupReport: React.FC = () => {
   const { toast } = useModal();
   const printRef = useRef<HTMLDivElement>(null);
+  const [loading, setLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>({
     academicYear: '',
     term: '',
@@ -35,11 +40,12 @@ const PrintGroupReport: React.FC = () => {
   });
 
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+  const [allStudents, setAllStudents] = useState<StudentItem[]>([]);
+  const [classes, setClasses] = useState<string[]>([]);
 
   // Sample data
   const academicYears: string[] = ['2023/2024', '2024/2025', '2025/2026'];
-  const terms: string[] = ['1st Term', '2nd Term', '3rd Term'];
-  const classes: string[] = ['Basic 1', 'Basic 2', 'Basic 3', 'Basic 4', 'Basic 5', 'Basic 6', 'JHS 1', 'JHS 2', 'JHS 3'];
+  const terms: string[] = ['First Term', 'Second Term', 'Third Term'];
   const reportTypes: ReportType[] = [
     { value: 'all', label: 'All Students' },
     { value: 'passed', label: 'Passed Students Only' },
@@ -47,14 +53,60 @@ const PrintGroupReport: React.FC = () => {
     { value: 'excellent', label: 'Excellent (A & B grades only)' },
   ];
 
-  // Sample students
-  const allStudents: StudentItem[] = [
-    { id: 'STU001', name: 'John Doe', class: 'Basic 1', averageScore: 85, status: 'Active' },
-    { id: 'STU002', name: 'Jane Smith', class: 'Basic 1', averageScore: 78, status: 'Active' },
-    { id: 'STU003', name: 'Michael Johnson', class: 'Basic 1', averageScore: 45, status: 'Active' },
-    { id: 'STU004', name: 'Emily Brown', class: 'Basic 1', averageScore: 92, status: 'Active' },
-    { id: 'STU005', name: 'David Wilson', class: 'Basic 1', averageScore: 55, status: 'Active' },
-  ];
+  const loadStudents = useCallback(async () => {
+    try {
+      const students = await studentsService.getAll();
+      const uniqueClassesSet = new Set<string>();
+      
+      const studentsWithScores = await Promise.all(students.map(async (student: any) => {
+        if (student.class) {
+          uniqueClassesSet.add(student.class);
+        }
+        
+        try {
+          const results = await academicService.getResultsByStudent(student.id);
+          const scores = results
+            .filter((r: any) => 
+              (!formData.academicYear || r.academicYear === formData.academicYear) &&
+              (!formData.term || r.term === formData.term)
+            )
+            .map((r: any) => parseFloat(r.score) || 0);
+          
+          const averageScore = scores.length > 0 
+            ? scores.reduce((sum: number, score: number) => sum + score, 0) / scores.length 
+            : 0;
+          
+          return {
+            id: student.id,
+            name: `${student.firstName || ''} ${student.surname || ''} ${student.otherNames || ''}`.trim(),
+            class: student.class || 'N/A',
+            averageScore: Math.round(averageScore),
+            status: student.status || 'Active',
+            studentId: student.studentId || student.id
+          };
+        } catch (error) {
+          return {
+            id: student.id,
+            name: `${student.firstName || ''} ${student.surname || ''} ${student.otherNames || ''}`.trim(),
+            class: student.class || 'N/A',
+            averageScore: 0,
+            status: student.status || 'Active',
+            studentId: student.studentId || student.id
+          };
+        }
+      }));
+      
+      setAllStudents(studentsWithScores);
+      setClasses(Array.from(uniqueClassesSet).sort());
+    } catch (error) {
+      console.error('Error loading students:', error);
+      toast.showError('Failed to load students');
+    }
+  }, [toast, formData.academicYear, formData.term]);
+
+  useEffect(() => {
+    loadStudents();
+  }, [loadStudents]);
 
   // Filter students by selected class
   const filteredStudents = useMemo<StudentItem[]>(() => {
@@ -174,6 +226,7 @@ const PrintGroupReport: React.FC = () => {
 
     // Export to CSV
     const columns = [
+      { key: 'studentId', label: 'Student ID' },
       { key: 'name', label: 'Student Name' },
       { key: 'class', label: 'Class' },
       { key: 'averageScore', label: 'Average Score' },
@@ -181,6 +234,11 @@ const PrintGroupReport: React.FC = () => {
     ];
     
     exportToCSV(studentsToExport, `group-report-${formData.class || 'all'}-${new Date().toISOString().split('T')[0]}.csv`, columns);
+  };
+
+  const handleExportPDF = (): void => {
+    if (!printRef.current) return;
+    exportToPDF(printRef.current, `group-report-${formData.class || 'all'}-${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   return (
@@ -290,7 +348,14 @@ const PrintGroupReport: React.FC = () => {
               onClick={handleExport}
               className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-all duration-300"
             >
-              <i className="fas fa-download mr-2"></i>Export PDF
+              <i className="fas fa-download mr-2"></i>Export CSV
+            </button>
+            <button
+              type="button"
+              onClick={handleExportPDF}
+              className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-all duration-300"
+            >
+              <i className="fas fa-file-pdf mr-2"></i>Export PDF
             </button>
             <button
               type="button"
@@ -342,6 +407,8 @@ const PrintGroupReport: React.FC = () => {
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Student Name</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Class</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Average Score</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Grade</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -355,10 +422,22 @@ const PrintGroupReport: React.FC = () => {
                         className="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
                       />
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{student.id}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{student.studentId || student.id}</td>
                     <td className="px-4 py-3 text-sm text-gray-900 font-medium">{student.name}</td>
                     <td className="px-4 py-3 text-sm text-gray-900">{student.class}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{student.averageScore}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900 font-medium">{student.averageScore}%</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">
+                      {student.averageScore >= 80 ? 'A' : student.averageScore >= 70 ? 'B' : student.averageScore >= 60 ? 'C' : student.averageScore >= 50 ? 'D' : 'F'}
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                        student.averageScore >= 50 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {student.averageScore >= 50 ? 'Pass' : 'Fail'}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>

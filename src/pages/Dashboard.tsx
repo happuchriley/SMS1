@@ -104,12 +104,12 @@ const Dashboard: React.FC = () => {
   return (
     <Layout>
       {/* Page Header */}
-      <div className="mb-8 sm:mb-10 md:mb-12">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3 tracking-tight">Dashboard</h1>
-        <div className="flex items-center gap-2 text-slate-600 text-sm sm:text-base">
-          <Link to="/" className="text-slate-600 no-underline hover:text-primary-600 transition-colors font-medium">Home</Link>
-          <span className="text-slate-400">/</span>
-          <span className="text-slate-900 font-semibold">Dashboard</span>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 tracking-tight">Dashboard</h1>
+        <div className="flex items-center gap-2 text-gray-600 text-xs sm:text-sm">
+          <Link to="/" className="text-gray-600 no-underline hover:text-primary-600 transition-colors font-medium">Home</Link>
+          <span className="text-gray-400">/</span>
+          <span className="text-gray-900 font-semibold">Dashboard</span>
         </div>
       </div>
 
@@ -137,131 +137,96 @@ const Dashboard: React.FC = () => {
 
       {/* Student Statistics */}
       <div className="mb-6 sm:mb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-          <Link to="/students/all" className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 shadow-xl hover:shadow-2xl transition-shadow duration-200">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-            <div className="relative px-6 py-4 flex items-center justify-between">
-              <span className="text-white font-bold text-sm uppercase tracking-wider">STUDENTS STATISTICS</span>
-              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <i className="fas fa-users text-white text-lg"></i>
-              </div>
-            </div>
-            <div className="relative p-6 bg-white/95 backdrop-blur-sm grid grid-cols-2 gap-6">
-              <div>
-                <div className="text-xs text-slate-600 mb-2 font-semibold uppercase tracking-wide">TOTAL STUDENTS</div>
-                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900">{stats.totalStudents}</div>
-              </div>
-              <div>
-                <div className="text-xs text-primary-600 mb-2 font-semibold uppercase tracking-wide">ACTIVE STUDENTS</div>
-                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900">{stats.activeStudents}</div>
-              </div>
-            </div>
+        <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-4">Student Statistics</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <Link to="/students/all" className="bg-white rounded-lg p-4 sm:p-5 shadow-sm border-l-4 border-blue-500 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 no-underline">
+            <div className="text-xs text-gray-600 mb-2 font-medium uppercase tracking-wide">TOTAL STUDENTS</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900">{stats.totalStudents}</div>
           </Link>
-          <Link to="/students/inactive" className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 shadow-xl hover:shadow-2xl transition-shadow duration-200">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-            <div className="relative px-6 py-4 flex items-center justify-between">
-              <span className="text-white font-bold text-sm uppercase tracking-wider">STUDENTS STATISTICS</span>
-              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <i className="fas fa-users text-white text-lg"></i>
-              </div>
-            </div>
-            <div className="relative p-6 bg-white/95 backdrop-blur-sm grid grid-cols-2 gap-6">
-              <div>
-                <div className="text-xs text-slate-600 mb-2 font-semibold uppercase tracking-wide">INACTIVE STUDENTS</div>
-                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900">{stats.inactiveStudents}</div>
-              </div>
-              <div>
-                <div className="text-xs text-orange-600 mb-2 font-semibold uppercase tracking-wide">NEW STUDENTS</div>
-                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900">{stats.newStudents}</div>
-              </div>
-            </div>
+          <Link to="/students/all" className="bg-white rounded-lg p-4 sm:p-5 shadow-sm border-l-4 border-green-500 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 no-underline">
+            <div className="text-xs text-gray-600 mb-2 font-medium uppercase tracking-wide">ACTIVE STUDENTS</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900">{stats.activeStudents}</div>
+          </Link>
+          <Link to="/students/inactive" className="bg-white rounded-lg p-4 sm:p-5 shadow-sm border-l-4 border-red-500 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 no-underline">
+            <div className="text-xs text-gray-600 mb-2 font-medium uppercase tracking-wide">INACTIVE STUDENTS</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900">{stats.inactiveStudents}</div>
+          </Link>
+          <Link to="/students/all" className="bg-white rounded-lg p-4 sm:p-5 shadow-sm border-l-4 border-orange-500 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 no-underline">
+            <div className="text-xs text-gray-600 mb-2 font-medium uppercase tracking-wide">NEW STUDENTS</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900">{stats.newStudents}</div>
           </Link>
         </div>
       </div>
 
       {/* Staff Statistics */}
       <div className="mb-6 sm:mb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-          <Link to="/staff/all" className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-600 to-purple-700 shadow-xl hover:shadow-2xl transition-shadow duration-200">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-            <div className="relative px-6 py-4 flex items-center justify-between">
-              <span className="text-white font-bold text-sm uppercase tracking-wider">STAFF STATISTICS</span>
-              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <i className="fas fa-user-tie text-white text-lg"></i>
-              </div>
-            </div>
-            <div className="relative p-6 bg-white/95 backdrop-blur-sm grid grid-cols-2 gap-6">
-              <div>
-                <div className="text-xs text-slate-600 mb-2 font-semibold uppercase tracking-wide">TOTAL STAFF</div>
-                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900">{stats.totalStaff}</div>
-              </div>
-              <div>
-                <div className="text-xs text-purple-600 mb-2 font-semibold uppercase tracking-wide">ACTIVE STAFF</div>
-                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900">{stats.activeStaff}</div>
-              </div>
-            </div>
+        <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-4">Staff Statistics</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <Link to="/staff/all" className="bg-white rounded-lg p-4 sm:p-5 shadow-sm border-l-4 border-blue-500 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 no-underline">
+            <div className="text-xs text-gray-600 mb-2 font-medium uppercase tracking-wide">TOTAL STAFF</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900">{stats.totalStaff}</div>
           </Link>
-          <Link to="/staff/inactive" className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 shadow-xl hover:shadow-2xl transition-shadow duration-200">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-            <div className="relative px-6 py-4 flex items-center justify-between">
-              <span className="text-white font-bold text-sm uppercase tracking-wider">STAFF STATISTICS</span>
-              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <i className="fas fa-user-tie text-white text-lg"></i>
-              </div>
-            </div>
-            <div className="relative p-6 bg-white/95 backdrop-blur-sm grid grid-cols-2 gap-6">
-              <div>
-                <div className="text-xs text-slate-600 mb-2 font-semibold uppercase tracking-wide">INACTIVE STAFF</div>
-                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900">{stats.inactiveStaff}</div>
-              </div>
-              <div>
-                <div className="text-xs text-pink-600 mb-2 font-semibold uppercase tracking-wide">NEW STAFF</div>
-                <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900">{stats.newStaff}</div>
-              </div>
-            </div>
+          <Link to="/staff/all" className="bg-white rounded-lg p-4 sm:p-5 shadow-sm border-l-4 border-green-500 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 no-underline">
+            <div className="text-xs text-gray-600 mb-2 font-medium uppercase tracking-wide">ACTIVE STAFF</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900">{stats.activeStaff}</div>
+          </Link>
+          <Link to="/staff/inactive" className="bg-white rounded-lg p-4 sm:p-5 shadow-sm border-l-4 border-red-500 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 no-underline">
+            <div className="text-xs text-gray-600 mb-2 font-medium uppercase tracking-wide">INACTIVE STAFF</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900">{stats.inactiveStaff}</div>
+          </Link>
+          <Link to="/staff/all" className="bg-white rounded-lg p-4 sm:p-5 shadow-sm border-l-4 border-orange-500 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 no-underline">
+            <div className="text-xs text-gray-600 mb-2 font-medium uppercase tracking-wide">NEW STAFF</div>
+            <div className="text-2xl sm:text-3xl font-bold text-gray-900">{stats.newStaff}</div>
           </Link>
         </div>
       </div>
 
       {/* Fees */}
       <div className="mb-6 sm:mb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-          <Link to="/billing" className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 shadow-xl hover:shadow-2xl transition-shadow duration-200 no-underline">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-            <div className="relative px-6 py-4 flex items-center justify-between">
-              <span className="text-white font-bold text-sm uppercase tracking-wider">SCHOOL FEES</span>
-              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <i className="fas fa-money-bill-wave text-white text-lg"></i>
+        <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-4">Fee Statistics</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <Link to="/billing" className="relative overflow-hidden bg-blue-500 rounded-lg p-5 sm:p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 no-underline">
+            <div className="relative z-10">
+              <div className="text-xl sm:text-2xl font-bold text-white mb-2">
+                GH¢ {stats.totalFees.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
+              <div className="text-xs text-white/90 font-medium uppercase tracking-wide">Total Sch Fees</div>
             </div>
-            <div className="relative p-6 bg-white/95 backdrop-blur-sm grid grid-cols-2 gap-6">
-              <div>
-                <div className="text-xs text-slate-600 mb-2 font-semibold uppercase tracking-wide">TOTAL FEES</div>
-                <div className="text-2xl md:text-3xl font-bold text-slate-900">GH¢ {stats.totalFees.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-              </div>
-              <div>
-                <div className="text-xs text-primary-600 mb-2 font-semibold uppercase tracking-wide">PAID FEES</div>
-                <div className="text-2xl md:text-3xl font-bold text-slate-900">GH¢ {stats.paidFees.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-              </div>
+            <div className="absolute bottom-0 left-0 opacity-20 z-0">
+              <i className="fas fa-coins text-6xl sm:text-7xl md:text-8xl text-white"></i>
             </div>
           </Link>
-          <Link to="/fee-balance" className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500 to-red-600 shadow-xl hover:shadow-2xl transition-shadow duration-200 no-underline">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-            <div className="relative px-6 py-4 flex items-center justify-between">
-              <span className="text-white font-bold text-sm uppercase tracking-wider">FEE BALANCE</span>
-              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <i className="fas fa-exclamation-triangle text-white text-lg"></i>
+          <Link to="/billing" className="relative overflow-hidden bg-green-500 rounded-lg p-5 sm:p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 no-underline">
+            <div className="relative z-10">
+              <div className="text-xl sm:text-2xl font-bold text-white mb-2">
+                GH¢ {stats.paidFees.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
+              <div className="text-xs text-white/90 font-medium uppercase tracking-wide">Total Sch Fee Collections</div>
             </div>
-            <div className="relative p-6 bg-white/95 backdrop-blur-sm grid grid-cols-2 gap-6">
-              <div>
-                <div className="text-xs text-slate-600 mb-2 font-semibold uppercase tracking-wide">OUTSTANDING</div>
-                <div className="text-2xl md:text-3xl font-bold text-slate-900">GH¢ {stats.feeBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+            <div className="absolute bottom-0 left-0 opacity-20 z-0">
+              <i className="fas fa-money-bill-wave text-6xl sm:text-7xl md:text-8xl text-white"></i>
+            </div>
+          </Link>
+          <Link to="/fee-balance" className="relative overflow-hidden bg-red-500 rounded-lg p-5 sm:p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 no-underline">
+            <div className="relative z-10">
+              <div className="text-xl sm:text-2xl font-bold text-white mb-2">
+                GH¢ {stats.feeBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
-              <div>
-                <div className="text-xs text-red-600 mb-2 font-semibold uppercase tracking-wide">COLLECTION RATE</div>
-                <div className="text-3xl md:text-4xl font-bold text-slate-900">{stats.collectionRate.toFixed(2)}%</div>
+              <div className="text-xs text-white/90 font-medium uppercase tracking-wide">Sch Fee Balance</div>
+            </div>
+            <div className="absolute bottom-0 left-0 opacity-20 z-0">
+              <i className="fas fa-exclamation-triangle text-6xl sm:text-7xl md:text-8xl text-white"></i>
+            </div>
+          </Link>
+          <Link to="/fee-balance" className="relative overflow-hidden bg-cyan-500 rounded-lg p-5 sm:p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 no-underline">
+            <div className="relative z-10">
+              <div className="text-xl sm:text-2xl font-bold text-white mb-2">
+                {stats.collectionRate.toFixed(2)}%
               </div>
+              <div className="text-xs text-white/90 font-medium uppercase tracking-wide">Collection Rate</div>
+            </div>
+            <div className="absolute bottom-0 left-0 opacity-20 z-0">
+              <i className="fas fa-chart-line text-6xl sm:text-7xl md:text-8xl text-white"></i>
             </div>
           </Link>
         </div>

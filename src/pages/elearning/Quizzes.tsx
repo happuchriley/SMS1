@@ -104,21 +104,31 @@ const Quizzes: React.FC = () => {
       <div className="mb-5 sm:mb-6 md:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Quizzes</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Manage Quizzes</h1>
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-gray-600 text-xs sm:text-sm">
               <Link to="/" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">Home</Link>
               <span>/</span>
               <Link to="/elearning" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">E-Learning</Link>
               <span>/</span>
-              <span className="text-gray-900 font-medium">Quizzes</span>
+              <Link to="/elearning/quizzes" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">Quizzes</Link>
+              <span>/</span>
+              <span className="text-gray-900 font-medium">Manage</span>
             </div>
           </div>
-          <Link
-            to="/elearning/quizzes/create"
-            className="px-4 py-2 bg-primary-500 text-white rounded-md text-sm font-semibold hover:bg-primary-700 transition-all duration-100"
-          >
-            <i className="fas fa-plus mr-2"></i>Create Quiz
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              to="/elearning/quizzes"
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-semibold hover:bg-gray-200 transition-all duration-100"
+            >
+              <i className="fas fa-home mr-2"></i>Quiz Home
+            </Link>
+            <Link
+              to="/elearning/quizzes/create"
+              className="px-4 py-2 bg-primary-500 text-white rounded-md text-sm font-semibold hover:bg-primary-700 transition-all duration-100"
+            >
+              <i className="fas fa-plus mr-2"></i>Create Quiz
+            </Link>
+          </div>
         </div>
       </div>
 

@@ -349,7 +349,7 @@ const AddStaff: React.FC = () => {
                   name="dateOfBirth"
                   value={formData.dateOfBirth}
                   onChange={handleChange}
-                  placeholder="YYYY-MM-DD"
+                  placeholder="DD/MM/YYYY"
                   required
                   className="text-sm"
                 />
@@ -701,7 +701,7 @@ const AddStaff: React.FC = () => {
                   name="employmentDate"
                   value={formData.employmentDate || ''}
                   onChange={handleChange}
-                  placeholder="YYYY-MM-DD"
+                  placeholder="DD/MM/YYYY"
                   className="text-sm"
                 />
               </div>

@@ -13,7 +13,7 @@ const SUBJECTS_TYPE = 'subjects';
 const BILL_ITEMS_TYPE = 'billItems';
 const BILLS_TYPE = 'bills';
 const PAYMENTS_TYPE = 'payments';
-const RESULTS_TYPE = 'results';
+const RESULTS_TYPE = 'academicResults';
 const NEWS_TYPE = 'news';
 const DOCUMENTS_TYPE = 'documents';
 const COURSES_TYPE = 'courses';
@@ -412,7 +412,7 @@ const demoDataService: DemoDataService = {
     if (students.length === 0 || subjects.length === 0) return;
 
     const academicYears = ['2023/2024', '2024/2025'];
-    const terms = ['1st Term', '2nd Term', '3rd Term'];
+    const terms = ['First Term', 'Second Term', 'Third Term'];
 
     const results = students.slice(0, 20).flatMap((student: any) => {
       const studentSubjects = subjects.filter((s: any) => 
@@ -428,6 +428,7 @@ const demoDataService: DemoDataService = {
           studentName: `${student.firstName} ${student.surname}`,
           class: student.class,
           subject: subject.name,
+          examType: 'End of Term',
           academicYear: academicYears[Math.floor(Math.random() * academicYears.length)],
           term: terms[Math.floor(Math.random() * terms.length)],
           score: score.toString(),

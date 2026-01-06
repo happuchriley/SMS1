@@ -81,7 +81,13 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
   }, []);
 
   const username = sessionStorage.getItem('username') || 'DTeye';
-  const userRole = sessionStorage.getItem('userType') || 'admin';
+  const userRole = sessionStorage.getItem('userType') || 'administrator';
+
+  // Helper function to check if a menu should be visible based on user role
+  const canAccess = (allowedRoles: string[]): boolean => {
+    if (allowedRoles.includes('all')) return true;
+    return allowedRoles.includes(userRole);
+  };
 
   const isActive = (path: string): boolean => {
     if (path === currentPath) return true;
@@ -136,12 +142,63 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
 
       {/* Sidebar Menu */}
       <ul className="list-none py-3">
-        {/* Manage Students */}
-        <li className="my-1">
+        {/* Dashboard Links */}
+        {canAccess(['administrator']) && (
+          <li className="my-1">
+            <Link
+              to="/"
+              className={`block px-5 py-3 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+                isActive('/') && userRole === 'administrator' ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
+              } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
+              onClick={handleLinkClick}
+            >
+              <div className="flex items-center">
+                <i className="fas fa-home mr-3 w-5 text-center text-sm"></i>
+                {!collapsed && <span className="text-sm font-medium">Dashboard</span>}
+              </div>
+            </Link>
+          </li>
+        )}
+        {canAccess(['staff']) && (
+          <li className="my-1">
+            <Link
+              to="/teacher-dashboard"
+              className={`block px-5 py-3 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+                isActive('/teacher-dashboard') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
+              } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
+              onClick={handleLinkClick}
+            >
+              <div className="flex items-center">
+                <i className="fas fa-home mr-3 w-5 text-center text-sm"></i>
+                {!collapsed && <span className="text-sm font-medium">Dashboard</span>}
+              </div>
+            </Link>
+          </li>
+        )}
+        {canAccess(['student']) && (
+          <li className="my-1">
+            <Link
+              to="/student-dashboard"
+              className={`block px-5 py-3 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+                isActive('/student-dashboard') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
+              } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
+              onClick={handleLinkClick}
+            >
+              <div className="flex items-center">
+                <i className="fas fa-home mr-3 w-5 text-center text-sm"></i>
+                {!collapsed && <span className="text-sm font-medium">Dashboard</span>}
+              </div>
+            </Link>
+          </li>
+        )}
+
+        {/* Manage Students - Admin only */}
+        {canAccess(['administrator']) && (
+          <li className="my-1">
           <button
             type="button"
             className={`w-full flex items-center justify-between px-5 py-3 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
-              expandedMenus.students ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
+              expandedMenus.students || isActive('/students') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
             } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
             onClick={() => toggleSubmenu('students')}
           >
@@ -161,7 +218,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/students/menu" 
                   className={`block px-5 py-2.5 pl-12 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/10 hover:text-white rounded-lg mx-2 ${
-                    isActive('/students/menu') ? 'bg-primary-500/20 text-white border-l-4 border-primary-400 pl-[36px] font-semibold shadow-md shadow-primary-500/10' : ''
+                    isActive('/students/menu') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[44px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -171,8 +228,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
               <li>
                 <Link 
                   to="/students/add" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90  mx-2 ${
-                    isActive('/students/add') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 rounded-lg mx-2 ${
+                    isActive('/students/add') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -182,8 +239,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
               <li>
                 <Link 
                   to="/students/all" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90  mx-2 ${
-                    isActive('/students/all') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 rounded-lg mx-2 ${
+                    isActive('/students/all') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -193,8 +250,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
               <li>
                 <Link 
                   to="/students/active" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90  mx-2 ${
-                    isActive('/students/active') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 rounded-lg mx-2 ${
+                    isActive('/students/active') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -204,8 +261,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
               <li>
                 <Link 
                   to="/students/inactive" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90  mx-2 ${
-                    isActive('/students/inactive') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 rounded-lg mx-2 ${
+                    isActive('/students/inactive') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -215,8 +272,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
               <li>
                 <Link 
                   to="/students/fresh" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90  mx-2 ${
-                    isActive('/students/fresh') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 rounded-lg mx-2 ${
+                    isActive('/students/fresh') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -226,8 +283,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
               <li>
                 <Link 
                   to="/students/classes" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90  mx-2 ${
-                    isActive('/students/classes') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 rounded-lg mx-2 ${
+                    isActive('/students/classes') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -237,8 +294,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
               <li>
                 <Link 
                   to="/students/parents" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90  mx-2 ${
-                    isActive('/students/parents') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 rounded-lg mx-2 ${
+                    isActive('/students/parents') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -248,13 +305,15 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
             </ul>
           )}
         </li>
+        )}
 
-        {/* Manage Staff */}
-        <li className="my-1">
+        {/* Manage Staff - Admin only */}
+        {canAccess(['administrator']) && (
+          <li className="my-1">
           <button
             type="button"
             className={`w-full flex items-center justify-between px-5 py-3 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
-              expandedMenus.staff ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
+              expandedMenus.staff || isActive('/staff') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
             } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
             onClick={() => toggleSubmenu('staff')}
           >
@@ -273,8 +332,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
               <li>
                 <Link 
                   to="/staff/menu" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90  mx-2 ${
-                    isActive('/staff/menu') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 rounded-lg mx-2 ${
+                    isActive('/staff/menu') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -284,8 +343,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
               <li>
                 <Link 
                   to="/staff/add" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90  mx-2 ${
-                    isActive('/staff/add') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 rounded-lg mx-2 ${
+                    isActive('/staff/add') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -295,8 +354,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
               <li>
                 <Link 
                   to="/staff/all" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90  mx-2 ${
-                    isActive('/staff/all') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 rounded-lg mx-2 ${
+                    isActive('/staff/all') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -306,8 +365,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
               <li>
                 <Link 
                   to="/staff/active" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90  mx-2 ${
-                    isActive('/staff/active') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 rounded-lg mx-2 ${
+                    isActive('/staff/active') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -317,8 +376,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
               <li>
                 <Link 
                   to="/staff/inactive" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90  mx-2 ${
-                    isActive('/staff/inactive') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 rounded-lg mx-2 ${
+                    isActive('/staff/inactive') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -328,8 +387,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
               <li>
                 <Link 
                   to="/staff/new" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90  mx-2 ${
-                    isActive('/staff/new') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 rounded-lg mx-2 ${
+                    isActive('/staff/new') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -339,8 +398,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
               <li>
                 <Link 
                   to="/staff/restriction" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90  mx-2 ${
-                    isActive('/staff/restriction') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 rounded-lg mx-2 ${
+                    isActive('/staff/restriction') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -350,8 +409,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
               <li>
                 <Link 
                   to="/staff/salary-structure" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90  mx-2 ${
-                    isActive('/staff/salary-structure') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 rounded-lg mx-2 ${
+                    isActive('/staff/salary-structure') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -361,8 +420,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
               <li>
                 <Link 
                   to="/staff/pay-reports" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90  mx-2 ${
-                    isActive('/staff/pay-reports') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 rounded-lg mx-2 ${
+                    isActive('/staff/pay-reports') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -372,13 +431,15 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
             </ul>
           )}
         </li>
+        )}
 
-        {/* Reports & Assessment */}
+        {/* Reports & Assessment - Admin and Staff */}
+        {canAccess(['administrator', 'staff']) && (
         <li className="my-1">
           <button
             type="button"
-            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
-              expandedMenus.reports ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+              expandedMenus.reports || isActive('/reports') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
             } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
             onClick={() => toggleSubmenu('reports')}
           >
@@ -398,7 +459,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/reports/populate-course-class" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/reports/populate-course-class') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/reports/populate-course-class') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -409,7 +470,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/reports/populate-course-student" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/reports/populate-course-student') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/reports/populate-course-student') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -420,7 +481,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/reports/enter-academic-result" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/reports/enter-academic-result') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/reports/enter-academic-result') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -431,7 +492,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/reports/student-promotion" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/reports/student-promotion') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/reports/student-promotion') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -442,7 +503,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/reports/end-term-remark" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/reports/end-term-remark') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/reports/end-term-remark') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -453,7 +514,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/reports/footnote" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/reports/footnote') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/reports/footnote') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -464,23 +525,54 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/reports/print-group-report" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/reports/print-group-report') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/reports/print-group-report') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
                   Print Group Report
                 </Link>
               </li>
+              <li>
+                <Link 
+                  to="/reports/student-academic-report" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/reports/student-academic-report') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Student Academic Report
+                </Link>
+              </li>
             </ul>
           )}
         </li>
+        )}
 
-        {/* Billing */}
+        {/* Student Academic Report - Students can view their own */}
+        {canAccess(['student']) && (
+        <li className="my-1">
+          <Link
+            to="/reports/student-academic-report"
+            className={`block px-5 py-3 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+              isActive('/reports/student-academic-report') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
+            } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
+            onClick={handleLinkClick}
+          >
+            <div className="flex items-center">
+              <i className="fas fa-file-alt mr-3 w-5 text-center text-sm"></i>
+              {!collapsed && <span className="text-sm font-medium">My Academic Report</span>}
+            </div>
+          </Link>
+        </li>
+        )}
+
+        {/* Billing - Admin only */}
+        {canAccess(['administrator']) && (
         <li className="my-1">
           <button
             type="button"
-            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
-              expandedMenus.billing ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+              expandedMenus.billing || isActive('/billing') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
             } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
             onClick={() => toggleSubmenu('billing')}
           >
@@ -500,7 +592,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/billing/create-single" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/billing/create-single') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/billing/create-single') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -511,7 +603,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/billing/create-group" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/billing/create-group') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/billing/create-group') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -522,7 +614,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/billing/scholarship-list" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/billing/scholarship-list') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/billing/scholarship-list') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -533,7 +625,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/billing/debtors-report" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/billing/debtors-report') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/billing/debtors-report') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -544,7 +636,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/billing/creditors-report" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/billing/creditors-report') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/billing/creditors-report') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -555,7 +647,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/billing/print-group-bill" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/billing/print-group-bill') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/billing/print-group-bill') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -566,7 +658,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/billing/print-group-statement" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/billing/print-group-statement') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/billing/print-group-statement') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -576,13 +668,15 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
             </ul>
           )}
         </li>
+        )}
 
-        {/* Fee Collection */}
+        {/* Fee Collection - Admin only */}
+        {canAccess(['administrator']) && (
         <li className="my-1">
           <button
             type="button"
-            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
-              expandedMenus.feeCollection ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+              expandedMenus.feeCollection || isActive('/fee-collection') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
             } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
             onClick={() => toggleSubmenu('feeCollection')}
           >
@@ -602,7 +696,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/fee-collection/record-single" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/fee-collection/record-single') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/fee-collection/record-single') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -613,7 +707,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/fee-collection/record-all" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/fee-collection/record-all') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/fee-collection/record-all') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -624,7 +718,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/fee-collection/manage-other-fees" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/fee-collection/manage-other-fees') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/fee-collection/manage-other-fees') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -635,7 +729,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/fee-collection/record-other-fee" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/fee-collection/record-other-fee') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/fee-collection/record-other-fee') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -646,7 +740,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/fee-collection/receive-other-fee" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/fee-collection/receive-other-fee') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/fee-collection/receive-other-fee') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -657,7 +751,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/fee-collection/debtors-report" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/fee-collection/debtors-report') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/fee-collection/debtors-report') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -668,7 +762,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/fee-collection/creditors-report" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/fee-collection/creditors-report') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/fee-collection/creditors-report') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -679,7 +773,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/fee-collection/print-group-bill" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/fee-collection/print-group-bill') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/fee-collection/print-group-bill') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -690,7 +784,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/fee-collection/print-group-statement" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/fee-collection/print-group-statement') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/fee-collection/print-group-statement') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -700,13 +794,15 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
             </ul>
           )}
         </li>
+        )}
 
-        {/* Payroll */}
+        {/* Payroll - Admin only */}
+        {canAccess(['administrator']) && (
         <li className="my-1">
           <button
             type="button"
-            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
-              expandedMenus.payroll ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+              expandedMenus.payroll || isActive('/payroll') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
             } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
             onClick={() => toggleSubmenu('payroll')}
           >
@@ -726,7 +822,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/payroll/overview" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/payroll/overview') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/payroll/overview') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -737,7 +833,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/payroll/generate-payslip" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/payroll/generate-payslip') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/payroll/generate-payslip') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -748,7 +844,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/payroll/schedule" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/payroll/schedule') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/payroll/schedule') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -759,7 +855,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/payroll/bank-schedule" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/payroll/bank-schedule') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/payroll/bank-schedule') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -770,7 +866,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/payroll/tax-reports" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/payroll/tax-reports') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/payroll/tax-reports') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -781,7 +877,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/payroll/advances" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/payroll/advances') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/payroll/advances') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -791,13 +887,15 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
             </ul>
           )}
         </li>
+        )}
 
-        {/* Finance Entries */}
+        {/* Finance Entries - Admin only */}
+        {canAccess(['administrator']) && (
         <li className="my-1">
           <button
             type="button"
-            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
-              expandedMenus.finance ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+              expandedMenus.finance || isActive('/finance') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
             } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
             onClick={() => toggleSubmenu('finance')}
           >
@@ -817,7 +915,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/finance/debtor-entry" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/finance/debtor-entry') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/finance/debtor-entry') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -828,7 +926,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/finance/creditor-entry" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/finance/creditor-entry') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/finance/creditor-entry') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -839,7 +937,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/finance/income-entry" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/finance/income-entry') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/finance/income-entry') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -850,7 +948,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/finance/expense-entry" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/finance/expense-entry') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/finance/expense-entry') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -861,7 +959,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/finance/general-journal" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/finance/general-journal') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/finance/general-journal') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -872,7 +970,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/finance/general-ledger" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/finance/general-ledger') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/finance/general-ledger') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -883,7 +981,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/finance/fixed-asset" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/finance/fixed-asset') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/finance/fixed-asset') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -893,13 +991,15 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
             </ul>
           )}
         </li>
+        )}
 
-        {/* Financial Reports */}
+        {/* Financial Reports - Admin only */}
+        {canAccess(['administrator']) && (
         <li className="my-1">
           <button
             type="button"
-            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
-              expandedMenus.financialReports ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+              expandedMenus.financialReports || isActive('/financial-reports') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
             } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
             onClick={() => toggleSubmenu('financialReports')}
           >
@@ -919,7 +1019,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/financial-reports/fee-collection" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/financial-reports/fee-collection') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/financial-reports/fee-collection') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -930,7 +1030,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/financial-reports/other-fee-all" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/financial-reports/other-fee-all') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/financial-reports/other-fee-all') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -941,7 +1041,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/financial-reports/other-fee-range" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/financial-reports/other-fee-range') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/financial-reports/other-fee-range') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -952,7 +1052,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/financial-reports/expenditure" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/financial-reports/expenditure') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/financial-reports/expenditure') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -963,7 +1063,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/financial-reports/debtors" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/financial-reports/debtors') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/financial-reports/debtors') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -974,7 +1074,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/financial-reports/creditors" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/financial-reports/creditors') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/financial-reports/creditors') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -985,7 +1085,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/financial-reports/generate-ledger" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/financial-reports/generate-ledger') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/financial-reports/generate-ledger') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -996,7 +1096,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/financial-reports/trial-balance" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/financial-reports/trial-balance') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/financial-reports/trial-balance') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1007,7 +1107,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/financial-reports/income-statement" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/financial-reports/income-statement') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/financial-reports/income-statement') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1018,7 +1118,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/financial-reports/chart-of-accounts" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/financial-reports/chart-of-accounts') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/financial-reports/chart-of-accounts') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1028,13 +1128,15 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
             </ul>
           )}
         </li>
+        )}
 
-        {/* SMS/Email Reminders */}
+        {/* SMS/Email Reminders - Admin only */}
+        {canAccess(['administrator']) && (
         <li className="my-1">
           <button
             type="button"
-            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
-              expandedMenus.reminders ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+              expandedMenus.reminders || isActive('/reminders') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
             } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
             onClick={() => toggleSubmenu('reminders')}
           >
@@ -1054,7 +1156,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/reminders/bill-reminder" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/reminders/bill-reminder') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/reminders/bill-reminder') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1065,7 +1167,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/reminders/payment-notification" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/reminders/payment-notification') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/reminders/payment-notification') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1076,7 +1178,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/reminders/application-details" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/reminders/application-details') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/reminders/application-details') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1087,7 +1189,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/reminders/event-reminder" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/reminders/event-reminder') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/reminders/event-reminder') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1098,7 +1200,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/reminders/staff-reminder" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/reminders/staff-reminder') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/reminders/staff-reminder') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1108,13 +1210,15 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
             </ul>
           )}
         </li>
+        )}
 
-        {/* News/Notices */}
+        {/* News/Notices - All roles */}
+        {canAccess(['all']) && (
         <li className="my-1">
           <button
             type="button"
-            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
-              expandedMenus.news ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+              expandedMenus.news || isActive('/news') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
             } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
             onClick={() => toggleSubmenu('news')}
           >
@@ -1134,7 +1238,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/news/add" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/news/add') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/news/add') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1145,7 +1249,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/news/page" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/news/page') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/news/page') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1156,7 +1260,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/news/academic-calendar" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/news/academic-calendar') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/news/academic-calendar') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1166,13 +1270,15 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
             </ul>
           )}
         </li>
+        )}
 
-        {/* TLMs */}
+        {/* TLMs - Admin and Staff */}
+        {canAccess(['administrator', 'staff']) && (
         <li className="my-1">
           <button
             type="button"
-            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
-              expandedMenus.tlms ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+              expandedMenus.tlms || isActive('/tlms') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
             } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
             onClick={() => toggleSubmenu('tlms')}
           >
@@ -1192,7 +1298,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/tlms/library" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/tlms/library') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/tlms/library') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1203,7 +1309,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/tlms/upload" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/tlms/upload') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/tlms/upload') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1214,7 +1320,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/tlms/categories" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/tlms/categories') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/tlms/categories') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1225,7 +1331,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/tlms/my-materials" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/tlms/my-materials') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/tlms/my-materials') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1235,13 +1341,15 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
             </ul>
           )}
         </li>
+        )}
 
-        {/* E-Learning */}
+        {/* E-Learning - All roles */}
+        {canAccess(['all']) && (
         <li className="my-1">
           <button
             type="button"
-            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
-              expandedMenus.elearning ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+              expandedMenus.elearning || isActive('/elearning') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
             } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
             onClick={() => toggleSubmenu('elearning')}
           >
@@ -1261,7 +1369,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/elearning/courses" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/elearning/courses') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/elearning/courses') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1272,7 +1380,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/elearning/assignments" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/elearning/assignments') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/elearning/assignments') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1283,7 +1391,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/elearning/quizzes" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/elearning/quizzes') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/elearning/quizzes') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1294,7 +1402,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/elearning/progress" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/elearning/progress') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/elearning/progress') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1304,13 +1412,15 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
             </ul>
           )}
         </li>
+        )}
 
-        {/* School Setup */}
+        {/* School Setup - Admin only */}
+        {canAccess(['administrator']) && (
         <li className="my-1">
           <button
             type="button"
-            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
-              expandedMenus.setup ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+              expandedMenus.setup || isActive('/setup') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
             } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
             onClick={() => toggleSubmenu('setup')}
           >
@@ -1330,7 +1440,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/setup/school-details" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/setup/school-details') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/setup/school-details') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1341,7 +1451,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/setup/item-setup" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/setup/item-setup') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/setup/item-setup') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1352,7 +1462,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/setup/class-list" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/setup/class-list') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/setup/class-list') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1363,7 +1473,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/setup/subject-course" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/setup/subject-course') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/setup/subject-course') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1374,7 +1484,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/setup/bill-item" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/setup/bill-item') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/setup/bill-item') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1384,13 +1494,15 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
             </ul>
           )}
         </li>
+        )}
 
-        {/* My Documents */}
-        <li className="my-1">
+        {/* My Documents - All roles */}
+        {canAccess(['all']) && (
+          <li className="my-1">
           <button
             type="button"
-            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 ${
-              expandedMenus.documents ? 'bg-primary/20 text-white border-l-3 border-primary font-semibold' : ''
+            className={`w-full flex items-center justify-between px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline font-inherit text-inherit hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+              expandedMenus.documents || isActive('/documents') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''
             } ${collapsed ? 'justify-center px-3 mx-2' : ''}`}
             onClick={() => toggleSubmenu('documents')}
           >
@@ -1410,7 +1522,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/documents/my-uploads" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/documents/my-uploads') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/documents/my-uploads') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1421,7 +1533,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/documents/shared" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/documents/shared') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/documents/shared') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1432,7 +1544,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/documents/categories" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/documents/categories') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/documents/categories') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1443,7 +1555,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                 <Link 
                   to="/documents/recent" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/documents/recent') ? 'bg-white/10 text-white border-l-2 border-secondary pl-[38px] font-medium' : ''
+                    isActive('/documents/recent') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
@@ -1453,22 +1565,25 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
             </ul>
           )}
         </li>
+        )}
 
-        {/* My Account */}
-        <li className="my-1">
-          <Link 
-            to="/profile" 
-            className={`flex items-center px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline hover:bg-white/10 hover:text-white mx-2 ${
-              collapsed ? 'justify-center px-3 mx-2' : ''
-            } ${isActive('/profile') ? 'bg-white/10 text-white border-l-2 border-primary' : ''}`}
-            onClick={handleLinkClick}
-          >
-            <i className="fas fa-user-cog mr-3 w-5 text-center text-sm"></i>
-            {!collapsed && <span className="text-sm font-medium">My Account</span>}
-          </Link>
-        </li>
+        {/* My Account - All roles */}
+        {canAccess(['all']) && (
+          <li className="my-1">
+            <Link 
+              to="/profile" 
+              className={`flex items-center px-5 py-2.5 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/90 no-underline hover:bg-white/10 hover:text-white mx-2 rounded-lg ${
+                collapsed ? 'justify-center px-3 mx-2' : ''
+              } ${isActive('/profile') ? 'bg-primary-500/20 text-white border-l-4 border-primary-500 font-bold shadow-lg shadow-primary-500/10' : ''}`}
+              onClick={handleLinkClick}
+            >
+              <i className="fas fa-user-cog mr-3 w-5 text-center text-sm"></i>
+              {!collapsed && <span className="text-sm font-medium">My Account</span>}
+            </Link>
+          </li>
+        )}
 
-        {/* Logout */}
+        {/* Logout - All roles */}
         <li className="my-1 mt-3 border-t border-white/5 pt-3">
           <button
             type="button"
