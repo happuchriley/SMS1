@@ -154,16 +154,22 @@
   /* Ensure select dropdowns are touch-friendly on mobile */
   @media (max-width: 768px) {
     select {
-      font-size: 16px !important; /* Prevents zoom on iOS */
-      min-height: 52px !important;
-      padding-left: 3rem !important;
-      padding-right: 3rem !important;
+      font-size: 18px !important; /* Prevents zoom on iOS and improves readability */
+      min-height: 60px !important;
+      padding-left: 3.5rem !important;
+      padding-right: 3.5rem !important;
+      padding-top: 1rem !important;
+      padding-bottom: 1rem !important;
+      line-height: 1.5 !important;
     }
   }
 
   @media (min-width: 640px) and (max-width: 768px) {
     select {
-      min-height: 56px !important;
+      font-size: 20px !important;
+      min-height: 64px !important;
+      padding-left: 3.75rem !important;
+      padding-right: 3.75rem !important;
     }
   }
 
