@@ -241,15 +241,22 @@ const StaffRestriction: React.FC = () => {
             />
           </div>
           <div className="sm:w-48">
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="input-modern w-full"
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
+            <div className="relative select-dropdown-wrapper">
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="select-dropdown input-modern w-full"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <div className="select-dropdown-arrow">
+                <div className="select-dropdown-arrow-icon">
+                  <i className="fas fa-chevron-down"></i>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -277,37 +284,51 @@ const StaffRestriction: React.FC = () => {
                   <label className="block mb-2 font-semibold text-gray-900 text-sm">
                     Staff <span className="text-red-500">*</span>
                   </label>
-                  <select
-                    name="staffId"
-                    value={formData.staffId || ''}
-                    onChange={handleChange}
-                    required
-                    className="input-modern w-full"
-                  >
-                    <option value="">Select Staff</option>
-                    {staffList.map(staff => (
-                      <option key={staff.id} value={staff.id}>
-                        {staff.staffId || staff.id} - {staff.firstName} {staff.surname} {staff.otherNames || ''}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative select-dropdown-wrapper">
+                    <select
+                      name="staffId"
+                      value={formData.staffId || ''}
+                      onChange={handleChange}
+                      required
+                      className="select-dropdown input-modern w-full"
+                    >
+                      <option value="">Select Staff</option>
+                      {staffList.map(staff => (
+                        <option key={staff.id} value={staff.id}>
+                          {staff.staffId || staff.id} - {staff.firstName} {staff.surname} {staff.otherNames || ''}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="select-dropdown-arrow">
+                      <div className="select-dropdown-arrow-icon">
+                        <i className="fas fa-chevron-down"></i>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block mb-2 font-semibold text-gray-900 text-sm">
                     Restriction Type <span className="text-red-500">*</span>
                   </label>
-                  <select
-                    name="restrictionType"
-                    value={formData.restrictionType || ''}
-                    onChange={handleChange}
-                    required
-                    className="input-modern w-full"
-                  >
-                    <option value="">Select Type</option>
-                    {restrictionTypes.map(type => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
+                  <div className="relative select-dropdown-wrapper">
+                    <select
+                      name="restrictionType"
+                      value={formData.restrictionType || ''}
+                      onChange={handleChange}
+                      required
+                      className="select-dropdown input-modern w-full"
+                    >
+                      <option value="">Select Type</option>
+                      {restrictionTypes.map(type => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                    <div className="select-dropdown-arrow">
+                      <div className="select-dropdown-arrow-icon">
+                        <i className="fas fa-chevron-down"></i>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block mb-2 font-semibold text-gray-900 text-sm">
@@ -345,15 +366,22 @@ const StaffRestriction: React.FC = () => {
                 </div>
                 <div>
                   <label className="block mb-2 font-semibold text-gray-900 text-sm">Status</label>
-                  <select
-                    name="status"
-                    value={formData.status || 'active'}
-                    onChange={handleChange}
-                    className="input-modern w-full"
-                  >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
+                  <div className="relative select-dropdown-wrapper">
+                    <select
+                      name="status"
+                      value={formData.status || 'active'}
+                      onChange={handleChange}
+                      className="select-dropdown input-modern w-full"
+                    >
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                    <div className="select-dropdown-arrow">
+                      <div className="select-dropdown-arrow-icon">
+                        <i className="fas fa-chevron-down"></i>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block mb-2 font-semibold text-gray-900 text-sm">Notes</label>

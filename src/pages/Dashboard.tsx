@@ -116,22 +116,50 @@ const Dashboard: React.FC = () => {
       {/* Filter Bar */}
       <div className="card-modern mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center flex-wrap">
-          <select className="input-modern w-full sm:w-auto sm:flex-1 min-h-[48px] sm:min-h-auto">
-            <option>2023 Academic Year, 2023/2024</option>
-          </select>
-          <select className="input-modern w-full md:w-auto flex-1">
-            <option>First Term</option>
-            <option>Second Term</option>
-            <option>Third Term</option>
-          </select>
-          <select className="input-modern w-full md:w-auto flex-1">
-            <option>Basic 1 - Ages 6 years, Basic 2-</option>
-          </select>
-          <select className="input-modern w-full md:w-auto flex-1">
-            <option>Tuition Fee</option>
-            <option>Admission Fee</option>
-            <option>School Fees</option>
-          </select>
+          <div className="relative select-dropdown-wrapper w-full sm:w-auto sm:flex-1">
+            <select className="select-dropdown input-modern w-full sm:w-auto sm:flex-1 min-h-[44px] sm:min-h-[40px] md:min-h-[44px]">
+              <option>2023 Academic Year, 2023/2024</option>
+            </select>
+            <div className="select-dropdown-arrow">
+              <div className="select-dropdown-arrow-icon">
+                <i className="fas fa-chevron-down"></i>
+              </div>
+            </div>
+          </div>
+          <div className="relative select-dropdown-wrapper w-full md:w-auto flex-1">
+            <select className="select-dropdown input-modern w-full md:w-auto flex-1 min-h-[44px] sm:min-h-[40px] md:min-h-[44px]">
+              <option>First Term</option>
+              <option>Second Term</option>
+              <option>Third Term</option>
+            </select>
+            <div className="select-dropdown-arrow">
+              <div className="select-dropdown-arrow-icon">
+                <i className="fas fa-chevron-down"></i>
+              </div>
+            </div>
+          </div>
+          <div className="relative select-dropdown-wrapper w-full md:w-auto flex-1">
+            <select className="select-dropdown input-modern w-full md:w-auto flex-1 min-h-[44px] sm:min-h-[40px] md:min-h-[44px]">
+              <option>Basic 1 - Ages 6 years, Basic 2-</option>
+            </select>
+            <div className="select-dropdown-arrow">
+              <div className="select-dropdown-arrow-icon">
+                <i className="fas fa-chevron-down"></i>
+              </div>
+            </div>
+          </div>
+          <div className="relative select-dropdown-wrapper w-full md:w-auto flex-1">
+            <select className="select-dropdown input-modern w-full md:w-auto flex-1 min-h-[44px] sm:min-h-[40px] md:min-h-[44px]">
+              <option>Tuition Fee</option>
+              <option>Admission Fee</option>
+              <option>School Fees</option>
+            </select>
+            <div className="select-dropdown-arrow">
+              <div className="select-dropdown-arrow-icon">
+                <i className="fas fa-chevron-down"></i>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -143,6 +143,66 @@
     }
   }
 
+  /* Select dropdown styling - smaller than text inputs with visible arrows */
+  .select-dropdown {
+    @apply appearance-none cursor-pointer relative;
+    background-image: none !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 2.75rem !important;
+  }
+
+  /* Select dropdown wrapper - automatically adds arrow */
+  .select-dropdown-wrapper {
+    @apply relative;
+  }
+
+  /* Select dropdown arrow indicator */
+  .select-dropdown-arrow {
+    @apply absolute right-2.5 sm:right-3 md:right-2.5 top-1/2 -translate-y-1/2 pointer-events-none z-30;
+  }
+
+  .select-dropdown-arrow-icon {
+    @apply flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 rounded-full border-2 border-primary-400 shadow-sm;
+  }
+
+  .select-dropdown-arrow-icon i {
+    @apply text-primary-700 text-xs sm:text-sm font-extrabold;
+  }
+
+  /* Automatic arrow for all select elements in forms */
+  form .select-dropdown-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.75rem;
+    height: 1.75rem;
+    background-color: rgb(219 234 254);
+    border-radius: 50%;
+    border: 2px solid rgb(96 165 250);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  form .select-dropdown-wrapper::before {
+    content: '\f078';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 1.125rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgb(29 78 216);
+    font-size: 0.75rem;
+    pointer-events: none;
+    z-index: 11;
+  }
+
   /* Mobile select dropdown improvements */
   select {
     -webkit-appearance: none;
@@ -151,9 +211,9 @@
     background-image: none;
   }
 
-  /* Ensure select dropdowns are touch-friendly on mobile */
+  /* Ensure select dropdowns are touch-friendly on mobile - smaller than text inputs */
   @media (max-width: 768px) {
-    select:not(.login-select-dropdown) {
+    select:not(.login-select-dropdown):not(.select-dropdown) {
       font-size: 18px !important; /* Prevents zoom on iOS and improves readability */
       min-height: 60px !important;
       padding-left: 3.5rem !important;
@@ -163,7 +223,8 @@
       line-height: 1.5 !important;
     }
     
-    /* Login page select - smaller than text inputs */
+    /* Dropdown selects - smaller than text inputs */
+    .select-dropdown,
     .login-select-dropdown {
       font-size: 16px !important;
       min-height: 44px !important;
@@ -176,13 +237,14 @@
   }
 
   @media (min-width: 640px) and (max-width: 768px) {
-    select:not(.login-select-dropdown) {
+    select:not(.login-select-dropdown):not(.select-dropdown) {
       font-size: 20px !important;
       min-height: 64px !important;
       padding-left: 3.75rem !important;
       padding-right: 3.75rem !important;
     }
     
+    .select-dropdown,
     .login-select-dropdown {
       font-size: 18px !important;
       min-height: 48px !important;
@@ -194,6 +256,29 @@
   /* Input styles - Modern with focus states */
   .input-modern {
     @apply w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-colors duration-100 bg-white text-slate-900 placeholder:text-slate-400 hover:border-slate-300;
+  }
+
+  /* Select elements with input-modern class - smaller than text inputs */
+  select.input-modern,
+  select.select-dropdown {
+    @apply appearance-none cursor-pointer min-h-[44px] sm:min-h-[40px] md:min-h-[44px] py-2.5 sm:py-2.5 md:py-2.5;
+    padding-right: 2.75rem !important;
+    background-image: none !important;
+  }
+
+  /* Automatically style all select elements to be smaller than text inputs */
+  select:not(.login-select-dropdown):not(.select-dropdown) {
+    @apply appearance-none;
+    background-image: none !important;
+  }
+
+  /* Select elements in forms - make them smaller than text inputs */
+  form select:not(.login-select-dropdown):not(.select-dropdown) {
+    min-height: 44px !important;
+    padding-right: 2.75rem !important;
+    padding-top: 0.625rem !important;
+    padding-bottom: 0.625rem !important;
+    font-size: 0.875rem !important;
   }
 
   .input-floating {

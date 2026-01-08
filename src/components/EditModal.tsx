@@ -125,22 +125,29 @@ const EditModal: React.FC<EditModalProps> = ({
               {field.label || field.name}
               {field.required && <span className="text-red-500 ml-1">*</span>}
             </label>
-            <select
-              name={field.name}
-              value={value}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) => handleChange(field.name, e.target.value)}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 ${
-                error ? 'border-red-500' : 'border-gray-300'
-              }`}
-              disabled={field.disabled || isLoading}
-            >
-              {field.placeholder && <option value="">{field.placeholder}</option>}
-              {field.options?.map(opt => (
-                <option key={typeof opt === 'object' ? opt.value : opt} value={typeof opt === 'object' ? opt.value : opt}>
-                  {typeof opt === 'object' ? opt.label : opt}
-                </option>
-              ))}
-            </select>
+            <div className="relative select-dropdown-wrapper">
+              <select
+                name={field.name}
+                value={value}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => handleChange(field.name, e.target.value)}
+                className={`select-dropdown w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[44px] ${
+                  error ? 'border-red-500' : 'border-gray-300'
+                }`}
+                disabled={field.disabled || isLoading}
+              >
+                {field.placeholder && <option value="">{field.placeholder}</option>}
+                {field.options?.map(opt => (
+                  <option key={typeof opt === 'object' ? opt.value : opt} value={typeof opt === 'object' ? opt.value : opt}>
+                    {typeof opt === 'object' ? opt.label : opt}
+                  </option>
+                ))}
+              </select>
+              <div className="select-dropdown-arrow">
+                <div className="select-dropdown-arrow-icon">
+                  <i className="fas fa-chevron-down"></i>
+                </div>
+              </div>
+            </div>
             {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
           </div>
         );

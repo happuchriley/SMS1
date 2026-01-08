@@ -268,20 +268,27 @@ const AddStaff: React.FC = () => {
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
                   Staff Title <span className="text-red-500">*</span>
                 </label>
-                <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Select Staff Title *</option>
-                  <option>Mr.</option>
-                  <option>Mrs.</option>
-                  <option>Miss</option>
-                  <option>Dr.</option>
-                  <option>Prof.</option>
-                </select>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]" 
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Select Staff Title *</option>
+                    <option>Mr.</option>
+                    <option>Mrs.</option>
+                    <option>Miss</option>
+                    <option>Dr.</option>
+                    <option>Prof.</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
@@ -329,17 +336,24 @@ const AddStaff: React.FC = () => {
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
                   Gender <span className="text-red-500">*</span>
                 </label>
-                <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Gender *</option>
-                  <option>Male</option>
-                  <option>Female</option>
-                </select>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]" 
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Gender *</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
@@ -369,20 +383,27 @@ const AddStaff: React.FC = () => {
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
                   Staff Qualification <span className="text-red-500">*</span>
                 </label>
-                <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  name="qualification"
-                  value={formData.qualification}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Staff Qualification *</option>
-                  <option>B.Ed</option>
-                  <option>M.Ed</option>
-                  <option>Ph.D</option>
-                  <option>Diploma</option>
-                  <option>Certificate</option>
-                </select>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]" 
+                    name="qualification"
+                    value={formData.qualification}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Staff Qualification *</option>
+                    <option>B.Ed</option>
+                    <option>M.Ed</option>
+                    <option>Ph.D</option>
+                    <option>Diploma</option>
+                    <option>Certificate</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
@@ -411,16 +432,23 @@ const AddStaff: React.FC = () => {
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">National</label>
-                <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  name="national"
-                  value={formData.national}
-                  onChange={handleChange}
-                >
-                  <option>Ghana</option>
-                  <option>Nigeria</option>
-                  <option>Other</option>
-                </select>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]" 
+                    name="national"
+                    value={formData.national}
+                    onChange={handleChange}
+                  >
+                    <option>Ghana</option>
+                    <option>Nigeria</option>
+                    <option>Other</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Country of Residence</label>

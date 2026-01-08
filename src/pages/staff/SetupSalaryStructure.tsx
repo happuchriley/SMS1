@@ -307,15 +307,22 @@ const SetupSalaryStructure: React.FC = () => {
                 </div>
                 <div>
                   <label className="block mb-2 font-semibold text-gray-900 text-sm">Status</label>
-                  <select
-                    name="status"
-                    value={formData.status || 'active'}
-                    onChange={handleChange}
-                    className="input-modern w-full"
-                  >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
+                  <div className="relative select-dropdown-wrapper">
+                    <select
+                      name="status"
+                      value={formData.status || 'active'}
+                      onChange={handleChange}
+                      className="select-dropdown input-modern w-full"
+                    >
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                    <div className="select-dropdown-arrow">
+                      <div className="select-dropdown-arrow-icon">
+                        <i className="fas fa-chevron-down"></i>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -339,14 +346,21 @@ const SetupSalaryStructure: React.FC = () => {
                     step="0.01"
                     className="input-modern"
                   />
-                  <select
-                    value={newAllowance.type}
-                    onChange={(e) => setNewAllowance({ ...newAllowance, type: e.target.value as 'fixed' | 'percentage' })}
-                    className="input-modern"
-                  >
-                    <option value="fixed">Fixed</option>
-                    <option value="percentage">%</option>
-                  </select>
+                  <div className="relative select-dropdown-wrapper">
+                    <select
+                      value={newAllowance.type}
+                      onChange={(e) => setNewAllowance({ ...newAllowance, type: e.target.value as 'fixed' | 'percentage' })}
+                      className="select-dropdown input-modern"
+                    >
+                      <option value="fixed">Fixed</option>
+                      <option value="percentage">%</option>
+                    </select>
+                    <div className="select-dropdown-arrow">
+                      <div className="select-dropdown-arrow-icon">
+                        <i className="fas fa-chevron-down"></i>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <button
                   type="button"
@@ -395,14 +409,21 @@ const SetupSalaryStructure: React.FC = () => {
                     step="0.01"
                     className="input-modern"
                   />
-                  <select
-                    value={newDeduction.type}
-                    onChange={(e) => setNewDeduction({ ...newDeduction, type: e.target.value as 'fixed' | 'percentage' })}
-                    className="input-modern"
-                  >
-                    <option value="fixed">Fixed</option>
-                    <option value="percentage">%</option>
-                  </select>
+                  <div className="relative select-dropdown-wrapper">
+                    <select
+                      value={newDeduction.type}
+                      onChange={(e) => setNewDeduction({ ...newDeduction, type: e.target.value as 'fixed' | 'percentage' })}
+                      className="select-dropdown input-modern"
+                    >
+                      <option value="fixed">Fixed</option>
+                      <option value="percentage">%</option>
+                    </select>
+                    <div className="select-dropdown-arrow">
+                      <div className="select-dropdown-arrow-icon">
+                        <i className="fas fa-chevron-down"></i>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <button
                   type="button"

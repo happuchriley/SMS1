@@ -241,36 +241,50 @@ const CreateSingleBill: React.FC = () => {
               <label className="block mb-2 font-semibold text-gray-900 text-sm">
                 Term <span className="text-red-500">*</span>
               </label>
-              <select
-                name="term"
-                value={formData.term}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-              >
-                <option value="">Select Term</option>
-                {terms.map(term => (
-                  <option key={term} value={term}>{term}</option>
-                ))}
-              </select>
+              <div className="relative select-dropdown-wrapper">
+                <select
+                  name="term"
+                  value={formData.term}
+                  onChange={handleChange}
+                  required
+                  className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
+                >
+                  <option value="">Select Term</option>
+                  {terms.map(term => (
+                    <option key={term} value={term}>{term}</option>
+                  ))}
+                </select>
+                <div className="select-dropdown-arrow">
+                  <div className="select-dropdown-arrow-icon">
+                    <i className="fas fa-chevron-down"></i>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div>
               <label className="block mb-2 font-semibold text-gray-900 text-sm">
                 Class <span className="text-red-500">*</span>
               </label>
-              <select
-                name="class"
-                value={formData.class}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-              >
-                <option value="">Select Class</option>
-                {classes.map(cls => (
-                  <option key={cls} value={cls}>{cls}</option>
-                ))}
-              </select>
+              <div className="relative select-dropdown-wrapper">
+                <select
+                  name="class"
+                  value={formData.class}
+                  onChange={handleChange}
+                  required
+                  className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
+                >
+                  <option value="">Select Class</option>
+                  {classes.map(cls => (
+                    <option key={cls} value={cls}>{cls}</option>
+                  ))}
+                </select>
+                <div className="select-dropdown-arrow">
+                  <div className="select-dropdown-arrow-icon">
+                    <i className="fas fa-chevron-down"></i>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="sm:col-span-2 lg:col-span-3">

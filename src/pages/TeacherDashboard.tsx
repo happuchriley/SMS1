@@ -237,18 +237,25 @@ const TeacherDashboard: React.FC = () => {
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <h3 className="section-title">My Students</h3>
                 <div className="flex items-center gap-3">
-                  <select
-                    value={selectedClass}
-                    onChange={(e) => setSelectedClass(e.target.value)}
-                    className="px-4 py-2 border-2 border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary-500 transition-colors"
-                  >
-                    <option value="all">All Classes</option>
-                    {myClasses.map((cls) => (
-                      <option key={cls.id} value={cls.name}>
-                        {cls.name} ({cls.studentCount})
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative select-dropdown-wrapper">
+                    <select
+                      value={selectedClass}
+                      onChange={(e) => setSelectedClass(e.target.value)}
+                      className="select-dropdown px-4 py-2 border-2 border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary-500 transition-colors min-h-[44px] sm:min-h-[40px] md:min-h-[44px]"
+                    >
+                      <option value="all">All Classes</option>
+                      {myClasses.map((cls) => (
+                        <option key={cls.id} value={cls.name}>
+                          {cls.name} ({cls.studentCount})
+                        </option>
+                      ))}
+                    </select>
+                    <div className="select-dropdown-arrow">
+                      <div className="select-dropdown-arrow-icon">
+                        <i className="fas fa-chevron-down"></i>
+                      </div>
+                    </div>
+                  </div>
                   <button
                     onClick={() => navigate('/reports/enter-academic-result')}
                     className="px-4 py-2 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors"
