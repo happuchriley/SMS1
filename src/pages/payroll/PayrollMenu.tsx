@@ -13,46 +13,18 @@ interface MenuCard {
 const PayrollMenu: React.FC = () => {
   const menuCards: MenuCard[] = [
     {
-      title: "Payroll Overview",
-      subtitle: "View payroll summary and statistics",
-      icon: "fa-chart-bar",
-      path: "/payroll/overview",
+      title: "Setup Salary Structure",
+      subtitle: "Configure salary structures, allowances, and deductions",
+      icon: "fa-cog",
+      path: "/payroll/setup-salary-structure",
       color: "border-blue-500",
     },
     {
-      title: "Generate Payslip",
-      subtitle: "Generate payslips for staff",
-      icon: "fa-file-invoice",
-      path: "/payroll/generate-payslip",
+      title: "Pay Reports",
+      subtitle: "View payroll reports and payslips",
+      icon: "fa-file-invoice-dollar",
+      path: "/payroll/pay-reports",
       color: "border-green-500",
-    },
-    {
-      title: "Payroll Schedule",
-      subtitle: "Manage payroll schedule and dates",
-      icon: "fa-calendar-alt",
-      path: "/payroll/schedule",
-      color: "border-purple-500",
-    },
-    {
-      title: "Bank Schedule",
-      subtitle: "Generate bank transfer schedule",
-      icon: "fa-university",
-      path: "/payroll/bank-schedule",
-      color: "border-orange-500",
-    },
-    {
-      title: "Tax Reports",
-      subtitle: "Generate tax reports (GRA, SSNIT)",
-      icon: "fa-receipt",
-      path: "/payroll/tax-reports",
-      color: "border-red-500",
-    },
-    {
-      title: "Salary Advances",
-      subtitle: "Manage staff salary advances",
-      icon: "fa-hand-holding-usd",
-      path: "/payroll/advances",
-      color: "border-cyan-500",
     },
   ];
 
@@ -143,4 +115,3 @@ const PayrollMenu: React.FC = () => {
 };
 
 export default PayrollMenu;
-

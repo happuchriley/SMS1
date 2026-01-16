@@ -5,6 +5,7 @@ import { printPage, exportToCSV, exportToPDF } from '../../utils/printExport';
 import { useModal } from '../../components/ModalProvider';
 import academicService from '../../services/academicService';
 import studentsService from '../../services/studentsService';
+import { getAccessibleClasses, filterStudentsByAccessibleClasses } from '../../utils/classRestriction';
 
 interface StudentItem {
   id: string;
@@ -56,9 +57,11 @@ const PrintGroupReport: React.FC = () => {
   const loadStudents = useCallback(async () => {
     try {
       const students = await studentsService.getAll();
+      // Filter students by accessible classes
+      const filteredStudents = await filterStudentsByAccessibleClasses(students);
       const uniqueClassesSet = new Set<string>();
       
-      const studentsWithScores = await Promise.all(students.map(async (student: any) => {
+      const studentsWithScores = await Promise.all(filteredStudents.map(async (student: any) => {
         if (student.class) {
           uniqueClassesSet.add(student.class);
         }
@@ -97,7 +100,12 @@ const PrintGroupReport: React.FC = () => {
       }));
       
       setAllStudents(studentsWithScores);
-      setClasses(Array.from(uniqueClassesSet).sort());
+      // Get accessible classes and filter unique classes
+      const accessibleClasses = await getAccessibleClasses();
+      const filteredUniqueClasses = Array.from(uniqueClassesSet)
+        .filter(cls => accessibleClasses.includes(cls))
+        .sort();
+      setClasses(filteredUniqueClasses);
     } catch (error) {
       console.error('Error loading students:', error);
       toast.showError('Failed to load students');
@@ -266,70 +274,98 @@ const PrintGroupReport: React.FC = () => {
             <label className="block mb-2 font-semibold text-gray-900 text-sm">
               Academic Year <span className="text-red-500">*</span>
             </label>
-            <select
-              name="academicYear"
-              value={formData.academicYear}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-            >
-              <option value="">Select Academic Year</option>
-              {academicYears.map(year => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
+            <div className="relative select-dropdown-wrapper">
+              <select
+                name="academicYear"
+                value={formData.academicYear}
+                onChange={handleChange}
+                required
+                className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
+              >
+                <option value="">Select Academic Year</option>
+                {academicYears.map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+              <div className="select-dropdown-arrow">
+                <div className="select-dropdown-arrow-icon">
+                  <i className="fas fa-chevron-down"></i>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div>
             <label className="block mb-2 font-semibold text-gray-900 text-sm">
               Term <span className="text-red-500">*</span>
             </label>
-            <select
-              name="term"
-              value={formData.term}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-            >
-              <option value="">Select Term</option>
-              {terms.map(term => (
-                <option key={term} value={term}>{term}</option>
-              ))}
-            </select>
+            <div className="relative select-dropdown-wrapper">
+              <select
+                name="term"
+                value={formData.term}
+                onChange={handleChange}
+                required
+                className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
+              >
+                <option value="">Select Term</option>
+                {terms.map(term => (
+                  <option key={term} value={term}>{term}</option>
+                ))}
+              </select>
+              <div className="select-dropdown-arrow">
+                <div className="select-dropdown-arrow-icon">
+                  <i className="fas fa-chevron-down"></i>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div>
             <label className="block mb-2 font-semibold text-gray-900 text-sm">
               Class <span className="text-red-500">*</span>
             </label>
-            <select
-              name="class"
-              value={formData.class}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-            >
-              <option value="">Select Class</option>
-              {classes.map(cls => (
-                <option key={cls} value={cls}>{cls}</option>
-              ))}
-            </select>
+            <div className="relative select-dropdown-wrapper">
+              <select
+                name="class"
+                value={formData.class}
+                onChange={handleChange}
+                required
+                className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
+              >
+                <option value="">Select Class</option>
+                {classes.map(cls => (
+                  <option key={cls} value={cls}>{cls}</option>
+                ))}
+              </select>
+              <div className="select-dropdown-arrow">
+                <div className="select-dropdown-arrow-icon">
+                  <i className="fas fa-chevron-down"></i>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div>
             <label className="block mb-2 font-semibold text-gray-900 text-sm">
               Report Type
             </label>
-            <select
-              name="reportType"
-              value={formData.reportType}
-              onChange={handleChange}
-              className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-            >
-              {reportTypes.map(type => (
-                <option key={type.value} value={type.value}>{type.label}</option>
-              ))}
-            </select>
+            <div className="relative select-dropdown-wrapper">
+              <select
+                name="reportType"
+                value={formData.reportType}
+                onChange={handleChange}
+                className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
+              >
+                {reportTypes.map(type => (
+                  <option key={type.value} value={type.value}>{type.label}</option>
+                ))}
+              </select>
+              <div className="select-dropdown-arrow">
+                <div className="select-dropdown-arrow-icon">
+                  <i className="fas fa-chevron-down"></i>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

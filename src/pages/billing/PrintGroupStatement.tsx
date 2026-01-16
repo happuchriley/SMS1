@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 import { useModal } from '../../components/ModalProvider';
+import { getAccessibleClasses } from '../../utils/classRestriction';
 
 interface StudentItem {
   id: string;
@@ -32,7 +33,20 @@ const PrintGroupStatement: React.FC = () => {
   // Sample data
   const academicYears: string[] = ['2023/2024', '2024/2025', '2025/2026'];
   const terms: string[] = ['1st Term', '2nd Term', '3rd Term'];
-  const classes: string[] = ['Basic 1', 'Basic 2', 'Basic 3', 'Basic 4', 'Basic 5', 'Basic 6', 'JHS 1', 'JHS 2', 'JHS 3'];
+  const [classes, setClasses] = useState<string[]>([]);
+
+  const loadClasses = useCallback(async () => {
+    try {
+      const accessibleClasses = await getAccessibleClasses();
+      setClasses(accessibleClasses);
+    } catch (error) {
+      console.error('Error loading classes:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadClasses();
+  }, [loadClasses]);
 
   // Sample students with statements
   const allStudents: StudentItem[] = [
@@ -217,31 +231,51 @@ const PrintGroupStatement: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        {filteredStudents.length > 0 && (
-          <div className="flex flex-wrap items-center justify-end gap-3 pt-4 mt-6 border-t border-gray-200">
+        <div className="flex flex-wrap items-center justify-end gap-3 pt-4 mt-6 border-t border-gray-200">
+          {filteredStudents.length > 0 ? (
+            <>
+              <button
+                type="button"
+                onClick={handlePreview}
+                className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-all duration-300"
+              >
+                <i className="fas fa-eye mr-2"></i>Preview
+              </button>
+              <button
+                type="button"
+                onClick={handleExport}
+                className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-all duration-300"
+              >
+                <i className="fas fa-download mr-2"></i>Export PDF
+              </button>
+              <button
+                type="button"
+                onClick={handlePrint}
+                disabled={filteredStudents.length === 0}
+                className="px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <i className="fas fa-print mr-2"></i>Print Statements
+              </button>
+            </>
+          ) : (
             <button
               type="button"
-              onClick={handlePreview}
-              className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-all duration-300"
+              onClick={() => {
+                if (!formData.academicYear || !formData.term || !formData.class) {
+                  toast.showError('Please fill in all required fields (Academic Year, Term, and Class).');
+                } else if (filteredStudents.length === 0) {
+                  toast.showError('No students found matching the selected criteria.');
+                } else {
+                  handlePrint();
+                }
+              }}
+              disabled={!formData.academicYear || !formData.term || !formData.class}
+              className="px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <i className="fas fa-eye mr-2"></i>Preview
+              <i className="fas fa-search mr-2"></i>Search & Print Statements
             </button>
-            <button
-              type="button"
-              onClick={handleExport}
-              className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-all duration-300"
-            >
-              <i className="fas fa-download mr-2"></i>Export PDF
-            </button>
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-all duration-300 shadow-md hover:shadow-lg"
-            >
-              <i className="fas fa-print mr-2"></i>Print Statements
-            </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Students List */}

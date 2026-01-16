@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 import { useModal } from '../../components/ModalProvider';
+import { exportToCSV, exportToExcel, exportToPDF } from '../../utils/printExport';
 
 interface ScholarshipItem {
   id: string;
@@ -24,11 +25,13 @@ interface Stats {
 }
 
 const ScholarshipList: React.FC = () => {
-  const { toast } = useModal();
+  const { toast, showDeleteModal } = useModal();
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedClass, setSelectedClass] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [entriesPerPage, setEntriesPerPage] = useState<number>(10);
+  const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
+  const actionMenuRef = useRef<HTMLDivElement>(null);
 
   // Sample data
   const scholarships: ScholarshipItem[] = [
@@ -40,6 +43,17 @@ const ScholarshipList: React.FC = () => {
   ];
 
   const classes: string[] = ['Nursery 1', 'Nursery 2', 'Basic 1', 'Basic 2', 'Basic 3', 'Basic 4', 'Basic 5', 'Basic 6', 'JHS 1', 'JHS 2', 'JHS 3'];
+
+  // Close action menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (actionMenuRef.current && !actionMenuRef.current.contains(event.target as Node)) {
+        setOpenActionMenu(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Filter scholarships
   const filteredScholarships = useMemo<ScholarshipItem[]>(() => {
@@ -54,11 +68,12 @@ const ScholarshipList: React.FC = () => {
   }, [searchTerm, selectedClass]);
 
   // Pagination
-  const totalPages = Math.ceil(filteredScholarships.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredScholarships.length / entriesPerPage);
   const paginatedScholarships = useMemo<ScholarshipItem[]>(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredScholarships.slice(start, start + itemsPerPage);
-  }, [filteredScholarships, currentPage, itemsPerPage]);
+    const start = (currentPage - 1) * entriesPerPage;
+    const end = start + entriesPerPage;
+    return filteredScholarships.slice(start, end);
+  }, [filteredScholarships, currentPage, entriesPerPage]);
 
   // Statistics
   const stats = useMemo<Stats>(() => {
@@ -76,12 +91,91 @@ const ScholarshipList: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const handleExport = (): void => {
-    toast.showSuccess('Export functionality will be implemented');
+  const handleEdit = (scholarship: ScholarshipItem): void => {
+    toast.showInfo('Edit functionality will be implemented');
   };
 
-  const handlePrint = (): void => {
-    window.print();
+  const handleDelete = (scholarship: ScholarshipItem): void => {
+    showDeleteModal({
+      title: 'Delete Scholarship',
+      message: 'Are you sure you want to delete this scholarship?',
+      itemName: `${scholarship.studentName} - ${scholarship.type}`,
+      onConfirm: async () => {
+        toast.showSuccess('Scholarship deleted successfully');
+      }
+    });
+  };
+
+  const handleActionClick = (scholarshipId: string, action: string): void => {
+    setOpenActionMenu(null);
+    const scholarship = scholarships.find(s => s.id === scholarshipId);
+    if (!scholarship) return;
+
+    switch (action) {
+      case 'edit':
+        handleEdit(scholarship);
+        break;
+      case 'delete':
+        handleDelete(scholarship);
+        break;
+      case 'view':
+        toast.showInfo(`Viewing scholarship: ${scholarship.id}`);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleExport = (format: 'copy' | 'excel' | 'csv' | 'pdf'): void => {
+    if (filteredScholarships.length === 0) {
+      toast.showError('No data to export');
+      return;
+    }
+
+    const columns = [
+      { key: 'id', label: 'Scholarship ID' },
+      { key: 'studentName', label: 'Student Name' },
+      { key: 'studentId', label: 'Student ID' },
+      { key: 'class', label: 'Class' },
+      { key: 'type', label: 'Type' },
+      { key: 'amount', label: 'Amount' },
+      { key: 'percentage', label: 'Percentage' },
+      { key: 'status', label: 'Status' }
+    ];
+
+    const exportData = filteredScholarships.map(s => ({
+      id: s.id,
+      studentName: s.studentName,
+      studentId: s.studentId,
+      class: s.class,
+      type: s.type,
+      amount: s.amount,
+      percentage: `${s.percentage}%`,
+      status: s.status
+    }));
+
+    switch (format) {
+      case 'copy':
+        const text = exportData.map(row => Object.values(row).join('\t')).join('\n');
+        navigator.clipboard.writeText(text);
+        toast.showSuccess('Data copied to clipboard');
+        break;
+      case 'excel':
+        exportToExcel(exportData, `scholarships-${new Date().toISOString().split('T')[0]}.xlsx`, columns);
+        toast.showSuccess('Data exported to Excel');
+        break;
+      case 'csv':
+        exportToCSV(exportData, `scholarships-${new Date().toISOString().split('T')[0]}.csv`, columns);
+        toast.showSuccess('Data exported to CSV');
+        break;
+      case 'pdf':
+        const printContent = document.getElementById('scholarship-table');
+        if (printContent) {
+          exportToPDF(printContent, `scholarships-${new Date().toISOString().split('T')[0]}.pdf`);
+          toast.showSuccess('Data exported to PDF');
+        }
+        break;
+    }
   };
 
   return (
@@ -165,8 +259,8 @@ const ScholarshipList: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-4 mt-4 border-t border-gray-200">
-          {(searchTerm || selectedClass) && (
+        {(searchTerm || selectedClass) && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
             <button
               type="button"
               onClick={handleClearFilters}
@@ -174,67 +268,152 @@ const ScholarshipList: React.FC = () => {
             >
               <i className="fas fa-times mr-1.5"></i> Clear Filters
             </button>
-          )}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3 ml-auto">
-            <button
-              type="button"
-              onClick={handleExport}
-              className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-            >
-              <i className="fas fa-download mr-1.5"></i> <span className="hidden sm:inline">Export</span>
-            </button>
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-            >
-              <i className="fas fa-print mr-1.5"></i> <span className="hidden sm:inline">Print</span>
-            </button>
-            <select
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-              className="px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:border-primary-500"
-            >
-              <option value={10}>10 per page</option>
-              <option value={25}>25 per page</option>
-              <option value={50}>50 per page</option>
-              <option value={100}>100 per page</option>
-            </select>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Table Card */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
+      {/* Table Section */}
+      <div className="bg-white rounded-lg shadow-md border border-gray-200">
+        {/* Table Controls */}
+        <div className="p-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-700">Show</label>
+            <select
+              value={entriesPerPage}
+              onChange={(e) => {
+                setEntriesPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-primary-500"
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <label className="text-sm text-gray-700">entries</label>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => handleExport('copy')}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              title="Copy"
+            >
+              Copy
+            </button>
+            <button
+              onClick={() => handleExport('excel')}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              title="Excel"
+            >
+              Excel
+            </button>
+            <button
+              onClick={() => handleExport('csv')}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              title="CSV"
+            >
+              CSV
+            </button>
+            <button
+              onClick={() => handleExport('pdf')}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              title="PDF"
+            >
+              PDF
+            </button>
+            <button
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              title="Column visibility"
+            >
+              Column visibility
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-700">Search:</label>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Search..."
+              className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-primary-500 w-48"
+            />
+          </div>
+        </div>
+
+        {/* Table */}
+        <div id="scholarship-table" className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-primary-500">
+            <thead className="bg-blue-600 text-white">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Scholarship ID</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Student</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Class</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Type</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Amount (GHS)</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Percentage</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Period</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Action</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Action</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">No.</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Scholarship.ID</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Student</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Class</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Type</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Amount (GHS)</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Percentage</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Period</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {paginatedScholarships.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
-                    No scholarships found.
+                  <td colSpan={10} className="px-4 py-8 text-center text-gray-500">
+                    <div className="flex flex-col items-center justify-center">
+                      <i className="fas fa-inbox text-4xl mb-4 text-gray-300"></i>
+                      <div className="text-lg font-semibold">No scholarships found</div>
+                    </div>
                   </td>
                 </tr>
               ) : (
-                paginatedScholarships.map(scholarship => (
-                  <tr key={scholarship.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 text-sm text-gray-900">{scholarship.id}</td>
+                paginatedScholarships.map((scholarship, index) => (
+                  <tr key={scholarship.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 relative">
+                      <div ref={actionMenuRef}>
+                        <button
+                          onClick={() => setOpenActionMenu(openActionMenu === scholarship.id ? null : scholarship.id)}
+                          className="px-3 py-1.5 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center gap-1"
+                        >
+                          <i className="fas fa-cog"></i>
+                          <i className="fas fa-chevron-right text-xs"></i>
+                        </button>
+                        {openActionMenu === scholarship.id && (
+                          <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-[200px]">
+                            <button
+                              onClick={() => handleActionClick(scholarship.id, 'view')}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            >
+                              <i className="fas fa-eye text-green-500"></i>
+                              View Details
+                            </button>
+                            <button
+                              onClick={() => handleActionClick(scholarship.id, 'edit')}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            >
+                              <i className="fas fa-edit text-blue-500"></i>
+                              Edit Scholarship
+                            </button>
+                            <button
+                              onClick={() => handleActionClick(scholarship.id, 'delete')}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            >
+                              <i className="fas fa-trash text-red-500"></i>
+                              Delete Scholarship
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{(currentPage - 1) * entriesPerPage + index + 1}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900 font-medium">{scholarship.id}</td>
                     <td className="px-4 py-3 text-sm text-gray-900">
                       <div>
                         <div className="font-medium">{scholarship.studentName}</div>
@@ -257,16 +436,6 @@ const ScholarshipList: React.FC = () => {
                         {scholarship.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <button type="button" className="text-primary-600 hover:text-primary-700 text-sm font-medium">
-                          <i className="fas fa-edit"></i>
-                        </button>
-                        <button type="button" className="text-red-600 hover:text-red-700 text-sm font-medium">
-                          <i className="fas fa-trash"></i>
-                        </button>
-                      </div>
-                    </td>
                   </tr>
                 ))
               )}
@@ -275,35 +444,33 @@ const ScholarshipList: React.FC = () => {
         </div>
 
         {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="px-4 py-3 border-t border-gray-200 flex items-center justify-between">
-            <div className="text-sm text-gray-700">
-              Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredScholarships.length)} of {filteredScholarships.length} scholarships
-            </div>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Previous
-              </button>
-              <button
-                type="button"
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next
-              </button>
-            </div>
+        <div className="p-4 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="text-sm text-gray-700">
+            Showing {filteredScholarships.length === 0 ? 0 : (currentPage - 1) * entriesPerPage + 1} to {Math.min(currentPage * entriesPerPage, filteredScholarships.length)} of {filteredScholarships.length} entries
           </div>
-        )}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-gray-700">
+              Page {currentPage} of {totalPages || 1}
+            </span>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage >= totalPages}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </Layout>
   );
 };
 
 export default ScholarshipList;
-

@@ -6,28 +6,15 @@ interface HeaderProps {
   toggleSidebar: () => void;
 }
 
-interface MenuItem {
-  name: string;
-  path: string;
-  action?: () => void;
-}
-
-interface MenuSection {
-  title: string;
-  items: MenuItem[];
-}
-
 const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const username = sessionStorage.getItem('username') || 'AD';
   const initials = username.substring(0, 2).toUpperCase();
   const { isMobile } = useResponsive();
   const navigate = useNavigate();
   const location = useLocation();
-  const [showGoToMenu, setShowGoToMenu] = useState<boolean>(false);
   const [showProfileMenu, setShowProfileMenu] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [clickedButton, setClickedButton] = useState<string | null>(null);
-  const goToMenuRef = useRef<HTMLDivElement>(null);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   
   // Check if we're on messages or notifications page
@@ -41,158 +28,22 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
         return;
       }
       
-      if (goToMenuRef.current && !goToMenuRef.current.contains(target)) {
-        setShowGoToMenu(false);
-      }
       if (profileMenuRef.current && !profileMenuRef.current.contains(target)) {
         setShowProfileMenu(false);
       }
     };
 
-    if (showGoToMenu || showProfileMenu) {
+    if (showProfileMenu) {
       document.addEventListener('click', handleClickOutside as EventListener, true);
       return () => document.removeEventListener('click', handleClickOutside as EventListener, true);
     }
-  }, [showGoToMenu, showProfileMenu]);
+  }, [showProfileMenu]);
 
 
   const handleLogout = (): void => {
     sessionStorage.clear();
     navigate('/login');
   };
-
-  const menuSections: MenuSection[] = [
-    {
-      title: 'Manage Student',
-      items: [
-        { name: 'Add New Student', path: '/students/add' },
-        { name: 'Student List (All)', path: '/students/all' },
-        { name: 'Student List (Active)', path: '/students/active' },
-        { name: 'Fresh Student', path: '/students/fresh' },
-        { name: 'Student List (Inactive)', path: '/students/inactive' },
-        { name: 'Get Class List', path: '/students/classes' },
-        { name: 'Parent List', path: '/students/parents' }
-      ]
-    },
-    {
-      title: 'Manage Staff',
-      items: [
-        { name: 'Add New Staff', path: '/staff/add' },
-        { name: 'Staff List (All)', path: '/staff/all' },
-        { name: 'Staff List (Active)', path: '/staff/active' },
-        { name: 'Staff List (New)', path: '/staff/new' },
-        { name: 'Staff List (Inactive)', path: '/staff/inactive' },
-        { name: 'Staff Restriction', path: '/staff/restriction' }
-      ]
-    },
-    {
-      title: 'Reports & Assessment',
-      items: [
-        { name: 'Populate Course - Class', path: '/reports/populate-course-class' },
-        { name: 'Populate Course - Student', path: '/reports/populate-course-student' },
-        { name: 'Enter Academic Result', path: '/reports/enter-academic-result' },
-        { name: 'Student Promotion', path: '/reports/student-promotion' },
-        { name: 'End of Term Remark', path: '/reports/end-term-remark' },
-        { name: 'Reports Footnote', path: '/reports/footnote' },
-        { name: 'Print Group Report', path: '/reports/print-group-report' }
-      ]
-    },
-    {
-      title: 'Billing',
-      items: [
-        { name: 'Create Single Bill', path: '/billing/create-single' },
-        { name: 'Create Group Bill', path: '/billing/create-group' },
-        { name: 'Scholarship List', path: '/billing/scholarship-list' },
-        { name: 'Debtors Report', path: '/billing/debtors-report' },
-        { name: 'Creditors Report', path: '/billing/creditors-report' },
-        { name: 'Print Group Bill', path: '/billing/print-group-bill' },
-        { name: 'Print Group Statement', path: '/billing/print-group-statement' }
-      ]
-    },
-    {
-      title: 'Fee Collection',
-      items: [
-        { name: 'Record Sch Fees (Single View)', path: '/fee-collection/record-single' },
-        { name: 'Record Sch Fees (All)', path: '/fee-collection/record-all' },
-        { name: 'Manage Other Fee List', path: '/fee-collection/manage-other-fees' },
-        { name: 'Record Other Fee', path: '/fee-collection/record-other-fee' },
-        { name: 'Receive Other Fee', path: '/fee-collection/receive-other-fee' },
-        { name: 'Debtors Report', path: '/fee-collection/debtors-report' },
-        { name: 'Creditors Report', path: '/fee-collection/creditors-report' },
-        { name: 'Print Group Bill', path: '/fee-collection/print-group-bill' },
-        { name: 'Print Group Statement', path: '/fee-collection/print-group-statement' }
-      ]
-    },
-    {
-      title: 'Payroll',
-      items: [
-        { name: 'Setup Salary Structure', path: '/staff/salary-structure' },
-        { name: 'Pay Report', path: '/staff/pay-reports' }
-      ]
-    },
-    {
-      title: 'Finance Entries',
-      items: [
-        { name: 'Debtor Entry', path: '/finance/debtor-entry' },
-        { name: 'Creditor Entry', path: '/finance/creditor-entry' },
-        { name: 'Income Entry', path: '/finance/income-entry' },
-        { name: 'Expense Entry', path: '/finance/expense-entry' },
-        { name: 'General Journal', path: '/finance/general-journal' },
-        { name: 'General Ledger', path: '/finance/general-ledger' },
-        { name: 'Fixed Asset', path: '/finance/fixed-asset' }
-      ]
-    },
-    {
-      title: 'Financial Reports',
-      items: [
-        { name: 'Fee Collection Report', path: '/financial-reports/fee-collection' },
-        { name: 'Other Fee Report All', path: '/financial-reports/other-fee-all' },
-        { name: 'Other Fee Report Range', path: '/financial-reports/other-fee-range' },
-        { name: 'Expenditure Report', path: '/financial-reports/expenditure' },
-        { name: 'Debtors Report', path: '/financial-reports/debtors' },
-        { name: 'Creditors Report', path: '/financial-reports/creditors' },
-        { name: 'Generate Ledger', path: '/financial-reports/generate-ledger' },
-        { name: 'Trial Balance', path: '/financial-reports/trial-balance' },
-        { name: 'Income Statement', path: '/financial-reports/income-statement' },
-        { name: 'Chart of Accounts', path: '/financial-reports/chart-of-accounts' }
-      ]
-    },
-    {
-      title: 'SMS/Email Reminder',
-      items: [
-        { name: 'Send Bill Reminder', path: '/reminders/bill-reminder' },
-        { name: 'Payment Notification', path: '/reminders/payment-notification' },
-        { name: 'Send Application Details', path: '/reminders/application-details' },
-        { name: 'Send Event Reminder', path: '/reminders/event-reminder' },
-        { name: 'Send Staff Reminder', path: '/reminders/staff-reminder' }
-      ]
-    },
-    {
-      title: 'News/Notice',
-      items: [
-        { name: 'Add/Upload News', path: '/news/add' },
-        { name: 'News Page', path: '/news/page' },
-        { name: 'Academic Calendar', path: '/news/academic-calendar' }
-      ]
-    },
-    {
-      title: 'School Setup',
-      items: [
-        { name: 'School Details', path: '/setup/school-details' },
-        { name: 'Item Setup', path: '/setup/item-setup' },
-        { name: 'Stage/Class List', path: '/setup/class-list' },
-        { name: 'Subject/Course', path: '/setup/subject-course' },
-        { name: 'Bill Item', path: '/setup/bill-item' }
-      ]
-    },
-    {
-      title: 'My Account',
-      items: [
-        { name: 'My Profile', path: '/profile' },
-        { name: 'Logout', path: '/login', action: handleLogout }
-      ]
-    }
-  ];
 
   return (
     <header className="bg-white/95 backdrop-blur-md h-14 sm:h-16 px-3 sm:px-4 md:px-6 lg:px-8 flex items-center justify-between shadow-sm sticky top-0 z-[100] border-b border-slate-200 w-full flex-shrink-0" style={{ position: 'sticky' }}>
@@ -218,45 +69,6 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
           >
             Excelz International School
           </a>
-          <div className="relative" ref={goToMenuRef}>
-            <button
-              onClick={() => setShowGoToMenu(!showGoToMenu)}
-              className="px-2.5 py-1.5 text-sm border border-slate-200 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 flex items-center gap-1 hover:bg-blue-50 hover:border-primary-300"
-              type="button"
-            >
-              Go To <i className="fas fa-chevron-down text-xs"></i>
-            </button>
-            {showGoToMenu && (
-              <div 
-                className="absolute top-full left-0 mt-2 w-[300px] max-h-[600px] overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-xl z-50"
-                onClick={(e: MouseEvent<HTMLDivElement>) => e.stopPropagation()}
-              >
-                {menuSections.map((section, idx) => (
-                  <div key={idx} className="border-b border-gray-100 last:border-b-0">
-                    <div className="px-4 py-2 bg-slate-50 font-semibold text-xs text-slate-700 uppercase">
-                      {section.title}
-                    </div>
-                    {section.items.map((item, itemIdx) => (
-                      <Link
-                        key={itemIdx}
-                        to={item.path}
-                        onClick={(e) => {
-                          setShowGoToMenu(false);
-                          if (item.action) {
-                            e.preventDefault();
-                            item.action();
-                          }
-                        }}
-                        className="block px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 hover:text-primary-600 transition-colors cursor-pointer"
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       </div>
       <div className="flex items-center gap-2 sm:gap-3 md:gap-4">

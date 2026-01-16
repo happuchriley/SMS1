@@ -161,6 +161,50 @@ const billingService = {
     return payments.reduce((sum: number, payment: PaymentData & { id: string }) => sum + (parseFloat(payment.amount.toString()) || 0), 0);
   },
 
+  async updatePayment(id: string, paymentData: Partial<PaymentData>): Promise<PaymentData & { id: string }> {
+    const updatedPayment = await apiService.update<PaymentData & { id: string }>(PAYMENTS_TYPE, id, paymentData);
+    
+    // Update bill status if billId provided
+    if (paymentData.billId || updatedPayment.billId) {
+      const billId = paymentData.billId || updatedPayment.billId;
+      if (billId) {
+        const bill = await this.getBillById(billId);
+        const totalPaid = await this.getTotalPaidForBill(billId);
+        
+        if (totalPaid >= (bill.total || 0)) {
+          await this.updateBill(billId, { status: 'paid' });
+        } else if (totalPaid > 0) {
+          await this.updateBill(billId, { status: 'partial' });
+        } else {
+          await this.updateBill(billId, { status: 'pending' });
+        }
+      }
+    }
+    
+    return updatedPayment;
+  },
+
+  async deletePayment(id: string): Promise<void> {
+    const payment = await this.getPaymentById(id);
+    
+    // Delete the payment
+    await apiService.delete(PAYMENTS_TYPE, id);
+    
+    // Update bill status if billId exists
+    if (payment.billId) {
+      const bill = await this.getBillById(payment.billId);
+      const totalPaid = await this.getTotalPaidForBill(payment.billId);
+      
+      if (totalPaid >= (bill.total || 0)) {
+        await this.updateBill(payment.billId, { status: 'paid' });
+      } else if (totalPaid > 0) {
+        await this.updateBill(payment.billId, { status: 'partial' });
+      } else {
+        await this.updateBill(payment.billId, { status: 'pending' });
+      }
+    }
+  },
+
   // Debtors and Creditors
   async getDebtors(): Promise<DebtorBill[]> {
     const bills = await this.getAllBills();

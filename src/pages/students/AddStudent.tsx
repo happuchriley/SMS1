@@ -29,6 +29,12 @@ interface StudentFormData {
   religion: string;
   feeType: string;
   photo: File | null;
+  guardianName: string;
+  guardianRelationship: string;
+  guardianContact: string;
+  guardianEmail: string;
+  guardianAddress: string;
+  guardianOccupation: string;
 }
 
 const AddStudent: React.FC = () => {
@@ -57,7 +63,13 @@ const AddStudent: React.FC = () => {
     currentCity: '',
     religion: '',
     feeType: '',
-    photo: null
+    photo: null,
+    guardianName: '',
+    guardianRelationship: '',
+    guardianContact: '',
+    guardianEmail: '',
+    guardianAddress: '',
+    guardianOccupation: ''
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
@@ -116,7 +128,11 @@ const AddStudent: React.FC = () => {
         ...formData,
         photo: photoData,
         admissionDate: formData.admissionDate || new Date().toISOString().split('T')[0],
-        status: 'active'
+        status: 'active',
+        parentName: formData.guardianName,
+        parentContact: formData.guardianContact,
+        parentEmail: formData.guardianEmail,
+        parent: formData.guardianName
       };
 
       await studentsService.create(studentData);
@@ -156,7 +172,13 @@ const AddStudent: React.FC = () => {
       currentCity: '',
       religion: '',
       feeType: '',
-      photo: null
+      photo: null,
+      guardianName: '',
+      guardianRelationship: '',
+      guardianContact: '',
+      guardianEmail: '',
+      guardianAddress: '',
+      guardianOccupation: ''
     });
     setPhotoPreview(null);
     if (fileInputRef.current) {
@@ -315,17 +337,24 @@ const AddStudent: React.FC = () => {
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
                   Gender <span className="text-red-500">*</span>
                 </label>
-                <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  name="gender" 
-                  value={formData.gender} 
-                  onChange={handleChange} 
-                  required
-                >
-                  <option value="">Gender *</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                </select>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]" 
+                    name="gender" 
+                    value={formData.gender} 
+                    onChange={handleChange} 
+                    required
+                  >
+                    <option value="">Gender *</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
@@ -342,22 +371,29 @@ const AddStudent: React.FC = () => {
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Blood Group/type</label>
-                <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  name="bloodGroup" 
-                  value={formData.bloodGroup} 
-                  onChange={handleChange}
-                >
-                  <option value="">Select Blood Group</option>
-                  <option>A+</option>
-                  <option>A-</option>
-                  <option>B+</option>
-                  <option>B-</option>
-                  <option>AB+</option>
-                  <option>AB-</option>
-                  <option>O+</option>
-                  <option>O-</option>
-                </select>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]" 
+                    name="bloodGroup" 
+                    value={formData.bloodGroup} 
+                    onChange={handleChange}
+                  >
+                    <option value="">Select Blood Group</option>
+                    <option>A+</option>
+                    <option>A-</option>
+                    <option>B+</option>
+                    <option>B-</option>
+                    <option>AB+</option>
+                    <option>AB-</option>
+                    <option>O+</option>
+                    <option>O-</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Allergies</label>
@@ -408,29 +444,43 @@ const AddStudent: React.FC = () => {
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">National</label>
-                <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  name="national" 
-                  value={formData.national} 
-                  onChange={handleChange}
-                >
-                  <option>Ghana</option>
-                  <option>Nigeria</option>
-                  <option>Other</option>
-                </select>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]" 
+                    name="national" 
+                    value={formData.national} 
+                    onChange={handleChange}
+                  >
+                    <option>Ghana</option>
+                    <option>Nigeria</option>
+                    <option>Other</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Country of Residence</label>
-                <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  name="countryOfResidence" 
-                  value={formData.countryOfResidence} 
-                  onChange={handleChange}
-                >
-                  <option>Ghana</option>
-                  <option>Nigeria</option>
-                  <option>Other</option>
-                </select>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]" 
+                    name="countryOfResidence" 
+                    value={formData.countryOfResidence} 
+                    onChange={handleChange}
+                  >
+                    <option>Ghana</option>
+                    <option>Nigeria</option>
+                    <option>Other</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
@@ -462,31 +512,45 @@ const AddStudent: React.FC = () => {
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Religion</label>
-                <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  name="religion" 
-                  value={formData.religion} 
-                  onChange={handleChange}
-                >
-                  <option value="">Religion</option>
-                  <option>Christianity</option>
-                  <option>Islam</option>
-                  <option>Other</option>
-                </select>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]" 
+                    name="religion" 
+                    value={formData.religion} 
+                    onChange={handleChange}
+                  >
+                    <option value="">Religion</option>
+                    <option>Christianity</option>
+                    <option>Islam</option>
+                    <option>Other</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Fee/Scholarship</label>
-                <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  name="feeType" 
-                  value={formData.feeType} 
-                  onChange={handleChange}
-                >
-                  <option value="">Select fee type</option>
-                  <option>Full Fee</option>
-                  <option>Scholarship</option>
-                  <option>Partial Scholarship</option>
-                </select>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]" 
+                    name="feeType" 
+                    value={formData.feeType} 
+                    onChange={handleChange}
+                  >
+                    <option value="">Select fee type</option>
+                    <option>Full Fee</option>
+                    <option>Scholarship</option>
+                    <option>Partial Scholarship</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Photo</label>
@@ -571,6 +635,9 @@ const AddStudent: React.FC = () => {
                 </label>
                 <input 
                   type="text" 
+                  name="guardianName"
+                  value={formData.guardianName}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   placeholder="Guardian Name *" 
                   required 
@@ -580,16 +647,26 @@ const AddStudent: React.FC = () => {
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
                   Relationship <span className="text-red-500">*</span>
                 </label>
-                <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  required
-                >
-                  <option value="">Select Relationship</option>
-                  <option>Father</option>
-                  <option>Mother</option>
-                  <option>Guardian</option>
-                  <option>Other</option>
-                </select>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    name="guardianRelationship"
+                    value={formData.guardianRelationship}
+                    onChange={handleChange}
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]" 
+                    required
+                  >
+                    <option value="">Select Relationship</option>
+                    <option>Father</option>
+                    <option>Mother</option>
+                    <option>Guardian</option>
+                    <option>Other</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div>
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">
@@ -597,6 +674,9 @@ const AddStudent: React.FC = () => {
                 </label>
                 <input 
                   type="tel" 
+                  name="guardianContact"
+                  value={formData.guardianContact}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   placeholder="Contact *" 
                   required 
@@ -606,6 +686,9 @@ const AddStudent: React.FC = () => {
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Email</label>
                 <input 
                   type="email" 
+                  name="guardianEmail"
+                  value={formData.guardianEmail}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   placeholder="Email" 
                 />
@@ -614,6 +697,9 @@ const AddStudent: React.FC = () => {
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Address</label>
                 <input 
                   type="text" 
+                  name="guardianAddress"
+                  value={formData.guardianAddress}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   placeholder="Address" 
                 />
@@ -622,6 +708,9 @@ const AddStudent: React.FC = () => {
                 <label className="block mb-2 font-semibold text-gray-900 text-sm">Occupation</label>
                 <input 
                   type="text" 
+                  name="guardianOccupation"
+                  value={formData.guardianOccupation}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
                   placeholder="Occupation" 
                 />

@@ -885,20 +885,27 @@ const StudentAcademicReport: React.FC = () => {
               <label className="block mb-2 font-semibold text-gray-900 text-sm">
                 Student <span className="text-red-500">*</span>
               </label>
-              <select
-                name="studentId"
-                value={formData.studentId}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
-              >
-                <option value="">Select Student</option>
-                {students.map(student => (
-                  <option key={student.id} value={student.id}>
-                    {student.studentId || student.id} - {student.firstName} {student.surname}
-                  </option>
-                ))}
-              </select>
+              <div className="relative select-dropdown-wrapper">
+                <select
+                  name="studentId"
+                  value={formData.studentId}
+                  onChange={handleChange}
+                  required
+                  className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
+                >
+                  <option value="">Select Student</option>
+                  {students.map(student => (
+                    <option key={student.id} value={student.id}>
+                      {student.studentId || student.id} - {student.firstName} {student.surname}
+                    </option>
+                  ))}
+                </select>
+                <div className="select-dropdown-arrow">
+                  <div className="select-dropdown-arrow-icon">
+                    <i className="fas fa-chevron-down"></i>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="sm:col-span-3">
@@ -928,36 +935,50 @@ const StudentAcademicReport: React.FC = () => {
             <label className="block mb-2 font-semibold text-gray-900 text-sm">
               Academic Year <span className="text-red-500">*</span>
             </label>
-            <select
-              name="academicYear"
-              value={formData.academicYear}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
-            >
-              <option value="">Select Academic Year</option>
-              {academicYears.map(year => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
+            <div className="relative select-dropdown-wrapper">
+              <select
+                name="academicYear"
+                value={formData.academicYear}
+                onChange={handleChange}
+                required
+                className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
+              >
+                <option value="">Select Academic Year</option>
+                {academicYears.map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+              <div className="select-dropdown-arrow">
+                <div className="select-dropdown-arrow-icon">
+                  <i className="fas fa-chevron-down"></i>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div>
             <label className="block mb-2 font-semibold text-gray-900 text-sm">
               Term <span className="text-red-500">*</span>
             </label>
-            <select
-              name="term"
-              value={formData.term}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
-            >
-              <option value="">Select Term</option>
-              {terms.map(term => (
-                <option key={term} value={term}>{term}</option>
-              ))}
-            </select>
+            <div className="relative select-dropdown-wrapper">
+              <select
+                name="term"
+                value={formData.term}
+                onChange={handleChange}
+                required
+                className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
+              >
+                <option value="">Select Term</option>
+                {terms.map(term => (
+                  <option key={term} value={term}>{term}</option>
+                ))}
+              </select>
+              <div className="select-dropdown-arrow">
+                <div className="select-dropdown-arrow-icon">
+                  <i className="fas fa-chevron-down"></i>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

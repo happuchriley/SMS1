@@ -807,7 +807,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
             onClick={() => toggleSubmenu('payroll')}
           >
             <div className="flex items-center">
-              <i className="fas fa-coins mr-3 w-5 text-center text-sm"></i>
+              <i className="fas fa-money-bill-1 mr-3 w-5 text-center text-sm"></i>
               {!collapsed && <span className="text-sm font-medium">Payroll</span>}
             </div>
             {!collapsed && (
@@ -820,68 +820,35 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
             <ul className={`list-none ${expandedMenus.payroll ? 'block' : 'hidden'} py-2 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`}>
               <li>
                 <Link 
-                  to="/payroll/overview" 
+                  to="/payroll/menu" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/payroll/overview') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
+                    isActive('/payroll/menu') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
-                  Payroll Overview
+                  Menu
                 </Link>
               </li>
               <li>
                 <Link 
-                  to="/payroll/generate-payslip" 
+                  to="/payroll/setup-salary-structure" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/payroll/generate-payslip') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
+                    isActive('/payroll/setup-salary-structure') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
-                  Generate Payslip
+                  Setup Salary Structure
                 </Link>
               </li>
               <li>
                 <Link 
-                  to="/payroll/schedule" 
+                  to="/payroll/pay-reports" 
                   className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/payroll/schedule') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
+                    isActive('/payroll/pay-reports') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
                   }`}
                   onClick={handleLinkClick}
                 >
-                  Payroll Schedule
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  to="/payroll/bank-schedule" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/payroll/bank-schedule') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
-                  }`}
-                  onClick={handleLinkClick}
-                >
-                  Bank Schedule
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  to="/payroll/tax-reports" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/payroll/tax-reports') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
-                  }`}
-                  onClick={handleLinkClick}
-                >
-                  Tax Reports
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  to="/payroll/advances" 
-                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
-                    isActive('/payroll/advances') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
-                  }`}
-                  onClick={handleLinkClick}
-                >
-                  Salary Advances
+                  Pay Reports
                 </Link>
               </li>
             </ul>

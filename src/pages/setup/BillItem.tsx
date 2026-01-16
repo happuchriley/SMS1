@@ -4,125 +4,120 @@ import { Link } from 'react-router-dom';
 import setupService, { BillItemData } from '../../services/setupService';
 import { useModal } from '../../components/ModalProvider';
 
-interface BillItemFormData {
-  code: string;
-  name: string;
-  type: string;
+interface BillRow {
+  id: string;
+  billItem: string;
   amount: string;
-  taxable: boolean;
-  active: boolean;
 }
 
+interface BillFormData {
+  academicYear: string;
+  term: string;
+  classGroup: string;
+  billName: string;
+}
 
 const BillItem: React.FC = () => {
-  const { toast, showDeleteModal } = useModal();
-  const [items, setItems] = useState<BillItemData[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { toast } = useModal();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [billItems, setBillItems] = useState<BillItemData[]>([]);
+  const [rows, setRows] = useState<BillRow[]>([
+    { id: '1', billItem: '', amount: '' }
+  ]);
 
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [editingItem, setEditingItem] = useState<BillItemData | null>(null);
-  const [formData, setFormData] = useState<BillItemFormData>({
-    code: '',
-    name: '',
-    type: 'Mandatory',
-    amount: '',
-    taxable: false,
-    active: true
+  const [formData, setFormData] = useState<BillFormData>({
+    academicYear: '',
+    term: '',
+    classGroup: '',
+    billName: ''
   });
 
-  const billTypes: string[] = ['Mandatory', 'Optional', 'Penalty'];
+  const academicYears: string[] = ['2023/2024', '2024/2025', '2025/2026'];
+  const terms: string[] = ['Term 1', 'Term 2', 'Term 3'];
+  const classGroups: string[] = ['Nursery', 'Primary', 'JHS', 'All Classes'];
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
-    const { name, value, type } = e.target;
-    const checked = (e.target as HTMLInputElement).checked;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    });
-  };
-
-  const loadItems = useCallback(async (): Promise<void> => {
+  const loadBillItems = useCallback(async (): Promise<void> => {
     try {
-      setLoading(true);
-      const allItems = await setupService.getAllBillItems();
-      setItems(allItems);
+      const items = await setupService.getAllBillItems();
+      setBillItems(items);
     } catch (error) {
       console.error('Error loading bill items:', error);
       toast.showError('Failed to load bill items');
-    } finally {
-      setLoading(false);
     }
   }, [toast]);
 
   useEffect(() => {
-    loadItems();
-  }, [loadItems]);
+    loadBillItems();
+  }, [loadBillItems]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
-    try {
-      if (editingItem && editingItem.id) {
-        await setupService.updateBillItem(editingItem.id, {
-          ...formData,
-          amount: parseFloat(formData.amount)
-        });
-        toast.showSuccess('Bill item updated successfully');
-      } else {
-        await setupService.createBillItem({
-          ...formData,
-          amount: parseFloat(formData.amount)
-        });
-        toast.showSuccess('Bill item created successfully');
-      }
-      await loadItems();
-      handleCloseModal();
-    } catch (error: any) {
-      console.error('Error saving bill item:', error);
-      toast.showError(error.message || 'Failed to save bill item');
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const handleRowChange = (id: string, field: keyof BillRow, value: string): void => {
+    setRows(rows.map(row => 
+      row.id === id ? { ...row, [field]: value } : row
+    ));
+  };
+
+  const handleAddRow = (): void => {
+    const newId = (rows.length + 1).toString();
+    setRows([...rows, { id: newId, billItem: '', amount: '' }]);
+  };
+
+  const handleDeleteRow = (id: string): void => {
+    if (rows.length > 1) {
+      setRows(rows.filter(row => row.id !== id));
+    } else {
+      toast.showError('At least one row is required');
     }
   };
 
-  const handleEdit = (item: BillItemData): void => {
-    setEditingItem(item);
+  const calculateGrandTotal = (): number => {
+    return rows.reduce((total, row) => {
+      const amount = parseFloat(row.amount) || 0;
+      return total + amount;
+    }, 0);
+  };
+
+  const handleReset = (): void => {
     setFormData({
-      code: item.code || '',
-      name: item.name || '',
-      type: item.type || 'Mandatory',
-      amount: String(item.amount || ''),
-      taxable: item.taxable || false,
-      active: item.active !== undefined ? item.active : true
+      academicYear: '',
+      term: '',
+      classGroup: '',
+      billName: ''
     });
-    setShowModal(true);
+    setRows([{ id: '1', billItem: '', amount: '' }]);
   };
 
-  const handleDelete = (id: string): void => {
-    showDeleteModal({
-      title: 'Delete Bill Item',
-      message: 'Are you sure you want to delete this bill item? This action cannot be undone.',
-      itemName: items.find(i => i.id === id)?.name || 'this bill item',
-      onConfirm: async () => {
-        try {
-          await setupService.deleteBillItem(id);
-          toast.showSuccess('Bill item deleted successfully');
-          await loadItems();
-        } catch (error: any) {
-          console.error('Error deleting bill item:', error);
-          toast.showError(error.message || 'Failed to delete bill item');
-        }
-      }
-    });
-  };
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault();
+    if (!formData.academicYear || !formData.term || !formData.classGroup || !formData.billName) {
+      toast.showError('Please fill in all required fields.');
+      return;
+    }
 
-  const handleCloseModal = (): void => {
-    setShowModal(false);
-    setEditingItem(null);
-    setFormData({ code: '', name: '', type: 'Mandatory', amount: '', taxable: false, active: true });
-  };
+    const validRows = rows.filter(row => row.billItem && row.amount);
+    if (validRows.length === 0) {
+      toast.showError('Please add at least one bill item with amount.');
+      return;
+    }
 
-  const handleAddNew = (): void => {
-    setEditingItem(null);
-    setFormData({ code: '', name: '', type: 'Mandatory', amount: '', taxable: false, active: true });
-    setShowModal(true);
+    setLoading(true);
+    try {
+      // Here you would create the bill - for now just show success
+      toast.showSuccess('Bill setup created successfully!');
+      handleReset();
+    } catch (error: any) {
+      console.error('Error saving bill:', error);
+      toast.showError(error.message || 'Failed to save bill');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -130,227 +125,252 @@ const BillItem: React.FC = () => {
       <div className="mb-5 sm:mb-6 md:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Bill Item</h1>
-            <div className="flex items-center gap-2 text-gray-600 text-xs sm:text-sm">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+              Setup Page
+            </h1>
+            <p className="text-sm text-gray-600">(Stages/Classes/Subjects/Courses/Bill Items/Bills)</p>
+            <div className="flex items-center gap-2 text-gray-600 text-xs sm:text-sm mt-2">
               <Link to="/" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">Home</Link>
               <span>/</span>
-              <Link to="/setup" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">School Setup</Link>
-              <span>/</span>
-              <span className="text-gray-900 font-medium">Bill Item</span>
+              <span className="text-gray-900 font-medium">Setup Page (Stages/Classes/Subjects/Courses/Bill Items/Bills)</span>
             </div>
           </div>
-          <button
-            onClick={handleAddNew}
-            className="px-4 py-2 bg-primary-500 text-white rounded-md text-sm font-semibold hover:bg-primary-700 transition-all duration-300"
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 sm:p-5 md:p-6">
+        {/* Tabs */}
+        <div className="flex flex-wrap gap-3 sm:gap-4 mb-6 border-b border-gray-200 pb-4">
+          <Link
+            to="/setup/item-setup"
+            className="px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-300 rounded-md"
           >
-            <i className="fas fa-plus mr-2"></i>Add New Bill Item
+            New Class/Stage
+          </Link>
+          <Link
+            to="/setup/subject-course"
+            className="px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-300 rounded-md"
+          >
+            Create New Subject/Course
+          </Link>
+          <button
+            className="px-4 py-2 text-sm font-medium bg-primary-100 text-primary-700 border-2 border-primary-500 rounded-md"
+          >
+            Setup New Bill
           </button>
+          <Link
+            to="/setup/item-setup"
+            className="px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 transition-all duration-300 rounded-md"
+          >
+            New Account Code
+          </Link>
         </div>
-      </div>
 
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-primary-500">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Code</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Name</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Type</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Amount (GHS)</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Taxable</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {loading ? (
-                <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
-                    Loading...
-                  </td>
-                </tr>
-              ) : items.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
-                    No bill items found. Add one above.
-                  </td>
-                </tr>
-              ) : (
-                items.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.code}</td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{item.name}</td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        item.type === 'Mandatory' ? 'bg-red-100 text-red-800' :
-                        item.type === 'Optional' ? 'bg-blue-100 text-blue-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {item.type}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{item.amount.toLocaleString()}</td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {item.taxable ? <i className="fas fa-check text-green-600"></i> : <i className="fas fa-times text-red-600"></i>}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        item.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {item.active ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => handleEdit(item)}
-                        className="text-primary-600 hover:text-primary-900 mr-3"
-                      >
-                        <i className="fas fa-edit"></i>
-                      </button>
-                      <button
-                        onClick={() => item.id && handleDelete(item.id)}
-                        className="text-red-600 hover:text-red-900"
-                        disabled={!item.id}
-                      >
-                        <i className="fas fa-trash"></i>
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Add/Edit Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">
-                  {editingItem ? 'Edit Bill Item' : 'Add New Bill Item'}
-                </h2>
-                <button
-                  onClick={handleCloseModal}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <i className="fas fa-times text-xl"></i>
-                </button>
+        {/* Setup bill for the Term Form */}
+        <form onSubmit={handleSave}>
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Setup bill for the Term</h2>
+          
+          <div className="space-y-4 mb-6">
+            {/* Term Selection Section */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                  Academic Year
+                </label>
+                <div className="relative select-dropdown-wrapper">
+                  <select
+                    name="academicYear"
+                    value={formData.academicYear}
+                    onChange={handleChange}
+                    required
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
+                  >
+                    <option value="">Select Academic Year</option>
+                    {academicYears.map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                      Bill Code <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="code"
-                      value={formData.code}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                      Bill Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                      Bill Type <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      name="type"
-                      value={formData.type}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-                    >
-                      {billTypes.map(type => (
-                        <option key={type} value={type}>{type}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                      Amount (GHS) <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      name="amount"
-                      value={formData.amount}
-                      onChange={handleChange}
-                      required
-                      min="0"
-                      step="0.01"
-                      className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="taxable"
-                      checked={formData.taxable}
-                      onChange={handleChange}
-                      className="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500 mr-3"
-                    />
-                    <span className="text-sm text-gray-900 font-medium">Taxable</span>
-                  </label>
-
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="active"
-                      checked={formData.active}
-                      onChange={handleChange}
-                      className="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500 mr-3"
-                    />
-                    <span className="text-sm text-gray-900 font-medium">Active</span>
-                  </label>
-                </div>
-
-                <div className="flex justify-end gap-3 pt-4 border-t">
-                  <button
-                    type="button"
-                    onClick={handleCloseModal}
-                    className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-all duration-300"
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                  Term
+                </label>
+                <div className="relative select-dropdown-wrapper">
+                  <select
+                    name="term"
+                    value={formData.term}
+                    onChange={handleChange}
+                    required
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
                   >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-all duration-300"
-                  >
-                    {editingItem ? 'Update' : 'Add'} Bill Item
-                  </button>
+                    <option value="">Select Term</option>
+                    {terms.map(term => (
+                      <option key={term} value={term}>{term}</option>
+                    ))}
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
                 </div>
-              </form>
+              </div>
+
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                  Class Group
+                </label>
+                <div className="relative select-dropdown-wrapper">
+                  <select
+                    name="classGroup"
+                    value={formData.classGroup}
+                    onChange={handleChange}
+                    required
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
+                  >
+                    <option value="">Select class gro</option>
+                    {classGroups.map(group => (
+                      <option key={group} value={group}>{group}</option>
+                    ))}
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bill Name/Description */}
+            <div>
+              <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                Bill Name/Description
+              </label>
+              <input
+                type="text"
+                name="billName"
+                value={formData.billName}
+                onChange={handleChange}
+                placeholder="Enter Bill Name / Description eg. Bills for basic 1, 2022 year, term"
+                required
+                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+              />
             </div>
           </div>
-        </div>
-      )}
+
+          {/* Bill Items Table */}
+          <div className="mb-6">
+            <table className="w-full border-collapse border-2 border-gray-200">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border-2 border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-900">#</th>
+                  <th className="border-2 border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-900">Bill Item</th>
+                  <th className="border-2 border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-900">Amount (GHS)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row, index) => (
+                  <tr key={row.id}>
+                    <td className="border-2 border-gray-200 px-4 py-3 text-center text-sm text-gray-900">{index + 1}</td>
+                    <td className="border-2 border-gray-200 px-4 py-3">
+                      <div className="relative select-dropdown-wrapper">
+                        <select
+                          value={row.billItem}
+                          onChange={(e) => handleRowChange(row.id, 'billItem', e.target.value)}
+                          className="select-dropdown w-full px-3 py-2 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 min-h-[40px]"
+                        >
+                          <option value="">Select Bill Item</option>
+                          {billItems.map(item => (
+                            <option key={item.id} value={item.id}>{item.name}</option>
+                          ))}
+                        </select>
+                        <div className="select-dropdown-arrow">
+                          <div className="select-dropdown-arrow-icon">
+                            <i className="fas fa-chevron-down"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="border-2 border-gray-200 px-4 py-3">
+                      <input
+                        type="number"
+                        value={row.amount}
+                        onChange={(e) => handleRowChange(row.id, 'amount', e.target.value)}
+                        placeholder="Enter Price"
+                        step="0.01"
+                        min="0"
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Add Row / Delete Row Buttons */}
+            <div className="flex gap-3 mt-4">
+              <button
+                type="button"
+                onClick={handleAddRow}
+                className="px-4 py-2 text-sm font-semibold text-primary-600 bg-primary-50 border border-primary-200 rounded-md hover:bg-primary-100 transition-all duration-300"
+              >
+                Add Row
+              </button>
+              <button
+                type="button"
+                onClick={() => rows.length > 1 && handleDeleteRow(rows[rows.length - 1].id)}
+                disabled={rows.length <= 1}
+                className="px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-md hover:bg-red-100 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Delete Row
+              </button>
+            </div>
+          </div>
+
+          {/* Grand Total */}
+          <div className="flex justify-end mb-6">
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-semibold text-gray-900">Grand Total:</label>
+              <input
+                type="text"
+                value={`GHS ${calculateGrandTotal().toFixed(2)}`}
+                readOnly
+                className="px-4 py-2 border-2 border-gray-200 rounded-md text-sm font-semibold text-gray-900 bg-gray-50"
+              />
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={handleReset}
+              className="px-5 py-2.5 text-sm font-semibold text-white bg-red-500 rounded-md hover:bg-red-600 transition-all duration-300 flex items-center gap-2"
+            >
+              <i className="fas fa-redo"></i>
+              Reset
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-md hover:bg-gray-50 transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <i className="fas fa-save"></i>
+              {loading ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+        </form>
+      </div>
     </Layout>
   );
 };
 
 export default BillItem;
-

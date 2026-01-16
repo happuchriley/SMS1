@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import staffService from "../services/staffService";
+import studentsService from "../services/studentsService";
 
 interface FormData {
   userType: string;
@@ -14,23 +16,107 @@ const Login: React.FC = () => {
     password: "",
   });
   const [remember, setRemember] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    if (formData.username && formData.password) {
-      sessionStorage.setItem("isAuthenticated", "true");
-      sessionStorage.setItem("userType", formData.userType);
-      sessionStorage.setItem("username", formData.username);
+    setError("");
+    
+    if (!formData.username || !formData.password) {
+      setError("Please enter both username and password");
+      return;
+    }
 
-      // Redirect based on user type
-      if (formData.userType === "staff") {
-        navigate("/teacher-dashboard");
-      } else if (formData.userType === "student") {
-        navigate("/student-dashboard");
-      } else {
+    setLoading(true);
+
+    try {
+      // For administrator, allow login without validation (backward compatibility)
+      if (formData.userType === "administrator") {
+        sessionStorage.setItem("isAuthenticated", "true");
+        sessionStorage.setItem("userType", "administrator");
+        sessionStorage.setItem("username", formData.username);
+        if (remember) {
+          localStorage.setItem("username", formData.username);
+          localStorage.setItem("userType", "administrator");
+        }
         navigate("/");
+        return;
       }
+
+      // For staff, validate against stored credentials
+      if (formData.userType === "staff") {
+        const allStaff = await staffService.getAll();
+        const staff = allStaff.find(s => 
+          s.staffId === formData.username ||
+          s.email === formData.username ||
+          `${s.firstName} ${s.surname}`.toLowerCase() === formData.username.toLowerCase()
+        );
+
+        if (!staff) {
+          setError("Staff member not found");
+          setLoading(false);
+          return;
+        }
+
+        // Check password
+        if (staff.password !== formData.password) {
+          setError("Invalid password");
+          setLoading(false);
+          return;
+        }
+
+        // Set authentication and user type from staff record
+        const userType = staff.userType || "staff";
+        sessionStorage.setItem("isAuthenticated", "true");
+        sessionStorage.setItem("userType", userType);
+        sessionStorage.setItem("username", staff.staffId || formData.username);
+        if (remember) {
+          localStorage.setItem("username", staff.staffId || formData.username);
+          localStorage.setItem("userType", userType);
+        }
+        navigate("/teacher-dashboard");
+        return;
+      }
+
+      // For students, validate against stored credentials
+      if (formData.userType === "student") {
+        const allStudents = await studentsService.getAll();
+        const student = allStudents.find(s => 
+          s.studentId === formData.username ||
+          s.id === formData.username ||
+          `${s.firstName} ${s.surname}`.toLowerCase() === formData.username.toLowerCase()
+        );
+
+        if (!student) {
+          setError("Student not found");
+          setLoading(false);
+          return;
+        }
+
+        // Check password
+        if (student.password && student.password !== formData.password) {
+          setError("Invalid password");
+          setLoading(false);
+          return;
+        }
+
+        sessionStorage.setItem("isAuthenticated", "true");
+        sessionStorage.setItem("userType", "student");
+        sessionStorage.setItem("username", student.studentId || student.id || formData.username);
+        if (remember) {
+          localStorage.setItem("username", student.studentId || student.id || formData.username);
+          localStorage.setItem("userType", "student");
+        }
+        navigate("/student-dashboard");
+        return;
+      }
+    } catch (error: any) {
+      console.error("Login error:", error);
+      setError("An error occurred during login. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -152,6 +238,13 @@ const Login: React.FC = () => {
           onSubmit={handleSubmit}
           className="space-y-5 sm:space-y-6 md:space-y-5"
         >
+          {error && (
+            <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              <i className="fas fa-exclamation-circle mr-2"></i>
+              {error}
+            </div>
+          )}
+          
           <div>
             <label className="block mb-3 sm:mb-3.5 font-semibold text-slate-900 text-base sm:text-lg md:text-sm">
               Select User Type
@@ -219,9 +312,16 @@ const Login: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full py-4.5 sm:py-5 md:py-4 bg-primary-600 text-white rounded-xl text-lg sm:text-xl md:text-base font-bold cursor-pointer transition-all duration-300 mt-3 sm:mt-4 shadow-lg tracking-wide uppercase hover:bg-primary-700 hover:-translate-y-1 hover:shadow-xl active:-translate-y-0.5 active:bg-primary-800 min-h-[56px] sm:min-h-[60px] md:min-h-[48px]"
+            disabled={loading}
+            className="w-full py-4.5 sm:py-5 md:py-4 bg-primary-600 text-white rounded-xl text-lg sm:text-xl md:text-base font-bold cursor-pointer transition-all duration-300 mt-3 sm:mt-4 shadow-lg tracking-wide uppercase hover:bg-primary-700 hover:-translate-y-1 hover:shadow-xl active:-translate-y-0.5 active:bg-primary-800 min-h-[56px] sm:min-h-[60px] md:min-h-[48px] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Login
+            {loading ? (
+              <>
+                <i className="fas fa-spinner fa-spin mr-2"></i> Logging in...
+              </>
+            ) : (
+              'Login'
+            )}
           </button>
 
           <div className="flex flex-row justify-between items-center mt-4 text-sm">

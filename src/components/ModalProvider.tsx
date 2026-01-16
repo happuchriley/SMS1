@@ -38,6 +38,7 @@ interface EditModalConfig {
 interface ModalContextType {
   showDeleteModal: (config: Omit<DeleteModalConfig, 'isOpen'>) => void;
   hideDeleteModal: () => void;
+  showDeleteConfirm: (title: string, message: string) => Promise<boolean>;
   showViewModal: (config: Omit<ViewModalConfig, 'isOpen'>) => void;
   hideViewModal: () => void;
   showEditModal: (config: Omit<EditModalConfig, 'isOpen'>) => void;
@@ -63,6 +64,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const [deleteModal, setDeleteModal] = useState<DeleteModalConfig>({ isOpen: false });
   const [viewModal, setViewModal] = useState<ViewModalConfig>({ isOpen: false });
   const [editModal, setEditModal] = useState<EditModalConfig>({ isOpen: false });
+  const deleteConfirmResolveRef = React.useRef<((value: boolean) => void) | null>(null);
   const toast = useToast();
 
   const showDeleteModal = (config: Omit<DeleteModalConfig, 'isOpen'>) => {
@@ -70,7 +72,30 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   };
 
   const hideDeleteModal = () => {
+    if (deleteConfirmResolveRef.current) {
+      deleteConfirmResolveRef.current(false);
+      deleteConfirmResolveRef.current = null;
+    }
     setDeleteModal({ isOpen: false });
+  };
+
+  const showDeleteConfirm = (title: string, message: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      deleteConfirmResolveRef.current = resolve;
+      setDeleteModal({
+        isOpen: true,
+        title,
+        message,
+        onConfirm: () => {
+          if (deleteConfirmResolveRef.current) {
+            deleteConfirmResolveRef.current(true);
+            deleteConfirmResolveRef.current = null;
+          }
+          setDeleteModal({ isOpen: false });
+        },
+        isLoading: false
+      });
+    });
   };
 
   const showViewModal = (config: Omit<ViewModalConfig, 'isOpen'>) => {
@@ -92,6 +117,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const value: ModalContextType = {
     showDeleteModal,
     hideDeleteModal,
+    showDeleteConfirm,
     showViewModal,
     hideViewModal,
     showEditModal,

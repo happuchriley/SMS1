@@ -120,8 +120,23 @@ const AddStaff: React.FC = () => {
         status: 'active'
       };
 
-      await staffService.create(staffData);
-      toast.showSuccess('Staff registered successfully!');
+      const createdStaff = await staffService.create(staffData);
+      
+      // Show success message with generated password
+      const generatedPassword = createdStaff.password || 'N/A';
+      toast.showSuccess(
+        `Staff registered successfully! Password: ${generatedPassword}`,
+        5000 // Show for 5 seconds
+      );
+      
+      // Also log to console for admin reference
+      console.log(`Staff Registration Details:
+        Staff ID: ${createdStaff.staffId}
+        Name: ${createdStaff.firstName} ${createdStaff.surname}
+        Category: ${createdStaff.category}
+        Role: ${createdStaff.userType}
+        Password: ${generatedPassword}
+      `);
       
       // Reset form
       handleClear();
@@ -129,7 +144,7 @@ const AddStaff: React.FC = () => {
       // Navigate after a short delay
       setTimeout(() => {
         navigate('/staff/all');
-      }, 1000);
+      }, 2000);
     } catch (error: any) {
       console.error('Error creating staff:', error);
       toast.showError(error.message || 'Failed to register staff. Please try again.');

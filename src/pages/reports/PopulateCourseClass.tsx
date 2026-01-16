@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import academicService from '../../services/academicService';
 import setupService from '../../services/setupService';
 import { useModal } from '../../components/ModalProvider';
+import { getAccessibleClasses } from '../../utils/classRestriction';
 
 interface FormData {
   academicYear: string;
@@ -28,23 +29,31 @@ const PopulateCourseClass: React.FC = () => {
     class: '',
     courses: []
   });
+  const [showAddCourseModal, setShowAddCourseModal] = useState<boolean>(false);
+  const [newCourseData, setNewCourseData] = useState({ name: '', code: '' });
+  const [isCreatingCourse, setIsCreatingCourse] = useState<boolean>(false);
+  
+  // Check if user is administrator or staff (teacher)
+  const userType = sessionStorage.getItem('userType') || '';
+  const canCreateCourse = userType === 'administrator' || userType === 'staff';
 
   // Sample data
   const academicYears: string[] = ['2023/2024', '2024/2025', '2025/2026'];
   const terms: string[] = ['1st Term', '2nd Term', '3rd Term'];
-  const classes: string[] = [
-    'Nursery 1', 
-    'Nursery 2', 
-    'Basic 1', 
-    'Basic 2', 
-    'Basic 3', 
-    'Basic 4', 
-    'Basic 5', 
-    'Basic 6', 
-    'JHS 1', 
-    'JHS 2', 
-    'JHS 3'
-  ];
+  const [classes, setClasses] = useState<string[]>([]);
+
+  const loadClasses = useCallback(async () => {
+    try {
+      const accessibleClasses = await getAccessibleClasses();
+      setClasses(accessibleClasses);
+    } catch (error) {
+      console.error('Error loading classes:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadClasses();
+  }, [loadClasses]);
   const defaultCourses: string[] = [
     'English Language', 
     'Mathematics', 
@@ -142,6 +151,33 @@ const PopulateCourseClass: React.FC = () => {
   const handleClear = () => {
     setFormData({ academicYear: '', term: '', class: '', courses: [] });
     setSelectedCourses([]);
+  };
+
+  const handleAddCourse = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!newCourseData.name || !newCourseData.code) {
+      toast.showError('Course name and code are required.');
+      return;
+    }
+
+    setIsCreatingCourse(true);
+    try {
+      await setupService.createSubject({
+        name: newCourseData.name,
+        code: newCourseData.code
+      });
+      toast.showSuccess('Course created successfully!');
+      setShowAddCourseModal(false);
+      setNewCourseData({ name: '', code: '' });
+      // Reload courses to include the new one
+      await loadCourses();
+    } catch (error) {
+      console.error('Error creating course:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create course';
+      toast.showError(errorMessage);
+    } finally {
+      setIsCreatingCourse(false);
+    }
   };
 
   // Use availableCourses instead of allCourses for display
@@ -267,13 +303,25 @@ const PopulateCourseClass: React.FC = () => {
               >
                 Select Courses <span className="text-red-500">*</span>
               </label>
-              <button
-                type="button"
-                onClick={handleSelectAll}
-                className="text-xs sm:text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors self-start sm:self-auto"
-              >
-                {selectedCourses.length === displayCourses.length ? 'Deselect All' : 'Select All'}
-              </button>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                {canCreateCourse && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAddCourseModal(true)}
+                    className="text-xs sm:text-sm text-white bg-primary-500 hover:bg-primary-600 font-medium transition-colors px-3 py-1.5 rounded-md flex items-center gap-1.5"
+                  >
+                    <i className="fas fa-plus"></i>
+                    <span>Add Course</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={handleSelectAll}
+                  className="text-xs sm:text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"
+                >
+                  {selectedCourses.length === displayCourses.length ? 'Deselect All' : 'Select All'}
+                </button>
+              </div>
             </div>
             <div className="border-2 border-gray-200 rounded-md p-3 sm:p-4 max-h-64 sm:max-h-80 md:max-h-96 overflow-y-auto">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3">
@@ -323,6 +371,81 @@ const PopulateCourseClass: React.FC = () => {
           </div>
         </form>
       </div>
+
+      {/* Add Course Modal */}
+      {showAddCourseModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-gray-900">Add New Course</h2>
+                <button
+                  onClick={() => {
+                    setShowAddCourseModal(false);
+                    setNewCourseData({ name: '', code: '' });
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  type="button"
+                >
+                  <i className="fas fa-times text-xl"></i>
+                </button>
+              </div>
+
+              <form onSubmit={handleAddCourse} className="space-y-4">
+                <div>
+                  <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                    Course Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newCourseData.name}
+                    onChange={(e) => setNewCourseData({ ...newCourseData, name: e.target.value })}
+                    placeholder="e.g., English Language"
+                    required
+                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                    Course Code <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newCourseData.code}
+                    onChange={(e) => setNewCourseData({ ...newCourseData, code: e.target.value.toUpperCase() })}
+                    placeholder="e.g., ENG"
+                    required
+                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+                  />
+                </div>
+
+                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 pt-4 border-t border-gray-200">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddCourseModal(false);
+                      setNewCourseData({ name: '', code: '' });
+                    }}
+                    disabled={isCreatingCourse}
+                    className="w-full sm:w-auto px-4 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isCreatingCourse}
+                    className="w-full sm:w-auto px-4 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                  >
+                    <i className="fas fa-plus"></i>
+                    <span>{isCreatingCourse ? 'Creating...' : 'Create Course'}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };

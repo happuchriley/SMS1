@@ -3,6 +3,7 @@
  * Handles all staff-related API operations
  */
 import apiService from './api';
+import { generatePassword, getRoleFromCategory } from '../utils/passwordGenerator';
 
 const ENTITY_TYPE = 'staff';
 
@@ -17,6 +18,9 @@ interface StaffData {
   email?: string;
   contact?: string;
   employmentDate?: string;
+  password?: string;
+  userType?: string;
+  category?: string;
   [key: string]: any;
 }
 
@@ -53,6 +57,19 @@ const staffService = {
     // Set default status
     if (!staffData.status) {
       staffData.status = 'active';
+    }
+
+    // Generate password if not provided
+    if (!staffData.password) {
+      staffData.password = generatePassword(8);
+    }
+
+    // Determine user role based on category
+    if (!staffData.userType && staffData.category) {
+      staffData.userType = getRoleFromCategory(staffData.category);
+    } else if (!staffData.userType) {
+      // Default to staff if no category specified
+      staffData.userType = 'staff';
     }
 
     return await apiService.create<StaffData>(ENTITY_TYPE, staffData);

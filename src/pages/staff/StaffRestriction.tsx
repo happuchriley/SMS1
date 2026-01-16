@@ -1,20 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 import { useModal } from '../../components/ModalProvider';
 import staffRestrictionService from '../../services/staffRestrictionService';
 import staffService from '../../services/staffService';
-
-interface StaffRestriction {
-  id: string;
-  staffId: string;
-  restrictionType: string;
-  reason: string;
-  startDate?: string;
-  endDate?: string;
-  status?: string;
-  notes?: string;
-}
+import { exportToCSV, exportToExcel, exportToPDF } from '../../utils/printExport';
 
 interface StaffInfo {
   id?: string;
@@ -25,24 +15,53 @@ interface StaffInfo {
   [key: string]: any;
 }
 
+interface FeatureAccess {
+  feature: string;
+  label: string;
+  icon: string;
+  allowed: boolean;
+}
+
+interface StaffRestriction {
+  id?: string;
+  staffId: string;
+  features: string[]; // Array of allowed feature names
+  notes?: string;
+  lastUpdated?: string;
+}
+
 const StaffRestriction: React.FC = () => {
   const { toast, showDeleteModal } = useModal();
-  const [restrictions, setRestrictions] = useState<StaffRestriction[]>([]);
   const [staffList, setStaffList] = useState<StaffInfo[]>([]);
+  const [restrictions, setRestrictions] = useState<StaffRestriction[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [selectedStaff, setSelectedStaff] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [entriesPerPage, setEntriesPerPage] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
+  const actionMenuRef = useRef<HTMLDivElement>(null);
   const [editingRestriction, setEditingRestriction] = useState<StaffRestriction | null>(null);
   const [showForm, setShowForm] = useState<boolean>(false);
-  const [formData, setFormData] = useState<Partial<StaffRestriction>>({
-    staffId: '',
-    restrictionType: '',
-    reason: '',
-    startDate: '',
-    endDate: '',
-    status: 'active',
-    notes: ''
-  });
+  const [formFeatures, setFormFeatures] = useState<Record<string, boolean>>({});
+
+  // Define all available features/modules
+  const allFeatures: FeatureAccess[] = [
+    { feature: 'students', label: 'Students Management', icon: 'fa-user-graduate', allowed: false },
+    { feature: 'staff', label: 'Staff Management', icon: 'fa-users', allowed: false },
+    { feature: 'reports', label: 'Reports', icon: 'fa-chart-bar', allowed: false },
+    { feature: 'billing', label: 'Billing', icon: 'fa-file-invoice-dollar', allowed: false },
+    { feature: 'fee-collection', label: 'Fee Collection', icon: 'fa-money-bill-wave', allowed: false },
+    { feature: 'payroll', label: 'Payroll', icon: 'fa-money-check-alt', allowed: false },
+    { feature: 'finance', label: 'Finance', icon: 'fa-wallet', allowed: false },
+    { feature: 'financial-reports', label: 'Financial Reports', icon: 'fa-chart-line', allowed: false },
+    { feature: 'reminders', label: 'Reminders', icon: 'fa-bell', allowed: false },
+    { feature: 'setup', label: 'Setup', icon: 'fa-cog', allowed: false },
+    { feature: 'tlms', label: 'TLMS', icon: 'fa-book', allowed: false },
+    { feature: 'elearning', label: 'E-Learning', icon: 'fa-laptop', allowed: false },
+    { feature: 'news', label: 'News', icon: 'fa-newspaper', allowed: false },
+    { feature: 'documents', label: 'Documents', icon: 'fa-folder', allowed: false },
+  ];
 
   const loadData = useCallback(async () => {
     try {
@@ -51,13 +70,18 @@ const StaffRestriction: React.FC = () => {
         staffRestrictionService.getAll(),
         staffService.getAll()
       ]);
-      // Map restrictions to ensure status has default value
-      const mappedRestrictions: StaffRestriction[] = restrictionsData.map(item => ({
-        ...item,
-        status: item.status ?? 'active'
+      
+      // Map restrictions
+      const mappedRestrictions: StaffRestriction[] = restrictionsData.map((item: any) => ({
+        id: item.id,
+        staffId: item.staffId,
+        features: item.features || [],
+        notes: item.notes || '',
+        lastUpdated: item.lastUpdated || item.updatedAt || ''
       }));
       setRestrictions(mappedRestrictions);
-      // Map staff data to ensure id is present
+      
+      // Map staff data
       const mappedStaff: StaffInfo[] = staffData.map((staff: any) => ({
         id: staff.id || staff.staffId || '',
         staffId: staff.staffId,
@@ -78,24 +102,16 @@ const StaffRestriction: React.FC = () => {
     loadData();
   }, [loadData]);
 
-  // Prevent body scroll when modal is open
+  // Close action menu when clicking outside
   useEffect(() => {
-    if (showForm) {
-      const scrollY = window.scrollY;
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
-      
-      return () => {
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
-        window.scrollTo(0, scrollY);
-      };
-    }
-  }, [showForm]);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (actionMenuRef.current && !actionMenuRef.current.contains(event.target as Node)) {
+        setOpenActionMenu(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const getStaffName = (staffId: string): string => {
     const staff = staffList.find(s => (s.id && s.id === staffId) || (s.staffId && s.staffId === staffId));
@@ -108,39 +124,37 @@ const StaffRestriction: React.FC = () => {
     return staff?.staffId || staff?.id || 'N/A';
   };
 
+  const getRestrictionForStaff = (staffId: string): StaffRestriction | null => {
+    return restrictions.find(r => r.staffId === staffId) || null;
+  };
+
   const handleAdd = (): void => {
     setEditingRestriction(null);
-    setFormData({
-      staffId: '',
-      restrictionType: '',
-      reason: '',
-      startDate: '',
-      endDate: '',
-      status: 'active',
-      notes: ''
-    });
+    setSelectedStaff('');
+    setFormFeatures({});
     setShowForm(true);
   };
 
   const handleEdit = (restriction: StaffRestriction): void => {
     setEditingRestriction(restriction);
-    setFormData({
-      staffId: restriction.staffId,
-      restrictionType: restriction.restrictionType,
-      reason: restriction.reason,
-      startDate: restriction.startDate || '',
-      endDate: restriction.endDate || '',
-      status: restriction.status,
-      notes: restriction.notes || ''
+    setSelectedStaff(restriction.staffId);
+    // Initialize form features based on restriction
+    const featuresMap: Record<string, boolean> = {};
+    allFeatures.forEach(f => {
+      featuresMap[f.feature] = restriction.features.includes(f.feature);
     });
+    setFormFeatures(featuresMap);
     setShowForm(true);
   };
 
   const handleDelete = (id: string): void => {
+    const restriction = restrictions.find(r => r.id === id);
+    if (!restriction) return;
+    
     showDeleteModal({
       title: 'Delete Restriction',
       message: 'Are you sure you want to delete this restriction?',
-      itemName: 'restriction',
+      itemName: getStaffName(restriction.staffId),
       onConfirm: async () => {
         try {
           await staffRestrictionService.delete(id);
@@ -154,19 +168,59 @@ const StaffRestriction: React.FC = () => {
     });
   };
 
+  const handleFeatureToggle = (feature: string): void => {
+    setFormFeatures(prev => ({
+      ...prev,
+      [feature]: !prev[feature]
+    }));
+  };
+
+  const handleStaffSelect = (staffId: string): void => {
+    setSelectedStaff(staffId);
+    // Load existing restriction if any
+    const existing = getRestrictionForStaff(staffId);
+    if (existing) {
+      setEditingRestriction(existing);
+      const featuresMap: Record<string, boolean> = {};
+      allFeatures.forEach(f => {
+        featuresMap[f.feature] = existing.features.includes(f.feature);
+      });
+      setFormFeatures(featuresMap);
+    } else {
+      setEditingRestriction(null);
+      // Default: all features allowed
+      const featuresMap: Record<string, boolean> = {};
+      allFeatures.forEach(f => {
+        featuresMap[f.feature] = true;
+      });
+      setFormFeatures(featuresMap);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    if (!formData.staffId || !formData.restrictionType || !formData.reason) {
-      toast.showError('Please fill in all required fields');
+    if (!selectedStaff) {
+      toast.showError('Please select a staff member');
       return;
     }
 
     try {
-      if (editingRestriction) {
-        await staffRestrictionService.update(editingRestriction.id, formData);
+      const allowedFeatures = allFeatures
+        .filter(f => formFeatures[f.feature])
+        .map(f => f.feature);
+
+      const restrictionData: StaffRestriction = {
+        staffId: selectedStaff,
+        features: allowedFeatures,
+        notes: '',
+        lastUpdated: new Date().toISOString()
+      };
+
+      if (editingRestriction && editingRestriction.id) {
+        await staffRestrictionService.update(editingRestriction.id, restrictionData);
         toast.showSuccess('Restriction updated successfully');
       } else {
-        await staffRestrictionService.create(formData as StaffRestriction);
+        await staffRestrictionService.create(restrictionData as any);
         toast.showSuccess('Restriction created successfully');
       }
       setShowForm(false);
@@ -177,39 +231,96 @@ const StaffRestriction: React.FC = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>): void => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
+  const filteredRestrictions = useMemo(() => {
+    if (!searchTerm) return restrictions;
+    const term = searchTerm.toLowerCase();
+    return restrictions.filter(restriction => {
+      const staffName = getStaffName(restriction.staffId).toLowerCase();
+      const staffId = getStaffId(restriction.staffId).toLowerCase();
+      return staffName.includes(term) || staffId.includes(term);
     });
+  }, [restrictions, searchTerm, staffList]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredRestrictions.length / entriesPerPage);
+  const paginatedRestrictions = useMemo(() => {
+    const start = (currentPage - 1) * entriesPerPage;
+    const end = start + entriesPerPage;
+    return filteredRestrictions.slice(start, end);
+  }, [filteredRestrictions, currentPage, entriesPerPage]);
+
+  const handleActionClick = (restrictionId: string, action: string): void => {
+    setOpenActionMenu(null);
+    const restriction = restrictions.find(r => r.id === restrictionId);
+    if (!restriction) return;
+
+    switch (action) {
+      case 'edit':
+        handleEdit(restriction);
+        break;
+      case 'delete':
+        if (restriction.id) {
+          handleDelete(restriction.id);
+        }
+        break;
+      case 'view':
+        toast.showInfo(`Viewing restrictions for ${getStaffName(restriction.staffId)}`);
+        break;
+      default:
+        break;
+    }
   };
 
-  const filteredRestrictions = restrictions.filter(restriction => {
-    const staffName = getStaffName(restriction.staffId).toLowerCase();
-    const matchesSearch = !searchTerm || 
-      staffName.includes(searchTerm.toLowerCase()) ||
-      restriction.restrictionType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      restriction.reason.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = filterStatus === 'all' || restriction.status === filterStatus;
-    
-    return matchesSearch && matchesStatus;
-  });
+  const handleExport = (format: 'copy' | 'excel' | 'csv' | 'pdf'): void => {
+    if (filteredRestrictions.length === 0) {
+      toast.showError('No data to export');
+      return;
+    }
 
-  const restrictionTypes = [
-    'Limited Access',
-    'No Access',
-    'Read Only',
-    'Temporary Suspension',
-    'Other'
-  ];
+    const columns = [
+      { key: 'staffId', label: 'Staff ID' },
+      { key: 'name', label: 'Staff Name' },
+      { key: 'features', label: 'Allowed Features' },
+      { key: 'count', label: 'Feature Count' }
+    ];
+
+    const exportData = filteredRestrictions.map(r => ({
+      staffId: getStaffId(r.staffId),
+      name: getStaffName(r.staffId),
+      features: r.features.join(', ') || 'None',
+      count: r.features.length
+    }));
+
+    switch (format) {
+      case 'copy':
+        const text = exportData.map(row => Object.values(row).join('\t')).join('\n');
+        navigator.clipboard.writeText(text);
+        toast.showSuccess('Data copied to clipboard');
+        break;
+      case 'excel':
+        exportToExcel(exportData, `staff-restrictions-${new Date().toISOString().split('T')[0]}.xlsx`, columns);
+        toast.showSuccess('Data exported to Excel');
+        break;
+      case 'csv':
+        exportToCSV(exportData, `staff-restrictions-${new Date().toISOString().split('T')[0]}.csv`, columns);
+        toast.showSuccess('Data exported to CSV');
+        break;
+      case 'pdf':
+        const printContent = document.getElementById('restriction-table');
+        if (printContent) {
+          exportToPDF(printContent, `staff-restrictions-${new Date().toISOString().split('T')[0]}.pdf`);
+          toast.showSuccess('Data exported to PDF');
+        }
+        break;
+    }
+  };
 
   return (
     <Layout>
-      <div className="mb-5 sm:mb-6">
+      <div className="mb-5 sm:mb-6 md:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Staff Restriction</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Staff Restriction</h1>
             <div className="flex items-center gap-2 text-gray-600 text-xs sm:text-sm">
               <Link to="/" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">Home</Link>
               <span>/</span>
@@ -220,7 +331,7 @@ const StaffRestriction: React.FC = () => {
           </div>
           <button
             onClick={handleAdd}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-md text-sm font-semibold hover:bg-primary-700 transition-colors duration-150 shadow-md hover:shadow-lg"
+            className="px-4 py-2 bg-primary-500 text-white rounded-md text-sm font-semibold hover:bg-primary-700 transition-all duration-300 flex items-center gap-2"
           >
             <i className="fas fa-plus"></i>
             <span>Add Restriction</span>
@@ -228,256 +339,316 @@ const StaffRestriction: React.FC = () => {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="card-modern mb-4 sm:mb-6">
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Search by staff name, restriction type, or reason..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="input-modern w-full"
-            />
-          </div>
-          <div className="sm:w-48">
-            <div className="relative select-dropdown-wrapper">
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="select-dropdown input-modern w-full"
-              >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-              <div className="select-dropdown-arrow">
-                <div className="select-dropdown-arrow-icon">
-                  <i className="fas fa-chevron-down"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Form Modal */}
+      {/* Form Section - Full Page Form */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-5 sm:p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900">
-                  {editingRestriction ? 'Edit Restriction' : 'Add Restriction'}
-                </h2>
-                <button
-                  onClick={() => setShowForm(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <i className="fas fa-times text-xl"></i>
-                </button>
-              </div>
-            </div>
-            <form onSubmit={handleSubmit} className="p-5 sm:p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                <div className="sm:col-span-2">
-                  <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                    Staff <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative select-dropdown-wrapper">
-                    <select
-                      name="staffId"
-                      value={formData.staffId || ''}
-                      onChange={handleChange}
-                      required
-                      className="select-dropdown input-modern w-full"
-                    >
-                      <option value="">Select Staff</option>
-                      {staffList.map(staff => (
-                        <option key={staff.id} value={staff.id}>
-                          {staff.staffId || staff.id} - {staff.firstName} {staff.surname} {staff.otherNames || ''}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="select-dropdown-arrow">
-                      <div className="select-dropdown-arrow-icon">
-                        <i className="fas fa-chevron-down"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                    Restriction Type <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative select-dropdown-wrapper">
-                    <select
-                      name="restrictionType"
-                      value={formData.restrictionType || ''}
-                      onChange={handleChange}
-                      required
-                      className="select-dropdown input-modern w-full"
-                    >
-                      <option value="">Select Type</option>
-                      {restrictionTypes.map(type => (
-                        <option key={type} value={type}>{type}</option>
-                      ))}
-                    </select>
-                    <div className="select-dropdown-arrow">
-                      <div className="select-dropdown-arrow-icon">
-                        <i className="fas fa-chevron-down"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                    Reason <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    name="reason"
-                    value={formData.reason || ''}
-                    onChange={handleChange}
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-gray-900">
+              {editingRestriction ? 'Edit Staff Restriction' : 'Add Staff Restriction'}
+            </h2>
+            <button
+              onClick={() => setShowForm(false)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <i className="fas fa-times text-xl"></i>
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-6">
+              {/* Staff Selection */}
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                  Select Staff <span className="text-red-500">*</span>
+                </label>
+                <div className="relative select-dropdown-wrapper">
+                  <select
+                    value={selectedStaff}
+                    onChange={(e) => handleStaffSelect(e.target.value)}
                     required
-                    rows={3}
-                    className="input-modern w-full"
-                    placeholder="Enter reason for restriction"
-                  />
-                </div>
-                <div>
-                  <label className="block mb-2 font-semibold text-gray-900 text-sm">Start Date</label>
-                  <input
-                    type="date"
-                    name="startDate"
-                    value={formData.startDate || ''}
-                    onChange={handleChange}
-                    className="input-modern w-full"
-                  />
-                </div>
-                <div>
-                  <label className="block mb-2 font-semibold text-gray-900 text-sm">End Date</label>
-                  <input
-                    type="date"
-                    name="endDate"
-                    value={formData.endDate || ''}
-                    onChange={handleChange}
-                    className="input-modern w-full"
-                  />
-                </div>
-                <div>
-                  <label className="block mb-2 font-semibold text-gray-900 text-sm">Status</label>
-                  <div className="relative select-dropdown-wrapper">
-                    <select
-                      name="status"
-                      value={formData.status || 'active'}
-                      onChange={handleChange}
-                      className="select-dropdown input-modern w-full"
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
-                    <div className="select-dropdown-arrow">
-                      <div className="select-dropdown-arrow-icon">
-                        <i className="fas fa-chevron-down"></i>
-                      </div>
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
+                  >
+                    <option value="">Select Staff Member</option>
+                    {staffList.map(staff => (
+                      <option key={staff.id} value={staff.id}>
+                        {staff.staffId || staff.id} - {staff.firstName} {staff.surname} {staff.otherNames || ''}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
                     </div>
                   </div>
                 </div>
-                <div className="sm:col-span-2">
-                  <label className="block mb-2 font-semibold text-gray-900 text-sm">Notes</label>
-                  <textarea
-                    name="notes"
-                    value={formData.notes || ''}
-                    onChange={handleChange}
-                    rows={3}
-                    className="input-modern w-full"
-                    placeholder="Additional notes (optional)"
-                  />
-                </div>
               </div>
-              <div className="flex justify-end gap-3 mt-6">
+
+              {/* Feature Access Controls */}
+              {selectedStaff && (
+                <div>
+                  <label className="block mb-4 font-semibold text-gray-900 text-sm">
+                    Feature Access Control <span className="text-red-500">*</span>
+                  </label>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Select the features/modules this staff member should have access to. Unchecked features will be restricted.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {allFeatures.map((feature) => (
+                      <div
+                        key={feature.feature}
+                        className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                          formFeatures[feature.feature]
+                            ? 'border-primary-500 bg-primary-50'
+                            : 'border-gray-200 bg-white hover:border-gray-300'
+                        }`}
+                        onClick={() => handleFeatureToggle(feature.feature)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={formFeatures[feature.feature] || false}
+                            onChange={() => handleFeatureToggle(feature.feature)}
+                            className="w-5 h-5 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <i className={`fas ${feature.icon} text-primary-500`}></i>
+                              <span className="font-semibold text-gray-900 text-sm">{feature.label}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                  className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-colors"
+                  disabled={!selectedStaff}
+                  className="px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {editingRestriction ? 'Update' : 'Create'}
+                  {editingRestriction ? 'Update Restriction' : 'Save Restriction'}
                 </button>
               </div>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       )}
 
-      {/* Table */}
-      <div className="card-modern overflow-hidden">
-        {loading ? (
-          <div className="p-12 text-center">
-            <i className="fas fa-spinner fa-spin text-4xl text-primary-500 mb-4"></i>
-            <p className="text-gray-600">Loading restrictions...</p>
+      {/* Table Section */}
+      <div className="bg-white rounded-lg shadow-md border border-gray-200">
+        {/* Table Controls */}
+        <div className="p-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-700">Show</label>
+            <select
+              value={entriesPerPage}
+              onChange={(e) => {
+                setEntriesPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-primary-500"
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <label className="text-sm text-gray-700">entries</label>
           </div>
-        ) : filteredRestrictions.length === 0 ? (
-          <div className="p-12 text-center">
-            <i className="fas fa-inbox text-5xl text-gray-300 mb-4"></i>
-            <p className="text-gray-600">No restrictions found</p>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => handleExport('copy')}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              title="Copy"
+            >
+              Copy
+            </button>
+            <button
+              onClick={() => handleExport('excel')}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              title="Excel"
+            >
+              Excel
+            </button>
+            <button
+              onClick={() => handleExport('csv')}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              title="CSV"
+            >
+              CSV
+            </button>
+            <button
+              onClick={() => handleExport('pdf')}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              title="PDF"
+            >
+              PDF
+            </button>
+            <button
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              title="Column visibility"
+            >
+              Column visibility
+            </button>
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="table-modern w-full">
-              <thead>
+
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-700">Search:</label>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Search..."
+              className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-primary-500 w-48"
+            />
+          </div>
+        </div>
+
+        {/* Table */}
+        <div id="restriction-table" className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-blue-600 text-white">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Action</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">No.</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Staff.ID</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Staff.Name</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Allowed Features</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Feature Count</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {loading ? (
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Staff ID</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Name</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Restriction Type</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Reason</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Actions</th>
+                  <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                    <div className="flex flex-col items-center justify-center">
+                      <i className="fas fa-spinner fa-spin text-4xl mb-4 text-primary-500"></i>
+                      <div className="text-lg font-semibold">Loading restrictions...</div>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {filteredRestrictions.map((restriction) => (
-                  <tr key={restriction.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 text-sm text-gray-900">{getStaffId(restriction.staffId)}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900 font-medium">{getStaffName(restriction.staffId)}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{restriction.restrictionType}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{restriction.reason}</td>
-                    <td className="px-4 py-3 text-sm">
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        (restriction.status || 'active') === 'active' 
-                          ? 'bg-red-100 text-red-800' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {restriction.status || 'active'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleEdit(restriction)}
-                          className="px-3 py-1.5 text-xs font-semibold text-primary-600 bg-primary-50 rounded-md hover:bg-primary-100 transition-colors"
-                        >
-                          <i className="fas fa-edit mr-1"></i>Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(restriction.id)}
-                          className="px-3 py-1.5 text-xs font-semibold text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors"
-                        >
-                          <i className="fas fa-trash mr-1"></i>Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+              ) : paginatedRestrictions.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                    <div className="flex flex-col items-center justify-center">
+                      <i className="fas fa-inbox text-4xl mb-4 text-gray-300"></i>
+                      <div className="text-lg font-semibold">No restrictions found</div>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                paginatedRestrictions.map((restriction, index) => {
+                  const featureLabels = restriction.features
+                    .map(f => allFeatures.find(af => af.feature === f)?.label || f)
+                    .join(', ') || 'None';
+                  
+                  return (
+                    <tr key={restriction.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 relative">
+                        <div ref={actionMenuRef}>
+                          <button
+                            onClick={() => setOpenActionMenu(openActionMenu === restriction.id ? null : restriction.id || null)}
+                            className="px-3 py-1.5 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center gap-1"
+                          >
+                            <i className="fas fa-cog"></i>
+                            <i className="fas fa-chevron-right text-xs"></i>
+                          </button>
+                          {openActionMenu === restriction.id && restriction.id && (
+                            <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-[200px]">
+                              <button
+                                onClick={() => handleActionClick(restriction.id!, 'view')}
+                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <i className="fas fa-eye text-green-500"></i>
+                                View Details
+                              </button>
+                              <button
+                                onClick={() => handleActionClick(restriction.id!, 'edit')}
+                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <i className="fas fa-edit text-blue-500"></i>
+                                Edit Restriction
+                              </button>
+                              <button
+                                onClick={() => handleActionClick(restriction.id!, 'delete')}
+                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <i className="fas fa-trash text-red-500"></i>
+                                Delete Restriction
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{(currentPage - 1) * entriesPerPage + index + 1}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900 font-medium">{getStaffId(restriction.staffId)}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{getStaffName(restriction.staffId)}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">
+                        <div className="flex flex-wrap gap-1">
+                          {restriction.features.length > 0 ? (
+                            restriction.features.map(f => {
+                              const feature = allFeatures.find(af => af.feature === f);
+                              return feature ? (
+                                <span key={f} className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">
+                                  <i className={`fas ${feature.icon}`}></i>
+                                  {feature.label}
+                                </span>
+                              ) : null;
+                            })
+                          ) : (
+                            <span className="text-gray-500 italic">No features allowed</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900 font-semibold">{restriction.features.length}</td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="p-4 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="text-sm text-gray-700">
+            Showing {filteredRestrictions.length === 0 ? 0 : (currentPage - 1) * entriesPerPage + 1} to {Math.min(currentPage * entriesPerPage, filteredRestrictions.length)} of {filteredRestrictions.length} entries
           </div>
-        )}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-gray-700">
+              Page {currentPage} of {totalPages || 1}
+            </span>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage >= totalPages}
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </Layout>
   );

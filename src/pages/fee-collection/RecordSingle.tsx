@@ -1,217 +1,272 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import Layout from '../../components/Layout';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import billingService from '../../services/billingService';
 import studentsService from '../../services/studentsService';
 import { useModal } from '../../components/ModalProvider';
+import { exportToCSV, exportToExcel, exportToPDF } from '../../utils/printExport';
+import { getAccessibleClasses, filterStudentsByAccessibleClasses } from '../../utils/classRestriction';
 
-interface StudentItem {
+interface StudentTableItem {
   id: string;
-  name: string;
-  class: string;
   studentId: string;
-}
-
-interface BillItem {
-  id: string;
-  billNumber: string;
-  amount: number;
-  paid: number;
+  name: string;
+  gender: string;
+  class: string;
+  image?: string;
+  bill: number;
+  payment: number;
   balance: number;
-  dueDate: string;
   status: string;
-  academicYear?: string;
-  term?: string;
 }
 
 interface FormData {
   academicYear: string;
   term: string;
   class: string;
-  student: string;
-  paymentDate: string;
-  paymentMethod: string;
-  referenceNumber: string;
-  amount: string;
-  billNumber: string;
 }
 
 const RecordSingle: React.FC = () => {
   const { toast } = useModal();
-  const [, setIsSubmitting] = useState<boolean>(false);
+  const navigate = useNavigate();
   const [allStudents, setAllStudents] = useState<any[]>([]);
   const [formData, setFormData] = useState<FormData>({
     academicYear: '',
     term: '',
-    class: '',
-    student: '',
-    paymentDate: '',
-    paymentMethod: '',
-    referenceNumber: '',
-    amount: '',
-    billNumber: ''
+    class: ''
   });
 
-  const [bills, setBills] = useState<BillItem[]>([]);
-  const [selectedBills, setSelectedBills] = useState<string[]>([]);
-  const [paymentAmounts, setPaymentAmounts] = useState<Record<string, number>>({});
+  const [studentData, setStudentData] = useState<StudentTableItem[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [entriesPerPage, setEntriesPerPage] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
+  const actionMenuRef = useRef<HTMLDivElement>(null);
+
+  // Sample data
+  const academicYears: string[] = ['2023/2024', '2024/2025', '2025/2026'];
+  const terms: string[] = ['1st Term', '2nd Term', '3rd Term'];
+  const [classes, setClasses] = useState<string[]>([]);
 
   const loadStudents = useCallback(async () => {
     try {
       const students = await studentsService.getAll();
-      setAllStudents(students);
+      // Filter students by accessible classes
+      const filteredStudents = await filterStudentsByAccessibleClasses(students);
+      setAllStudents(filteredStudents);
     } catch (error) {
       console.error('Error loading students:', error);
+      toast.showError('Failed to load students');
+    }
+  }, [toast]);
+
+  const loadClasses = useCallback(async () => {
+    try {
+      const accessibleClasses = await getAccessibleClasses();
+      setClasses(accessibleClasses);
+    } catch (error) {
+      console.error('Error loading classes:', error);
+      toast.showError('Failed to load classes');
     }
   }, []);
 
-  const loadBillsForStudent = useCallback(async (studentId: string, academicYear: string, term: string) => {
-    try {
-      const studentBills = await billingService.getBillsByStudent(studentId);
-      // Filter by academic year and term if selected
-      let filtered = studentBills;
-      if (academicYear) {
-        filtered = filtered.filter((b: any) => b.academicYear === academicYear);
-      }
-      if (term) {
-        filtered = filtered.filter((b: any) => b.term === term);
-      }
-      // Only show pending/partial bills
-      filtered = filtered.filter((b: any) => b.status === 'pending' || b.status === 'partial');
-      setBills(filtered.map((b: any) => ({
-        id: b.id,
-        billNumber: b.billNumber || b.id,
-        amount: b.total || 0,
-        paid: b.paid || 0,
-        balance: (b.total || 0) - (b.paid || 0),
-        dueDate: b.dueDate || '',
-        status: b.status || 'pending'
-      })));
-    } catch (error) {
-      console.error('Error loading bills:', error);
-      toast.showError('Failed to load bills for student');
-    }
-  }, [toast]);
+  useEffect(() => {
+    loadClasses();
+  }, [loadClasses]);
 
   useEffect(() => {
     loadStudents();
   }, [loadStudents]);
 
+  // Load student billing data
   useEffect(() => {
-    if (formData.student) {
-      loadBillsForStudent(formData.student, formData.academicYear, formData.term);
-    } else {
-      setBills([]);
-    }
-  }, [formData.student, formData.academicYear, formData.term, loadBillsForStudent]);
+    const loadStudentBillingData = async () => {
+      if (!formData.class || !formData.academicYear || !formData.term) {
+        setStudentData([]);
+        return;
+      }
 
-  // Sample data
-  const academicYears: string[] = ['2023/2024', '2024/2025', '2025/2026'];
-  const terms: string[] = ['1st Term', '2nd Term', '3rd Term'];
-  const classes: string[] = ['Nursery 1', 'Nursery 2', 'Basic 1', 'Basic 2', 'Basic 3', 'Basic 4', 'Basic 5', 'Basic 6', 'JHS 1', 'JHS 2', 'JHS 3'];
-  const paymentMethods: string[] = ['Cash', 'Cheque', 'Bank Transfer', 'Mobile Money', 'Card'];
+      try {
+        const filteredStudents = allStudents.filter(s => s.class === formData.class);
+        const data = await Promise.all(
+          filteredStudents.map(async (student) => {
+            try {
+              const bills = await billingService.getBillsByStudent(student.id);
+              const filteredBills = bills.filter((b: any) => 
+                b.academicYear === formData.academicYear && b.term === formData.term
+              );
 
-  // Filter students by selected class
-  const filteredStudents = useMemo<StudentItem[]>(() => {
-    if (!formData.class) return [];
-    return allStudents
-      .filter(s => s.class === formData.class)
-      .map(s => ({
-        id: s.id,
-        name: `${s.firstName || ''} ${s.surname || ''} ${s.otherNames || ''}`.trim(),
-        class: s.class,
-        studentId: s.studentId || s.id
-      }));
-  }, [formData.class, allStudents]);
+              let totalBill = 0;
+              let totalPaid = 0;
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>): void => {
-    const { name, value } = e.target;
+              for (const bill of filteredBills) {
+                totalBill += parseFloat(String(bill.total || 0));
+                const paid = await billingService.getTotalPaidForBill(bill.id);
+                totalPaid += paid;
+              }
+
+              const balance = totalBill - totalPaid;
+
+              return {
+                id: student.id,
+                studentId: student.studentId || student.id,
+                name: `${student.firstName || ''} ${student.surname || ''} ${student.otherNames || ''}`.trim(),
+                gender: student.gender || 'N/A',
+                class: student.class,
+                image: student.profileImage,
+                bill: totalBill,
+                payment: totalPaid,
+                balance: Math.max(0, balance),
+                status: balance > 0 ? 'Outstanding' : 'Cleared'
+              };
+            } catch (error) {
+              console.error(`Error loading data for student ${student.id}:`, error);
+              return {
+                id: student.id,
+                studentId: student.studentId || student.id,
+                name: `${student.firstName || ''} ${student.surname || ''} ${student.otherNames || ''}`.trim(),
+                gender: student.gender || 'N/A',
+                class: student.class,
+                image: student.profileImage,
+                bill: 0,
+                payment: 0,
+                balance: 0,
+                status: 'Active'
+              };
+            }
+          })
+        );
+        setStudentData(data);
+      } catch (error) {
+        console.error('Error loading student billing data:', error);
+        toast.showError('Failed to load student billing data');
+      }
+    };
+
+    loadStudentBillingData();
+  }, [formData, allStudents, toast]);
+
+  // Filter students by search term
+  const filteredStudents = useMemo(() => {
+    if (!searchTerm) return studentData;
+    const term = searchTerm.toLowerCase();
+    return studentData.filter(s =>
+      s.studentId.toLowerCase().includes(term) ||
+      s.name.toLowerCase().includes(term) ||
+      s.class.toLowerCase().includes(term)
+    );
+  }, [studentData, searchTerm]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredStudents.length / entriesPerPage);
+  const paginatedStudents = useMemo(() => {
+    const start = (currentPage - 1) * entriesPerPage;
+    const end = start + entriesPerPage;
+    return filteredStudents.slice(start, end);
+  }, [filteredStudents, currentPage, entriesPerPage]);
+
+  // Close action menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (actionMenuRef.current && !actionMenuRef.current.contains(event.target as Node)) {
+        setOpenActionMenu(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     setFormData({
       ...formData,
-      [name]: value,
-      ...(name === 'class' && { student: '' })
+      [e.target.name]: e.target.value
     });
+    setCurrentPage(1);
   };
 
-  const handleBillToggle = (billId: string): void => {
-    setSelectedBills(prev => {
-      if (prev.includes(billId)) {
-        const newSelected = prev.filter(id => id !== billId);
-        const newAmounts = { ...paymentAmounts };
-        delete newAmounts[billId];
-        setPaymentAmounts(newAmounts);
-        return newSelected;
-      } else {
-        const bill = bills.find(b => b.id === billId);
-        setPaymentAmounts(prev => ({ ...prev, [billId]: bill?.balance || 0 }));
-        return [...prev, billId];
-      }
-    });
+  const handleActionClick = (studentId: string, action: string): void => {
+    setOpenActionMenu(null);
+    
+    switch (action) {
+      case 'record-receipt':
+        navigate(`/fee-collection/record-single?student=${studentId}&year=${formData.academicYear}&term=${formData.term}`);
+        break;
+      case 'create-bill':
+        navigate(`/billing/create-single?student=${studentId}`);
+        break;
+      case 'view-profile':
+        navigate(`/students/${studentId}`);
+        break;
+      case 'view-bill':
+        navigate(`/billing/view-bill?student=${studentId}`);
+        break;
+      case 'view-statement':
+        navigate(`/billing/view-statement?student=${studentId}`);
+        break;
+      case 'edit-bill':
+        navigate(`/billing/edit-bill?student=${studentId}`);
+        break;
+      case 'edit-payment':
+        navigate(`/fee-collection/edit-payment?student=${studentId}`);
+        break;
+      default:
+        break;
+    }
   };
 
-  const handleAmountChange = (billId: string, value: string): void => {
-    const bill = bills.find(b => b.id === billId);
-    const maxAmount = bill?.balance || 0;
-    const amount = Math.min(Math.max(0, parseFloat(value) || 0), maxAmount);
-    setPaymentAmounts(prev => ({ ...prev, [billId]: amount }));
-  };
-
-  const calculateTotal = (): number => {
-    return selectedBills.reduce((sum, billId) => {
-      return sum + (paymentAmounts[billId] || 0);
-    }, 0);
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
-    if (!formData.academicYear || !formData.term || !formData.class || !formData.student ||
-        !formData.paymentDate || !formData.paymentMethod || selectedBills.length === 0) {
-      toast.showError('Please fill in all required fields and select at least one bill.');
+  const handleExport = (format: 'copy' | 'excel' | 'csv' | 'pdf'): void => {
+    if (filteredStudents.length === 0) {
+      toast.showError('No data to export');
       return;
     }
 
-    const totalAmount = calculateTotal();
-    if (totalAmount <= 0) {
-      toast.showError('Payment amount must be greater than zero.');
-      return;
-    }
+    const columns = [
+      { key: 'studentId', label: 'Student ID' },
+      { key: 'name', label: 'Student Name' },
+      { key: 'gender', label: 'Gender' },
+      { key: 'class', label: 'Class' },
+      { key: 'bill', label: 'Bill' },
+      { key: 'payment', label: 'Payment' },
+      { key: 'balance', label: 'Balance' },
+      { key: 'status', label: 'Status' }
+    ];
 
-    setIsSubmitting(true);
-    try {
-      // Record payment for each selected bill
-      for (const billId of selectedBills) {
-        const amount = paymentAmounts[billId] || 0;
-        if (amount > 0) {
-          await billingService.recordPayment({
-            studentId: formData.student,
-            billId: billId,
-            amount: amount,
-            paymentDate: formData.paymentDate,
-            paymentMethod: formData.paymentMethod,
-            referenceNumber: formData.referenceNumber,
-            academicYear: formData.academicYear,
-            term: formData.term
-          });
+    const exportData = filteredStudents.map(s => ({
+      studentId: s.studentId,
+      name: s.name,
+      gender: s.gender,
+      class: s.class,
+      bill: s.bill.toFixed(2),
+      payment: s.payment.toFixed(2),
+      balance: s.balance.toFixed(2),
+      status: s.status
+    }));
+
+    switch (format) {
+      case 'copy':
+        const text = exportData.map(row => 
+          Object.values(row).join('\t')
+        ).join('\n');
+        navigator.clipboard.writeText(text);
+        toast.showSuccess('Data copied to clipboard');
+        break;
+      case 'excel':
+        exportToExcel(exportData, `fee-receipt-${formData.class || 'all'}-${new Date().toISOString().split('T')[0]}.xlsx`, columns);
+        toast.showSuccess('Data exported to Excel');
+        break;
+      case 'csv':
+        exportToCSV(exportData, `fee-receipt-${formData.class || 'all'}-${new Date().toISOString().split('T')[0]}.csv`, columns);
+        toast.showSuccess('Data exported to CSV');
+        break;
+      case 'pdf':
+        // For PDF, we'll use print functionality
+        const printContent = document.getElementById('student-table');
+        if (printContent) {
+          exportToPDF(printContent, `fee-receipt-${formData.class || 'all'}-${new Date().toISOString().split('T')[0]}.pdf`);
+          toast.showSuccess('Data exported to PDF');
         }
-      }
-
-      toast.showSuccess(`Payment of GHS ${totalAmount.toFixed(2)} recorded successfully!`);
-      handleClear();
-      // Reload bills to reflect updated status
-      await loadBillsForStudent(formData.student, formData.academicYear, formData.term);
-    } catch (error: any) {
-      console.error('Error recording payment:', error);
-      toast.showError(error.message || 'Failed to record payment');
-    } finally {
-      setIsSubmitting(false);
+        break;
     }
-  };
-
-  const handleClear = (): void => {
-    setFormData({ academicYear: '', term: '', class: '', student: '', paymentDate: '', paymentMethod: '', referenceNumber: '', amount: '', billNumber: '' });
-    setBills([]);
-    setSelectedBills([]);
-    setPaymentAmounts({});
   };
 
   return (
@@ -219,254 +274,325 @@ const RecordSingle: React.FC = () => {
       <div className="mb-5 sm:mb-6 md:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Record Single Payment</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Select a student for fee receipt</h1>
             <div className="flex items-center gap-2 text-gray-600 text-xs sm:text-sm">
               <Link to="/" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">Home</Link>
               <span>/</span>
-              <Link to="/fee-collection" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">Fee Collection</Link>
-              <span>/</span>
-              <span className="text-gray-900 font-medium">Record Single Payment</span>
+              <span className="text-gray-900 font-medium">Select Student</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg p-4 sm:p-5 md:p-6 shadow-md border border-gray-200">
-        <div className="mb-6">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Payment Information</h2>
-          <p className="text-sm text-gray-600">Record payment for a single student.</p>
-        </div>
-
-        <form onSubmit={handleSubmit}>
-          {/* Basic Information */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-6">
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Academic Year <span className="text-red-500">*</span>
-              </label>
+      {/* Filters */}
+      <div className="bg-white rounded-lg p-4 sm:p-5 md:p-6 shadow-md border border-gray-200 mb-4 sm:mb-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+          <div>
+            <label className="block mb-2 font-semibold text-gray-900 text-sm">
+              Academic Year <span className="text-red-500">*</span>
+            </label>
+            <div className="relative select-dropdown-wrapper">
               <select
                 name="academicYear"
                 value={formData.academicYear}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+                className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
               >
                 <option value="">Select Academic Year</option>
                 {academicYears.map(year => (
                   <option key={year} value={year}>{year}</option>
                 ))}
               </select>
-            </div>
-
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Term <span className="text-red-500">*</span>
-              </label>
-              <div className="relative select-dropdown-wrapper">
-                <select
-                  name="term"
-                  value={formData.term}
-                  onChange={handleChange}
-                  required
-                  className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
-                >
-                  <option value="">Select Term</option>
-                  {terms.map(term => (
-                    <option key={term} value={term}>{term}</option>
-                  ))}
-                </select>
-                <div className="select-dropdown-arrow">
-                  <div className="select-dropdown-arrow-icon">
-                    <i className="fas fa-chevron-down"></i>
-                  </div>
+              <div className="select-dropdown-arrow">
+                <div className="select-dropdown-arrow-icon">
+                  <i className="fas fa-chevron-down"></i>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Class <span className="text-red-500">*</span>
-              </label>
-              <div className="relative select-dropdown-wrapper">
-                <select
-                  name="class"
-                  value={formData.class}
-                  onChange={handleChange}
-                  required
-                  className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
-                >
-                  <option value="">Select Class</option>
-                  {classes.map(cls => (
-                    <option key={cls} value={cls}>{cls}</option>
-                  ))}
-                </select>
-                <div className="select-dropdown-arrow">
-                  <div className="select-dropdown-arrow-icon">
-                    <i className="fas fa-chevron-down"></i>
-                  </div>
+          <div>
+            <label className="block mb-2 font-semibold text-gray-900 text-sm">
+              Term <span className="text-red-500">*</span>
+            </label>
+            <div className="relative select-dropdown-wrapper">
+              <select
+                name="term"
+                value={formData.term}
+                onChange={handleChange}
+                required
+                className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
+              >
+                <option value="">Select Term</option>
+                {terms.map(term => (
+                  <option key={term} value={term}>{term}</option>
+                ))}
+              </select>
+              <div className="select-dropdown-arrow">
+                <div className="select-dropdown-arrow-icon">
+                  <i className="fas fa-chevron-down"></i>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="sm:col-span-2 lg:col-span-3">
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Student <span className="text-red-500">*</span>
-              </label>
+          <div>
+            <label className="block mb-2 font-semibold text-gray-900 text-sm">
+              Class <span className="text-red-500">*</span>
+            </label>
+            <div className="relative select-dropdown-wrapper">
               <select
-                name="student"
-                value={formData.student}
+                name="class"
+                value={formData.class}
                 onChange={handleChange}
                 required
-                disabled={!formData.class}
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
               >
-                <option value="">{formData.class ? 'Select Student' : 'Select Class First'}</option>
-                {filteredStudents.map(student => (
-                  <option key={student.id} value={student.id}>{student.id} - {student.name}</option>
+                <option value="">Select Class</option>
+                {classes.map(cls => (
+                  <option key={cls} value={cls}>{cls}</option>
                 ))}
               </select>
+              <div className="select-dropdown-arrow">
+                <div className="select-dropdown-arrow-icon">
+                  <i className="fas fa-chevron-down"></i>
+                </div>
+              </div>
             </div>
+          </div>
+        </div>
+      </div>
 
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Payment Date <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                name="paymentDate"
-                value={formData.paymentDate}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-              />
-            </div>
-
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Payment Method <span className="text-red-500">*</span>
-              </label>
+      {/* Table Section */}
+      {formData.academicYear && formData.term && formData.class && (
+        <div className="bg-white rounded-lg shadow-md border border-gray-200">
+          {/* Table Controls */}
+          <div className="p-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-gray-700">Show</label>
               <select
-                name="paymentMethod"
-                value={formData.paymentMethod}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+                value={entriesPerPage}
+                onChange={(e) => {
+                  setEntriesPerPage(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-primary-500"
               >
-                <option value="">Select Payment Method</option>
-                {paymentMethods.map(method => (
-                  <option key={method} value={method}>{method}</option>
-                ))}
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
               </select>
+              <label className="text-sm text-gray-700">entries</label>
             </div>
 
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Reference Number
-              </label>
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={() => handleExport('copy')}
+                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                title="Copy"
+              >
+                Copy
+              </button>
+              <button
+                onClick={() => handleExport('excel')}
+                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                title="Excel"
+              >
+                Excel
+              </button>
+              <button
+                onClick={() => handleExport('csv')}
+                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                title="CSV"
+              >
+                CSV
+              </button>
+              <button
+                onClick={() => handleExport('pdf')}
+                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                title="PDF"
+              >
+                PDF
+              </button>
+              <button
+                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                title="Column visibility"
+              >
+                Column visibility
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-gray-700">Search:</label>
               <input
                 type="text"
-                name="referenceNumber"
-                value={formData.referenceNumber}
-                onChange={handleChange}
-                placeholder="Enter reference number"
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+                placeholder="Search..."
+                className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-primary-500 w-48"
               />
             </div>
           </div>
 
-          {/* Bills Selection */}
-          {bills.length > 0 && (
-            <div className="mb-6">
-              <label className="block mb-4 font-semibold text-gray-900 text-sm">
-                Select Bills to Pay <span className="text-red-500">*</span>
-              </label>
-              <div className="border-2 border-gray-200 rounded-md overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Select</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Bill Number</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Bill Amount</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Paid</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Balance</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Due Date</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Payment Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {bills.map(bill => (
-                        <tr key={bill.id} className={selectedBills.includes(bill.id) ? 'bg-primary-50' : ''}>
-                          <td className="px-4 py-3">
-                            <input
-                              type="checkbox"
-                              checked={selectedBills.includes(bill.id)}
-                              onChange={() => handleBillToggle(bill.id)}
-                              disabled={bill.balance === 0}
-                              className="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500 disabled:opacity-50"
-                            />
-                          </td>
-                          <td className="px-4 py-3 text-sm text-gray-900">{bill.billNumber}</td>
-                          <td className="px-4 py-3 text-sm text-gray-900">{bill.amount.toLocaleString()}</td>
-                          <td className="px-4 py-3 text-sm text-green-600">{bill.paid.toLocaleString()}</td>
-                          <td className="px-4 py-3 text-sm font-semibold text-red-600">{bill.balance.toLocaleString()}</td>
-                          <td className="px-4 py-3 text-sm text-gray-900">{new Date(bill.dueDate).toLocaleDateString()}</td>
-                          <td className="px-4 py-3">
-                            {selectedBills.includes(bill.id) ? (
-                              <input
-                                type="number"
-                                min="0"
-                                max={bill.balance}
-                                step="0.01"
-                                value={paymentAmounts[bill.id] || bill.balance}
-                                onChange={(e) => handleAmountChange(bill.id, e.target.value)}
-                                className="w-24 px-2 py-1 border border-gray-300 rounded text-sm"
-                              />
-                            ) : (
-                              <span className="text-gray-400">-</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Total */}
-          {selectedBills.length > 0 && (
-            <div className="mb-6 p-4 bg-primary-50 border border-primary-200 rounded-md">
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold text-gray-900">Total Payment Amount:</span>
-                <span className="text-2xl font-bold text-primary-600">GHS {calculateTotal().toFixed(2)}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Action Buttons */}
-          <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={handleClear}
-              className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-all duration-300"
-            >
-              Clear
-            </button>
-            <button
-              type="submit"
-              className="px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-all duration-300 shadow-md hover:shadow-lg"
-            >
-              <i className="fas fa-save mr-2"></i>
-              Record Payment
-            </button>
+          {/* Table */}
+          <div id="student-table" className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-blue-600 text-white">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Action</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase">No.</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Image</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Student.ID</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Student.Name</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Gender</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Class</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Bill</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Payment</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Balance</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {paginatedStudents.length === 0 ? (
+                  <tr>
+                    <td colSpan={11} className="px-4 py-8 text-center text-gray-500">
+                      No students found
+                    </td>
+                  </tr>
+                ) : (
+                  paginatedStudents.map((student, index) => (
+                    <tr key={student.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 relative">
+                        <div ref={actionMenuRef}>
+                          <button
+                            onClick={() => setOpenActionMenu(openActionMenu === student.id ? null : student.id)}
+                            className="px-3 py-1.5 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center gap-1"
+                          >
+                            <i className="fas fa-cog"></i>
+                            <i className="fas fa-chevron-right text-xs"></i>
+                          </button>
+                          {openActionMenu === student.id && (
+                            <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 min-w-[200px]">
+                              <button
+                                onClick={() => handleActionClick(student.id, 'record-receipt')}
+                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <i className="fas fa-file-invoice text-blue-500"></i>
+                                Record Fee Receipt
+                              </button>
+                              <button
+                                onClick={() => handleActionClick(student.id, 'create-bill')}
+                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <i className="fas fa-coins text-yellow-500"></i>
+                                Create Bill
+                              </button>
+                              <button
+                                onClick={() => handleActionClick(student.id, 'view-profile')}
+                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <i className="fas fa-user text-green-500"></i>
+                                View Profile
+                              </button>
+                              <button
+                                onClick={() => handleActionClick(student.id, 'view-bill')}
+                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <i className="fas fa-th text-purple-500"></i>
+                                View Bill
+                              </button>
+                              <button
+                                onClick={() => handleActionClick(student.id, 'view-statement')}
+                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <i className="fas fa-list text-indigo-500"></i>
+                                View Statement
+                              </button>
+                              <button
+                                onClick={() => handleActionClick(student.id, 'edit-bill')}
+                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <i className="fas fa-credit-card text-red-500"></i>
+                                Edit/Del Bill
+                              </button>
+                              <button
+                                onClick={() => handleActionClick(student.id, 'edit-payment')}
+                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              >
+                                <i className="fas fa-money-bill-wave text-green-600"></i>
+                                Edit/Del Payment
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{(currentPage - 1) * entriesPerPage + index + 1}</td>
+                      <td className="px-4 py-3">
+                        {student.image ? (
+                          <img src={student.image} alt={student.name} className="w-10 h-10 rounded-full object-cover" />
+                        ) : (
+                          <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                            <i className="fas fa-user text-gray-500"></i>
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900 font-medium">{student.studentId}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{student.name}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{student.gender}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{student.class}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{student.bill.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{student.payment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                      <td className="px-4 py-3 text-sm font-semibold text-gray-900">{student.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          student.status === 'Cleared' ? 'bg-green-100 text-green-800' :
+                          student.status === 'Outstanding' ? 'bg-red-100 text-red-800' :
+                          'bg-blue-100 text-blue-800'
+                        }`}>
+                          {student.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
-        </form>
-      </div>
+
+          {/* Pagination */}
+          <div className="p-4 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="text-sm text-gray-700">
+              Showing {filteredStudents.length === 0 ? 0 : (currentPage - 1) * entriesPerPage + 1} to {Math.min(currentPage * entriesPerPage, filteredStudents.length)} of {filteredStudents.length} entries
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              <span className="text-sm text-gray-700">
+                Page {currentPage} of {totalPages || 1}
+              </span>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage >= totalPages}
+                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };
 
 export default RecordSingle;
-

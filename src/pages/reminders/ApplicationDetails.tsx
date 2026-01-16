@@ -1,63 +1,57 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
-import remindersService from '../../services/remindersService';
 import studentsService from '../../services/studentsService';
+import notificationService from '../../services/notificationService';
 import { useModal } from '../../components/ModalProvider';
+import { generateNumericPassword } from '../../utils/passwordGenerator';
+import { getAccessibleClasses } from '../../utils/classRestriction';
+import setupService from '../../services/setupService';
 
 interface StudentItem {
   id: string;
   name: string;
   class: string;
+  studentId: string;
   phone?: string;
   email?: string;
-  applicationStatus?: string;
+  parentName?: string;
+  parentContact?: string;
+  parentEmail?: string;
 }
 
 interface FormData {
-  academicYear: string;
   class: string;
-  reminderType: string;
-  message: string;
-  scheduleDate: string;
+  reminderType: 'sms' | 'email';
 }
 
 const ApplicationDetails: React.FC = () => {
   const { toast } = useModal();
   const [loading, setLoading] = useState<boolean>(false);
   const [allStudents, setAllStudents] = useState<any[]>([]);
+  const [accessibleClasses, setAccessibleClasses] = useState<string[]>([]);
   const [formData, setFormData] = useState<FormData>({
-    academicYear: '',
     class: '',
-    reminderType: 'sms',
-    message: '',
-    scheduleDate: ''
+    reminderType: 'sms'
   });
 
-  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
-
-  const academicYears: string[] = ['2023/2024', '2024/2025', '2025/2026'];
-  const classes: string[] = ['Basic 1', 'Basic 2', 'Basic 3'];
-
-  const defaultMessage = `Dear Parent/Guardian,
-
-Your application details have been processed. Please check your status.
-
-Thank you.`;
-
-  const loadStudents = useCallback(async () => {
+  const loadData = useCallback(async () => {
     try {
-      const students = await studentsService.getAll();
+      const [students, classes] = await Promise.all([
+        studentsService.getAll(),
+        getAccessibleClasses()
+      ]);
       setAllStudents(students);
+      setAccessibleClasses(classes);
     } catch (error) {
-      console.error('Error loading students:', error);
-      toast.showError('Failed to load students');
+      console.error('Error loading data:', error);
+      toast.showError('Failed to load data');
     }
   }, [toast]);
 
   useEffect(() => {
-    loadStudents();
-  }, [loadStudents]);
+    loadData();
+  }, [loadData]);
 
   const filteredStudents = useMemo<StudentItem[]>(() => {
     if (!formData.class) return [];
@@ -67,78 +61,97 @@ Thank you.`;
         id: s.id,
         name: `${s.firstName || ''} ${s.surname || ''} ${s.otherNames || ''}`.trim(),
         class: s.class,
+        studentId: s.studentId || s.id,
         phone: s.contact || s.phone,
         email: s.email,
-        applicationStatus: 'Approved'
+        parentName: s.parentName || s.parent || s.guardianName,
+        parentContact: s.parentContact || s.guardianContact,
+        parentEmail: s.parentEmail || s.guardianEmail
       }));
   }, [formData.class, allStudents]);
 
-  useEffect(() => {
-    if (formData.class && filteredStudents.length > 0) {
-      setSelectedStudents(filteredStudents.map(s => s.id));
-      setFormData(prev => ({ ...prev, message: prev.message || defaultMessage }));
-    }
-  }, [formData.class, filteredStudents.length]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>): void => {
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
-    if (e.target.name === 'class') {
-      setSelectedStudents([]);
-    }
-  };
-
-  const handleStudentToggle = (studentId: string): void => {
-    setSelectedStudents(prev => {
-      if (prev.includes(studentId)) {
-        return prev.filter(id => id !== studentId);
-      } else {
-        return [...prev, studentId];
-      }
-    });
-  };
-
-  const handleSelectAll = (): void => {
-    if (selectedStudents.length === filteredStudents.length) {
-      setSelectedStudents([]);
-    } else {
-      setSelectedStudents(filteredStudents.map(s => s.id));
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    if (!formData.academicYear || !formData.class || !formData.message || selectedStudents.length === 0) {
-      toast.showError('Please fill in all required fields and select at least one student.');
+    if (!formData.class) {
+      toast.showError('Please select a class/group');
+      return;
+    }
+
+    if (filteredStudents.length === 0) {
+      toast.showError('No students found for the selected class');
       return;
     }
 
     setLoading(true);
     try {
-      const result = await remindersService.sendApplicationDetails({
-        studentIds: selectedStudents,
-        type: 'application',
-        reminderType: formData.reminderType,
-        message: formData.message,
-        scheduledDate: formData.scheduleDate || new Date().toISOString(),
-        academicYear: formData.academicYear,
-        class: formData.class
-      });
-      toast.showSuccess(`${result.sent} application detail(s) sent successfully via ${formData.reminderType.toUpperCase()}!`);
-      handleClear();
+      let smsSent = 0;
+      let emailSent = 0;
+      let failed = 0;
+
+      for (const student of filteredStudents) {
+        try {
+          // Generate password for parent
+          const parentPassword = generateNumericPassword(6);
+          
+          // Send based on reminder type
+          const credentials = {
+            username: student.studentId,
+            password: parentPassword,
+            name: student.parentName || 'Parent/Guardian',
+            role: 'parent' as const,
+            email: student.parentEmail,
+            phone: student.parentContact
+          };
+
+          if (formData.reminderType === 'sms' && student.parentContact) {
+            const sent = await notificationService.sendSMS(credentials);
+            if (sent) smsSent++;
+            else failed++;
+          } else if (formData.reminderType === 'email' && student.parentEmail) {
+            const sent = await notificationService.sendEmail(credentials);
+            if (sent) emailSent++;
+            else failed++;
+          } else {
+            failed++;
+          }
+        } catch (error) {
+          console.error(`Error sending credentials for ${student.name}:`, error);
+          failed++;
+        }
+      }
+
+      const totalSent = smsSent + emailSent;
+      if (totalSent > 0) {
+        let message = `${totalSent} login detail(s) sent successfully`;
+        if (formData.reminderType === 'sms' && smsSent > 0) {
+          message += ` via SMS`;
+        } else if (formData.reminderType === 'email' && emailSent > 0) {
+          message += ` via Email`;
+        }
+        if (failed > 0) {
+          message += `. ${failed} failed`;
+        }
+        toast.showSuccess(message);
+      } else {
+        toast.showError(`Failed to send login details. Please check that students have ${formData.reminderType === 'sms' ? 'parent contact' : 'parent email'} information.`);
+      }
     } catch (error: any) {
-      console.error('Error sending application details:', error);
-      toast.showError(error.message || 'Failed to send application details');
+      console.error('Error sending login details:', error);
+      toast.showError(error.message || 'Failed to send login details');
     } finally {
       setLoading(false);
     }
   };
 
   const handleClear = (): void => {
-    setFormData({ academicYear: '', class: '', reminderType: 'sms', message: '', scheduleDate: '' });
-    setSelectedStudents([]);
+    setFormData({ class: '', reminderType: 'sms' });
   };
 
   return (
@@ -146,163 +159,97 @@ Thank you.`;
       <div className="mb-5 sm:mb-6 md:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Application Details</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+              SMS/Email to Students/Parents (Login Details)
+            </h1>
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-gray-600 text-xs sm:text-sm">
               <Link to="/" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">Home</Link>
               <span>/</span>
-              <Link to="/reminders" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">SMS/Email Reminders</Link>
-              <span>/</span>
-              <span className="text-gray-900 font-medium">Application Details</span>
+              <span className="text-gray-900 font-medium">SMS/Email Reminder (Login Details)</span>
             </div>
           </div>
         </div>
       </div>
 
       <div className="bg-white rounded-lg p-4 sm:p-5 md:p-6 shadow-md border border-gray-200">
-        <div className="mb-6">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Send Application Details</h2>
-          <p className="text-sm text-gray-600">Send application status/details to parents/guardians.</p>
+        {/* Tabs */}
+        <div className="mb-6 flex gap-2 border-b border-gray-200">
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, reminderType: 'sms' })}
+            className={`px-6 py-3 text-sm font-semibold transition-colors border-b-2 ${
+              formData.reminderType === 'sms'
+                ? 'text-primary-600 border-primary-600 bg-primary-50'
+                : 'text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50'
+            }`}
+          >
+            Send SMS Reminder
+          </button>
+          <button
+            type="button"
+            onClick={() => setFormData({ ...formData, reminderType: 'email' })}
+            className={`px-6 py-3 text-sm font-semibold transition-colors border-b-2 ${
+              formData.reminderType === 'email'
+                ? 'text-primary-600 border-primary-600 bg-primary-50'
+                : 'text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50'
+            }`}
+          >
+            Send Email Reminder
+          </button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-6">
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Academic Year <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="academicYear"
-                value={formData.academicYear}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-              >
-                <option value="">Select Academic Year</option>
-                {academicYears.map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Class <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="class"
-                value={formData.class}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-              >
-                <option value="">Select Class</option>
-                {classes.map(cls => (
-                  <option key={cls} value={cls}>{cls}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Notification Type <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="reminderType"
-                value={formData.reminderType}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-              >
-                <option value="sms">SMS</option>
-                <option value="email">Email</option>
-                <option value="both">Both SMS & Email</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Schedule Date (Optional)
-              </label>
-              <input
-                type="datetime-local"
-                name="scheduleDate"
-                value={formData.scheduleDate}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-              />
-            </div>
-          </div>
-
-          {/* Message */}
           <div className="mb-6">
-            <label className="block mb-2 font-semibold text-gray-900 text-sm">
-              Message <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              name="message"
-              value={formData.message}
-              onChange={handleChange}
-              rows={6}
-              required
-              placeholder="Enter application details message..."
-              className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] resize-vertical"
-            />
-            <p className="mt-1 text-xs text-gray-500">Character count: {formData.message.length}</p>
-          </div>
-
-          {/* Students Selection */}
-          {filteredStudents.length > 0 && (
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
+              {formData.reminderType === 'sms' ? 'Send SMS Notification' : 'Send Email Notification'}
+            </h2>
+            
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <label className="block font-semibold text-gray-900 text-sm">
-                  Select Students <span className="text-red-500">*</span>
-                </label>
-                <button
-                  type="button"
-                  onClick={handleSelectAll}
-                  className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+              <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                Select Class/Group <span className="text-red-500">*</span>
+              </label>
+              <div className="relative select-dropdown-wrapper">
+                <select
+                  name="class"
+                  value={formData.class}
+                  onChange={handleChange}
+                  required
+                  className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm min-h-[44px]"
                 >
-                  {selectedStudents.length === filteredStudents.length ? 'Deselect All' : 'Select All'}
-                </button>
-              </div>
-              <div className="border-2 border-gray-200 rounded-md p-4 max-h-64 overflow-y-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {filteredStudents.map(student => (
-                    <label
-                      key={student.id}
-                      className="flex items-center p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50 transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedStudents.includes(student.id)}
-                        onChange={() => handleStudentToggle(student.id)}
-                        className="mr-3 w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
-                      />
-                      <div className="flex-1">
-                        <div className="text-sm font-medium text-gray-900">{student.name}</div>
-                        <div className="text-xs text-gray-500">{student.id}</div>
-                        <div className="text-xs text-gray-400">{formData.reminderType === 'sms' ? student.phone : student.email}</div>
-                        <div className="text-xs mt-1">
-                          <span className={`px-1.5 py-0.5 rounded text-xs ${
-                            student.applicationStatus === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {student.applicationStatus || 'Pending'}
-                          </span>
-                        </div>
-                      </div>
-                    </label>
+                  <option value="">Select class group</option>
+                  {accessibleClasses.map((className: string) => (
+                    <option key={className} value={className}>
+                      {className}
+                    </option>
                   ))}
+                </select>
+                <div className="select-dropdown-arrow">
+                  <div className="select-dropdown-arrow-icon">
+                    <i className="fas fa-chevron-down"></i>
+                  </div>
                 </div>
               </div>
-              {selectedStudents.length > 0 && (
-                <p className="mt-2 text-sm text-gray-600">
-                  {selectedStudents.length} student(s) selected
-                </p>
-              )}
             </div>
-          )}
 
-          {/* Action Buttons */}
+            {formData.class && filteredStudents.length > 0 && (
+              <div className="mb-6 p-4 bg-gray-50 rounded-md">
+                <p className="text-sm text-gray-700">
+                  <strong>{filteredStudents.length}</strong> student(s) found in <strong>{formData.class}</strong>.
+                  Login details will be sent to their {formData.reminderType === 'sms' ? 'parent contact numbers' : 'parent email addresses'}.
+                </p>
+              </div>
+            )}
+
+            {formData.class && filteredStudents.length === 0 && (
+              <div className="mb-6 p-4 bg-yellow-50 rounded-md border border-yellow-200">
+                <p className="text-sm text-yellow-800">
+                  No students found for the selected class.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Action Button */}
           <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-gray-200">
             <button
               type="button"
@@ -313,11 +260,11 @@ Thank you.`;
             </button>
             <button
               type="submit"
-              disabled={loading}
-              className="px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading || !formData.class || filteredStudents.length === 0}
+              className="px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              <i className="fas fa-paper-plane mr-2"></i>
-              Send Details
+              <i className={`fas ${formData.reminderType === 'sms' ? 'fa-comment' : 'fa-envelope'}`}></i>
+              Send {formData.reminderType === 'sms' ? 'SMS' : 'Email'} Notification
             </button>
           </div>
         </form>
@@ -327,4 +274,3 @@ Thank you.`;
 };
 
 export default ApplicationDetails;
-

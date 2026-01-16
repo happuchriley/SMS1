@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 import { useModal } from '../../components/ModalProvider';
+import { getAccessibleClasses } from '../../utils/classRestriction';
 
 interface StudentItem {
   id: string;
@@ -32,7 +33,20 @@ const FeeCollectionPrintGroupStatement: React.FC = () => {
   // Sample data
   const academicYears: string[] = ['2023/2024', '2024/2025', '2025/2026'];
   const terms: string[] = ['1st Term', '2nd Term', '3rd Term'];
-  const classes: string[] = ['Basic 1', 'Basic 2', 'Basic 3', 'Basic 4', 'Basic 5', 'Basic 6', 'JHS 1', 'JHS 2', 'JHS 3'];
+  const [classes, setClasses] = useState<string[]>([]);
+
+  const loadClasses = useCallback(async () => {
+    try {
+      const accessibleClasses = await getAccessibleClasses();
+      setClasses(accessibleClasses);
+    } catch (error) {
+      console.error('Error loading classes:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadClasses();
+  }, [loadClasses]);
 
   // Sample students with statements
   const allStudents: StudentItem[] = [

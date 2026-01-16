@@ -5,6 +5,7 @@ import billingService from '../../services/billingService';
 import studentsService from '../../services/studentsService';
 import setupService from '../../services/setupService';
 import { useModal } from '../../components/ModalProvider';
+import { getAccessibleClasses, filterStudentsByAccessibleClasses } from '../../utils/classRestriction';
 
 interface BillItemType {
   id: string;
@@ -12,55 +13,58 @@ interface BillItemType {
   defaultAmount: number;
 }
 
-interface StudentItem {
+interface BillItemRow {
   id: string;
-  name: string;
-  class: string;
-  studentId: string;
+  billItem: string;
+  amount: number;
 }
 
 interface FormData {
+  class: string;
   academicYear: string;
   term: string;
-  class: string;
+  billName: string;
+  academicEndDate: string;
+  nextResumptionDate: string;
+  billType: string;
   billDate: string;
-  dueDate: string;
-  billItems: string[];
 }
 
 const CreateGroupBill: React.FC = () => {
   const { toast } = useModal();
-  const [, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [allStudents, setAllStudents] = useState<any[]>([]);
   const [billItemTypes, setBillItemTypes] = useState<BillItemType[]>([]);
+  const [billItemRows, setBillItemRows] = useState<BillItemRow[]>([]);
   const [formData, setFormData] = useState<FormData>({
+    class: '',
     academicYear: '',
     term: '',
-    class: '',
-    billDate: '',
-    dueDate: '',
-    billItems: []
+    billName: '',
+    academicEndDate: '',
+    nextResumptionDate: '',
+    billType: '',
+    billDate: ''
   });
 
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
-  const [selectedBillItems, setSelectedBillItems] = useState<string[]>([]);
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const [amounts, setAmounts] = useState<Record<string, number>>({});
+  const [classes, setClasses] = useState<string[]>([]);
 
-  // Sample data
   const academicYears: string[] = ['2023/2024', '2024/2025', '2025/2026'];
   const terms: string[] = ['1st Term', '2nd Term', '3rd Term'];
-  const classes: string[] = ['Nursery 1', 'Nursery 2', 'Basic 1', 'Basic 2', 'Basic 3', 'Basic 4', 'Basic 5', 'Basic 6', 'JHS 1', 'JHS 2', 'JHS 3'];
+  const billTypes: string[] = ['Tuition', 'Registration', 'Library', 'PTA', 'Other'];
 
   const loadData = useCallback(async () => {
     try {
-      const [students, billItems] = await Promise.all([
+      const [students, billItems, accessibleClasses] = await Promise.all([
         studentsService.getAll(),
-        setupService.getAllBillItems()
+        setupService.getAllBillItems(),
+        getAccessibleClasses()
       ]);
-      setAllStudents(students);
+      const filteredStudents = await filterStudentsByAccessibleClasses(students);
+      setAllStudents(filteredStudents);
+      setClasses(accessibleClasses);
       
-      // Convert bill items to format expected by component
       const items: BillItemType[] = billItems.map((item: any) => ({
         id: item.id,
         name: item.name,
@@ -81,8 +85,15 @@ const CreateGroupBill: React.FC = () => {
     loadData();
   }, [loadData]);
 
+  // Initialize with one row
+  useEffect(() => {
+    if (billItemRows.length === 0) {
+      setBillItemRows([{ id: '1', billItem: '', amount: 0 }]);
+    }
+  }, [billItemRows.length]);
+
   // Filter students by selected class
-  const filteredStudents = useMemo<StudentItem[]>(() => {
+  const filteredStudents = useMemo<{ id: string; name: string; class: string; studentId: string }[]>(() => {
     if (!formData.class) return [];
     return allStudents
       .filter(s => s.class === formData.class)
@@ -94,102 +105,98 @@ const CreateGroupBill: React.FC = () => {
       }));
   }, [formData.class, allStudents]);
 
-  // Calculate total per item
-  const calculateItemTotal = useCallback((itemId: string): number => {
-    const quantity = quantities[itemId] || 1;
-    const amount = amounts[itemId] || 0;
-    return quantity * amount;
-  }, [quantities, amounts]);
+  // Auto-select all students when class is selected
+  useEffect(() => {
+    if (formData.class && filteredStudents.length > 0) {
+      setSelectedStudents(filteredStudents.map(s => s.id));
+    } else {
+      setSelectedStudents([]);
+    }
+  }, [formData.class, filteredStudents]);
 
   // Calculate grand total
   const grandTotal = useMemo<number>(() => {
-    return selectedBillItems.reduce((sum, itemId) => {
-      return sum + calculateItemTotal(itemId);
-    }, 0) * selectedStudents.length;
-  }, [selectedBillItems, selectedStudents.length, calculateItemTotal]);
+    return billItemRows.reduce((sum, row) => sum + (row.amount || 0), 0);
+  }, [billItemRows]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>): void => {
     const { name, value } = e.target;
-    setFormData({
+    const updatedFormData = {
       ...formData,
-      [name]: value,
-      ...(name === 'class' && { students: [] })
-    });
-    if (name === 'class') {
-      setSelectedStudents([]);
-    }
-  };
+      [name]: value
+    };
 
-  const handleStudentToggle = (studentId: string): void => {
-    setSelectedStudents(prev => {
-      if (prev.includes(studentId)) {
-        return prev.filter(id => id !== studentId);
+    // Update bill name when year and term are selected
+    if (name === 'academicYear' || name === 'term') {
+      if (name === 'academicYear') {
+        updatedFormData.academicYear = value;
       } else {
-        return [...prev, studentId];
+        updatedFormData.term = value;
       }
-    });
+      
+      if (updatedFormData.academicYear && updatedFormData.term) {
+        updatedFormData.billName = `${updatedFormData.academicYear} - ${updatedFormData.term}`;
+      }
+    }
+
+    setFormData(updatedFormData);
   };
 
-  const handleSelectAllStudents = (): void => {
-    if (selectedStudents.length === filteredStudents.length) {
-      setSelectedStudents([]);
+  const handleBillItemChange = (rowId: string, field: 'billItem' | 'amount', value: string | number): void => {
+    setBillItemRows(prev => prev.map(row => {
+      if (row.id === rowId) {
+        if (field === 'billItem') {
+          const item = billItemTypes.find(i => i.id === value);
+          return {
+            ...row,
+            billItem: value as string,
+            amount: item?.defaultAmount || 0
+          };
+        } else {
+          return { ...row, amount: typeof value === 'number' ? value : parseFloat(value) || 0 };
+        }
+      }
+      return row;
+    }));
+  };
+
+  const handleAddRow = (): void => {
+    const newId = String(Date.now());
+    setBillItemRows([...billItemRows, { id: newId, billItem: '', amount: 0 }]);
+  };
+
+  const handleDeleteRow = (rowId: string): void => {
+    if (billItemRows.length > 1) {
+      setBillItemRows(billItemRows.filter(row => row.id !== rowId));
     } else {
-      setSelectedStudents(filteredStudents.map(s => s.id));
+      toast.showError('At least one row is required');
     }
-  };
-
-  const handleBillItemToggle = (itemId: string): void => {
-    setSelectedBillItems(prev => {
-      if (prev.includes(itemId)) {
-        const newSelected = prev.filter(id => id !== itemId);
-        const newQuantities = { ...quantities };
-        const newAmounts = { ...amounts };
-        delete newQuantities[itemId];
-        delete newAmounts[itemId];
-        setQuantities(newQuantities);
-        setAmounts(newAmounts);
-        return newSelected;
-      } else {
-        const item = billItemTypes.find(i => i.id === itemId);
-        setQuantities(prev => ({ ...prev, [itemId]: 1 }));
-        setAmounts(prev => ({ ...prev, [itemId]: item?.defaultAmount || 0 }));
-        return [...prev, itemId];
-      }
-    });
-  };
-
-  const handleQuantityChange = (itemId: string, value: string): void => {
-    setQuantities(prev => ({ ...prev, [itemId]: Math.max(1, parseInt(value) || 1) }));
-  };
-
-  const handleAmountChange = (itemId: string, value: string): void => {
-    setAmounts(prev => ({ ...prev, [itemId]: Math.max(0, parseFloat(value) || 0) }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    if (!formData.academicYear || !formData.term || !formData.class || 
-        !formData.billDate || !formData.dueDate || selectedStudents.length === 0 || selectedBillItems.length === 0) {
-      toast.showError('Please fill in all required fields, select at least one student and one bill item.');
+    if (!formData.class || !formData.academicYear || !formData.term || 
+        !formData.billDate || selectedStudents.length === 0 || billItemRows.length === 0) {
+      toast.showError('Please fill in all required fields and add at least one bill item.');
       return;
     }
     
     setLoading(true);
     try {
-      const billItems = selectedBillItems.map(itemId => {
-        const item = billItemTypes.find(i => i.id === itemId);
-        return {
-          id: itemId,
-          name: item?.name,
-          quantity: quantities[itemId] || 1,
-          amount: amounts[itemId] || 0,
-          total: calculateItemTotal(itemId)
-        };
-      });
+      const billItems = billItemRows
+        .filter(row => row.billItem && row.amount > 0)
+        .map(row => {
+          const item = billItemTypes.find(i => i.id === row.billItem);
+          return {
+            id: row.billItem,
+            name: item?.name || '',
+            quantity: 1,
+            amount: row.amount,
+            total: row.amount
+          };
+        });
 
-      const itemTotal = selectedBillItems.reduce((sum, itemId) => {
-        return sum + calculateItemTotal(itemId);
-      }, 0);
+      const itemTotal = billItems.reduce((sum, item) => sum + item.total, 0);
 
       // Create bills for each selected student
       for (const studentId of selectedStudents) {
@@ -199,7 +206,7 @@ const CreateGroupBill: React.FC = () => {
           term: formData.term,
           class: formData.class,
           billDate: formData.billDate,
-          dueDate: formData.dueDate,
+          dueDate: formData.academicEndDate,
           items: billItems,
           total: itemTotal,
           status: 'pending'
@@ -219,11 +226,18 @@ const CreateGroupBill: React.FC = () => {
   };
 
   const handleClear = (): void => {
-    setFormData({ academicYear: '', term: '', class: '', billDate: '', dueDate: '', billItems: [] });
+    setFormData({ 
+      class: '', 
+      academicYear: '', 
+      term: '', 
+      billName: '', 
+      academicEndDate: '', 
+      nextResumptionDate: '', 
+      billType: '', 
+      billDate: '' 
+    });
     setSelectedStudents([]);
-    setSelectedBillItems([]);
-    setQuantities({});
-    setAmounts({});
+    setBillItemRows([{ id: '1', billItem: '', amount: 0 }]);
   };
 
   return (
@@ -243,200 +257,238 @@ const CreateGroupBill: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg p-4 sm:p-5 md:p-6 shadow-md border border-gray-200 mb-4 sm:mb-5">
-        <div className="mb-6">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Bill Information</h2>
-          <p className="text-sm text-gray-600">Fill in the details below to create bills for multiple students.</p>
-        </div>
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Panel - Bill Details */}
+          <div className="bg-white rounded-lg p-4 sm:p-5 md:p-6 shadow-md border border-gray-200">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Bill Details</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                  Select Class/Group
+                </label>
+                <div className="relative select-dropdown-wrapper">
+                  <select
+                    name="class"
+                    value={formData.class}
+                    onChange={handleChange}
+                    required
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm min-h-[44px]"
+                  >
+                    <option value="">Select class group</option>
+                    {classes.map(cls => (
+                      <option key={cls} value={cls}>{cls}</option>
+                    ))}
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-        <form onSubmit={handleSubmit}>
-          {/* Basic Information */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-6">
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Academic Year <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="academicYear"
-                value={formData.academicYear}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-              >
-                <option value="">Select Academic Year</option>
-                {academicYears.map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
-            </div>
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                  Academic Year
+                </label>
+                <div className="relative select-dropdown-wrapper">
+                  <select
+                    name="academicYear"
+                    value={formData.academicYear}
+                    onChange={handleChange}
+                    required
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm min-h-[44px]"
+                  >
+                    <option value="">Select Academic Year</option>
+                    {academicYears.map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Term <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="term"
-                value={formData.term}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-              >
-                <option value="">Select Term</option>
-                {terms.map(term => (
-                  <option key={term} value={term}>{term}</option>
-                ))}
-              </select>
-            </div>
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                  Term/Semester
+                </label>
+                <div className="relative select-dropdown-wrapper">
+                  <select
+                    name="term"
+                    value={formData.term}
+                    onChange={handleChange}
+                    required
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm min-h-[44px]"
+                  >
+                    <option value="">Select Term/s</option>
+                    {terms.map(term => (
+                      <option key={term} value={term}>{term}</option>
+                    ))}
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Class <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="class"
-                value={formData.class}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-              >
-                <option value="">Select Class</option>
-                {classes.map(cls => (
-                  <option key={cls} value={cls}>{cls}</option>
-                ))}
-              </select>
-            </div>
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                  Bill Name/Description
+                </label>
+                <div className="relative select-dropdown-wrapper">
+                  <select
+                    name="billName"
+                    value={formData.billName}
+                    onChange={handleChange}
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm min-h-[44px]"
+                    disabled={!formData.academicYear || !formData.term}
+                  >
+                    <option value="">Selection Year & Term first</option>
+                    {formData.academicYear && formData.term && (
+                      <option value={`${formData.academicYear} - ${formData.term}`}>
+                        {formData.academicYear} - {formData.term}
+                      </option>
+                    )}
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Bill Date <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                name="billDate"
-                value={formData.billDate}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-              />
-            </div>
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                  Academic End Date
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    name="academicEndDate"
+                    value={formData.academicEndDate}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm pr-10"
+                  />
+                  <i className="fas fa-calendar absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+              </div>
 
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Due Date <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                name="dueDate"
-                value={formData.dueDate}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-              />
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                  Next Resumption Date
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    name="nextResumptionDate"
+                    value={formData.nextResumptionDate}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm pr-10"
+                  />
+                  <i className="fas fa-calendar absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+              </div>
+
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                  Bill Type
+                </label>
+                <div className="relative select-dropdown-wrapper">
+                  <select
+                    name="billType"
+                    value={formData.billType}
+                    onChange={handleChange}
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm min-h-[44px]"
+                  >
+                    <option value="">Select Bill Type</option>
+                    {billTypes.map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                  Select Bill Date
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    name="billDate"
+                    value={formData.billDate}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm pr-10"
+                    placeholder="mm/dd/yyyy"
+                  />
+                  <i className="fas fa-calendar absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Students Selection */}
-          {filteredStudents.length > 0 && (
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <label className="block font-semibold text-gray-900 text-sm">
-                  Select Students <span className="text-red-500">*</span>
-                </label>
-                <button
-                  type="button"
-                  onClick={handleSelectAllStudents}
-                  className="text-sm text-primary-600 hover:text-primary-700 font-medium"
-                >
-                  {selectedStudents.length === filteredStudents.length ? 'Deselect All' : 'Select All'}
-                </button>
-              </div>
-              <div className="border-2 border-gray-200 rounded-md p-4 max-h-48 overflow-y-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {filteredStudents.map(student => (
-                    <label
-                      key={student.id}
-                      className="flex items-center p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50 transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedStudents.includes(student.id)}
-                        onChange={() => handleStudentToggle(student.id)}
-                        className="mr-3 w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
-                      />
-                      <span className="text-sm text-gray-700">{student.id} - {student.name}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-              {selectedStudents.length > 0 && (
-                <p className="mt-2 text-sm text-gray-600">
-                  {selectedStudents.length} student(s) selected
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Bill Items */}
-          <div className="mb-6">
-            <label className="block mb-4 font-semibold text-gray-900 text-sm">
-              Bill Items <span className="text-red-500">*</span>
-            </label>
-            <div className="border-2 border-gray-200 rounded-md overflow-hidden">
+          {/* Right Panel - Bill Items */}
+          <div className="bg-white rounded-lg p-4 sm:p-5 md:p-6 shadow-md border border-gray-200">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Bill Items</h2>
+            
+            <div className="mb-4">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Select</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Item Name</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Quantity</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Amount (GHS)</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Total per Student</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase">#</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase">Bill Item</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 uppercase">Amount (GHS)</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {billItemTypes.map(item => (
-                      <tr key={item.id} className={selectedBillItems.includes(item.id) ? 'bg-primary-50' : ''}>
-                        <td className="px-4 py-3">
+                    {billItemRows.map((row, index) => (
+                      <tr key={row.id}>
+                        <td className="px-3 py-2 text-sm text-gray-900">{index + 1}</td>
+                        <td className="px-3 py-2">
+                          <div className="relative select-dropdown-wrapper">
+                            <select
+                              value={row.billItem}
+                              onChange={(e) => handleBillItemChange(row.id, 'billItem', e.target.value)}
+                              className="select-dropdown w-full px-3 py-2 border border-gray-300 rounded-md text-sm min-h-[36px]"
+                            >
+                              <option value="">Select Bill Item</option>
+                              {billItemTypes.map(item => (
+                                <option key={item.id} value={item.id}>{item.name}</option>
+                              ))}
+                            </select>
+                            <div className="select-dropdown-arrow">
+                              <div className="select-dropdown-arrow-icon">
+                                <i className="fas fa-chevron-down"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-3 py-2">
                           <input
-                            type="checkbox"
-                            checked={selectedBillItems.includes(item.id)}
-                            onChange={() => handleBillItemToggle(item.id)}
-                            className="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={row.amount || ''}
+                            onChange={(e) => handleBillItemChange(row.id, 'amount', e.target.value)}
+                            placeholder="Enter Price"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
                           />
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{item.name}</td>
-                        <td className="px-4 py-3">
-                          {selectedBillItems.includes(item.id) ? (
-                            <input
-                              type="number"
-                              min="1"
-                              value={quantities[item.id] || 1}
-                              onChange={(e) => handleQuantityChange(item.id, e.target.value)}
-                              className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-                            />
-                          ) : (
-                            <span className="text-gray-400">-</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3">
-                          {selectedBillItems.includes(item.id) ? (
-                            <input
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              value={amounts[item.id] || item.defaultAmount}
-                              onChange={(e) => handleAmountChange(item.id, e.target.value)}
-                              className="w-24 px-2 py-1 border border-gray-300 rounded text-sm"
-                            />
-                          ) : (
-                            <span className="text-gray-400">-</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-sm font-semibold text-gray-900">
-                          {selectedBillItems.includes(item.id) 
-                            ? calculateItemTotal(item.id).toFixed(2)
-                            : '-'
-                          }
                         </td>
                       </tr>
                     ))}
@@ -444,52 +496,65 @@ const CreateGroupBill: React.FC = () => {
                 </table>
               </div>
             </div>
-          </div>
 
-          {/* Summary */}
-          {selectedBillItems.length > 0 && selectedStudents.length > 0 && (
-            <div className="mb-6 p-4 bg-primary-50 border border-primary-200 rounded-md">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <div className="text-sm text-gray-600">Selected Students</div>
-                  <div className="text-lg font-bold text-gray-900">{selectedStudents.length}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">Total per Student</div>
-                  <div className="text-lg font-bold text-gray-900">
-                    GHS {(grandTotal / selectedStudents.length).toFixed(2)}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-600">Grand Total</div>
-                  <div className="text-2xl font-bold text-primary-600">GHS {grandTotal.toFixed(2)}</div>
-                </div>
+            <div className="flex gap-2 mb-4">
+              <button
+                type="button"
+                onClick={handleAddRow}
+                className="px-4 py-2 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-colors"
+              >
+                Add Row
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (billItemRows.length > 1) {
+                    handleDeleteRow(billItemRows[billItemRows.length - 1].id);
+                  } else {
+                    toast.showError('At least one row is required');
+                  }
+                }}
+                className="px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors"
+              >
+                Delete Row
+              </button>
+            </div>
+
+            <div className="pt-4 border-t border-gray-200">
+              <div className="flex items-center justify-between">
+                <label className="block font-semibold text-gray-900 text-sm">Grand Total</label>
+                <input
+                  type="text"
+                  value={grandTotal.toFixed(2)}
+                  readOnly
+                  className="px-4 py-2 border-2 border-gray-200 rounded-md text-sm font-semibold text-gray-900 bg-gray-50 w-32 text-right"
+                />
               </div>
             </div>
-          )}
-
-          {/* Action Buttons */}
-          <div className="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={handleClear}
-              className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-all duration-300"
-            >
-              Clear
-            </button>
-            <button
-              type="submit"
-              className="px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-all duration-300 shadow-md hover:shadow-lg"
-            >
-              <i className="fas fa-save mr-2"></i>
-              Create Group Bill
-            </button>
           </div>
-        </form>
-      </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center justify-end gap-3 pt-6 mt-6">
+          <button
+            type="button"
+            onClick={handleClear}
+            className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-all duration-300"
+          >
+            Clear
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
+          >
+            <i className="fas fa-save mr-2"></i>
+            {loading ? 'Creating...' : 'Create Group Bill'}
+          </button>
+        </div>
+      </form>
     </Layout>
   );
 };
 
 export default CreateGroupBill;
-
