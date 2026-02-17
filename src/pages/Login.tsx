@@ -217,36 +217,49 @@ const Login: React.FC = () => {
 
         <div className="flex justify-between items-center mb-3 sm:mb-4 md:mb-8 flex-wrap gap-3">
           <h2 className="text-green-600 text-lg sm:text-xl md:text-2xl font-semibold">
-            Administrator
+            {formData.userType === 'administrator' ? 'Administrator' : formData.userType === 'staff' ? 'Staff Login' : 'Student Login'}
           </h2>
           <div className="flex gap-2.5">
             <a
               href="#facebook"
-              className="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-slate-600 text-sm transition-all duration-300 border border-slate-200 hover:bg-primary-600 hover:text-white hover:-translate-y-1 hover:rotate-6 hover:shadow-md"
+              className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 text-sm transition-all duration-300 hover:bg-gray-200"
               aria-label="Facebook"
               onClick={(e) => e.preventDefault()}
             >
-              <i className="fab fa-facebook-f"></i>
+              <span className="text-xs font-bold">f</span>
             </a>
             <a
               href="#twitter"
-              className="w-9 h-9 rounded-full bg-slate-50 flex items-center justify-center text-slate-600 text-sm transition-all duration-300 border border-slate-200 hover:bg-primary-600 hover:text-white hover:-translate-y-1 hover:rotate-6 hover:shadow-md"
+              className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 text-sm transition-all duration-300 hover:bg-gray-200"
               aria-label="Twitter"
               onClick={(e) => e.preventDefault()}
             >
-              <i className="fab fa-twitter"></i>
+              <i className="fab fa-twitter text-xs"></i>
             </a>
           </div>
         </div>
 
         <div className="text-center mb-4 sm:mb-5 md:mb-8">
-          {/* School Logo - Circular */}
-          <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 mx-auto mb-2 sm:mb-3 md:mb-6 flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl rounded-full overflow-hidden bg-white p-2 sm:p-2.5 md:p-3 border-4 border-gray-200">
-            <img
-              src="/images/crest.png"
-              alt="Excelz International School Logo"
-              className="w-full h-full object-contain max-w-full max-h-full"
-            />
+          {/* School Logo - Circular with green border */}
+          <div className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 mx-auto mb-2 sm:mb-3 md:mb-6 flex items-center justify-center shadow-lg rounded-full overflow-hidden bg-white p-3 sm:p-3.5 md:p-4 border-4 border-green-500">
+            <div className="w-full h-full flex flex-col items-center justify-center text-center">
+              <div className="text-[8px] sm:text-[9px] md:text-[10px] font-semibold text-gray-700 mb-1">
+                YOUR SCHOOL NAME HERE
+              </div>
+              <div className="flex-1 flex items-center justify-center">
+                <img
+                  src="/images/crest.png"
+                  alt="Excelz International School Logo"
+                  className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain"
+                />
+              </div>
+              <div className="text-[7px] sm:text-[8px] md:text-[9px] font-medium text-gray-600 mt-1">
+                SCHOOL SLOGAN HERE
+              </div>
+              <div className="text-[6px] sm:text-[7px] md:text-[8px] font-medium text-gray-500 mt-0.5">
+                ESTABLISHED: 2000
+              </div>
+            </div>
           </div>
         </div>
 
@@ -264,7 +277,7 @@ const Login: React.FC = () => {
           
           <div>
             <label className="block mb-3 sm:mb-3.5 font-semibold text-slate-900 text-base sm:text-lg md:text-sm">
-              Administrator
+              Role
             </label>
             <div className="relative">
               <i className="fas fa-user absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 z-10 transition-all duration-300 text-base sm:text-lg"></i>
@@ -296,7 +309,7 @@ const Login: React.FC = () => {
               Username/ID
             </label>
             <div className="relative">
-              <i className="fas fa-user absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-gray-500 z-10 transition-all duration-300 text-lg sm:text-xl"></i>
+              <i className="fas fa-user absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-gray-400 z-10 transition-all duration-300 text-lg sm:text-xl"></i>
               <input
                 type="text"
                 className="w-full pl-12 sm:pl-14 pr-4 py-4 sm:py-4.5 md:py-3 border-2 border-gray-200 rounded-xl text-lg sm:text-xl md:text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 focus:shadow-[0_0_0_4px_rgba(0,0,0,0.1)] min-h-[52px] sm:min-h-[56px] md:min-h-[48px]"
@@ -314,7 +327,7 @@ const Login: React.FC = () => {
               Password
             </label>
             <div className="relative">
-              <i className="fas fa-lock absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-gray-500 z-10 transition-all duration-300 text-lg sm:text-xl"></i>
+              <i className="fas fa-lock absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-gray-400 z-10 transition-all duration-300 text-lg sm:text-xl"></i>
               <input
                 type="password"
                 className="w-full pl-12 sm:pl-14 pr-4 py-4 sm:py-4.5 md:py-3 border-2 border-gray-200 rounded-xl text-lg sm:text-xl md:text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 focus:shadow-[0_0_0_4px_rgba(0,0,0,0.1)] min-h-[52px] sm:min-h-[56px] md:min-h-[48px]"
@@ -330,7 +343,7 @@ const Login: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4.5 sm:py-5 md:py-4 bg-amber-600 text-white rounded-xl text-lg sm:text-xl md:text-base font-bold cursor-pointer transition-all duration-300 mt-3 sm:mt-4 shadow-lg tracking-wide uppercase hover:bg-amber-700 hover:-translate-y-1 hover:shadow-xl active:-translate-y-0.5 active:bg-amber-800 min-h-[56px] sm:min-h-[60px] md:min-h-[48px] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-4.5 sm:py-5 md:py-4 bg-amber-600 text-white rounded-xl text-lg sm:text-xl md:text-base font-bold cursor-pointer transition-all duration-300 mt-3 sm:mt-4 shadow-lg tracking-wide hover:bg-amber-700 hover:-translate-y-1 hover:shadow-xl active:-translate-y-0.5 active:bg-amber-800 min-h-[56px] sm:min-h-[60px] md:min-h-[48px] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
@@ -348,18 +361,19 @@ const Login: React.FC = () => {
                 id="remember"
                 checked={remember}
                 onChange={(e) => setRemember(e.target.checked)}
-                className="cursor-pointer w-4 h-4"
+                className="cursor-pointer w-4 h-4 accent-orange-500"
+                style={{ accentColor: '#f97316' }}
               />
               <label
                 htmlFor="remember"
-                className="font-normal cursor-pointer text-sm"
+                className="font-normal cursor-pointer text-sm text-gray-700"
               >
                 Remember Me
               </label>
             </div>
             <Link
               to="/forgot-password"
-              className="text-amber-600 no-underline hover:text-amber-700 hover:underline text-sm transition-colors"
+              className="text-orange-500 no-underline hover:text-orange-600 hover:underline text-sm transition-colors font-medium"
             >
               Forgot Password?
             </Link>
