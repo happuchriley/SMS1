@@ -43,21 +43,21 @@ const LoginDebug: React.FC = () => {
         );
         
         if (!found) {
-          alert(`❌ Staff NOT FOUND\n\nSearched for: "${username}"\n\nAvailable staffIds: ${allStaff.map(s => s.staffId).join(', ')}`);
+          alert(`Staff NOT FOUND\n\nSearched for: "${username}"\n\nAvailable staffIds: ${allStaff.map(s => s.staffId).join(', ')}`);
           return;
         }
         
         if (!found.password) {
-          alert(`❌ Staff found but NO PASSWORD SET\n\nStaff: ${found.firstName} ${found.surname}\nStaffId: ${found.staffId}\nPassword field: ${found.password || 'UNDEFINED'}`);
+          alert(`Staff found but NO PASSWORD SET\n\nStaff: ${found.firstName} ${found.surname}\nStaffId: ${found.staffId}\nPassword field: ${found.password || 'UNDEFINED'}`);
           return;
         }
         
         if (found.password !== password) {
-          alert(`❌ PASSWORD MISMATCH\n\nStaff: ${found.firstName} ${found.surname}\nStaffId: ${found.staffId}\nExpected: ${found.password}\nYou entered: ${password}`);
+          alert(`PASSWORD MISMATCH\n\nStaff: ${found.firstName} ${found.surname}\nStaffId: ${found.staffId}\nExpected: ${found.password}\nYou entered: ${password}`);
           return;
         }
         
-        alert(`✅ LOGIN WOULD SUCCEED\n\nStaff: ${found.firstName} ${found.surname}\nStaffId: ${found.staffId}\nPassword: ${found.password}`);
+        alert(`LOGIN WOULD SUCCEED\n\nStaff: ${found.firstName} ${found.surname}\nStaffId: ${found.staffId}\nPassword: ${found.password}`);
       } else if (userType === 'student') {
         const allStudents = await studentsService.getAll();
         const found = allStudents.find(s => 
@@ -67,21 +67,21 @@ const LoginDebug: React.FC = () => {
         );
         
         if (!found) {
-          alert(`❌ Student NOT FOUND\n\nSearched for: "${username}"\n\nAvailable studentIds: ${allStudents.map(s => s.studentId).join(', ')}`);
+          alert(`Student NOT FOUND\n\nSearched for: "${username}"\n\nAvailable studentIds: ${allStudents.map(s => s.studentId).join(', ')}`);
           return;
         }
         
         if (!found.password) {
-          alert(`❌ Student found but NO PASSWORD SET\n\nStudent: ${found.firstName} ${found.surname}\nStudentId: ${found.studentId}\nPassword field: ${found.password || 'UNDEFINED'}`);
+          alert(`Student found but NO PASSWORD SET\n\nStudent: ${found.firstName} ${found.surname}\nStudentId: ${found.studentId}\nPassword field: ${found.password || 'UNDEFINED'}`);
           return;
         }
         
         if (found.password !== password) {
-          alert(`❌ PASSWORD MISMATCH\n\nStudent: ${found.firstName} ${found.surname}\nStudentId: ${found.studentId}\nExpected: ${found.password}\nYou entered: ${password}`);
+          alert(`PASSWORD MISMATCH\n\nStudent: ${found.firstName} ${found.surname}\nStudentId: ${found.studentId}\nExpected: ${found.password}\nYou entered: ${password}`);
           return;
         }
         
-        alert(`✅ LOGIN WOULD SUCCEED\n\nStudent: ${found.firstName} ${found.surname}\nStudentId: ${found.studentId}\nPassword: ${found.password}`);
+        alert(`LOGIN WOULD SUCCEED\n\nStudent: ${found.firstName} ${found.surname}\nStudentId: ${found.studentId}\nPassword: ${found.password}`);
       }
     } catch (error) {
       alert(`Error: ${error}`);
@@ -111,14 +111,14 @@ const LoginDebug: React.FC = () => {
       </div>
 
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-        <h3 className="font-semibold text-yellow-900 mb-2">📊 Data Summary</h3>
+        <h3 className="font-semibold text-yellow-900 mb-2">Data Summary</h3>
         <p className="text-sm text-yellow-800">
           <strong>Staff Count:</strong> {staff.length} | 
           <strong> Students Count:</strong> {students.length}
         </p>
         {staff.length === 0 && students.length === 0 && (
           <p className="text-sm text-yellow-800 mt-2">
-            ⚠️ No data found! You need to seed demo data first.
+            Warning: No data found! You need to seed demo data first.
           </p>
         )}
       </div>
@@ -147,12 +147,12 @@ const LoginDebug: React.FC = () => {
                     <td className="px-4 py-2">{i + 1}</td>
                     <td className="px-4 py-2">{s.firstName} {s.surname}</td>
                     <td className="px-4 py-2 font-mono">{s.staffId || 'N/A'}</td>
-                    <td className="px-4 py-2 font-mono">{s.password || '❌ NOT SET'}</td>
+                    <td className="px-4 py-2 font-mono">{s.password || 'NOT SET'}</td>
                     <td className="px-4 py-2">
                       {s.password ? (
-                        <span className="text-green-600">✅ Yes</span>
+                        <span className="text-green-600">Yes</span>
                       ) : (
-                        <span className="text-red-600">❌ No</span>
+                        <span className="text-red-600">No</span>
                       )}
                     </td>
                     <td className="px-4 py-2">
@@ -196,12 +196,12 @@ const LoginDebug: React.FC = () => {
                     <td className="px-4 py-2">{i + 1}</td>
                     <td className="px-4 py-2">{s.firstName} {s.surname}</td>
                     <td className="px-4 py-2 font-mono">{s.studentId || 'N/A'}</td>
-                    <td className="px-4 py-2 font-mono">{s.password || '❌ NOT SET'}</td>
+                    <td className="px-4 py-2 font-mono">{s.password || 'NOT SET'}</td>
                     <td className="px-4 py-2">
                       {s.password ? (
-                        <span className="text-green-600">✅ Yes</span>
+                        <span className="text-green-600">Yes</span>
                       ) : (
-                        <span className="text-red-600">❌ No</span>
+                        <span className="text-red-600">No</span>
                       )}
                     </td>
                     <td className="px-4 py-2">
@@ -222,10 +222,10 @@ const LoginDebug: React.FC = () => {
       </div>
 
       <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="font-semibold text-blue-900 mb-2">💡 How to Use</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">How to Use</h3>
         <ol className="list-decimal list-inside text-sm text-blue-800 space-y-1">
           <li>Check if staff/students exist (should be {'>'} 0)</li>
-          <li>Check if passwords are set (should show ✅ Yes)</li>
+          <li>Check if passwords are set (should show Yes)</li>
           <li>Click &quot;Test&quot; button to verify login would work</li>
           <li>Use the exact Staff ID / Student ID and Password shown</li>
         </ol>
