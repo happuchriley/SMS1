@@ -33,11 +33,11 @@ const DebtorsReport: React.FC = () => {
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
   // Sample data - debtors from fee collection perspective
-  const debtors: DebtorItem[] = [
+  const debtors: DebtorItem[] = useMemo(() => [
     { id: 'STU001', name: 'John Doe', class: 'Basic 1', billNumber: 'BL001', billDate: '2024-01-15', dueDate: '2024-02-15', billAmount: 1000, paidAmount: 400, balance: 600, daysOverdue: 10 },
     { id: 'STU002', name: 'Jane Smith', class: 'Basic 2', billNumber: 'BL002', billDate: '2024-01-15', dueDate: '2024-02-15', billAmount: 1200, paidAmount: 500, balance: 700, daysOverdue: 5 },
     { id: 'STU003', name: 'Michael Johnson', class: 'Basic 1', billNumber: 'BL003', billDate: '2024-01-20', dueDate: '2024-02-20', billAmount: 1000, paidAmount: 200, balance: 800, daysOverdue: 15 },
-  ];
+  ], []);
 
   const classes: string[] = ['Nursery 1', 'Nursery 2', 'Basic 1', 'Basic 2', 'Basic 3', 'Basic 4', 'Basic 5', 'Basic 6', 'JHS 1', 'JHS 2', 'JHS 3'];
 

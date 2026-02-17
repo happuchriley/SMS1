@@ -34,13 +34,13 @@ const ScholarshipList: React.FC = () => {
   const actionMenuRef = useRef<HTMLDivElement>(null);
 
   // Sample data
-  const scholarships: ScholarshipItem[] = [
+  const scholarships: ScholarshipItem[] = useMemo(() => [
     { id: 'SCH001', studentId: 'STU001', studentName: 'John Doe', class: 'Basic 1', type: 'Academic Excellence', amount: 500, percentage: 50, startDate: '2024-01-01', endDate: '2024-12-31', status: 'Active' },
     { id: 'SCH002', studentId: 'STU002', studentName: 'Jane Smith', class: 'Basic 2', type: 'Need-Based', amount: 300, percentage: 30, startDate: '2024-01-01', endDate: '2024-12-31', status: 'Active' },
     { id: 'SCH003', studentId: 'STU003', studentName: 'Michael Johnson', class: 'Basic 3', type: 'Sports', amount: 200, percentage: 20, startDate: '2024-01-01', endDate: '2024-06-30', status: 'Expired' },
     { id: 'SCH004', studentId: 'STU004', studentName: 'Emily Brown', class: 'Basic 1', type: 'Academic Excellence', amount: 600, percentage: 60, startDate: '2024-01-01', endDate: '2024-12-31', status: 'Active' },
     { id: 'SCH005', studentId: 'STU005', studentName: 'David Wilson', class: 'Basic 2', type: 'Merit', amount: 400, percentage: 40, startDate: '2024-01-01', endDate: '2024-12-31', status: 'Active' },
-  ];
+  ], []);
 
   const classes: string[] = ['Nursery 1', 'Nursery 2', 'Basic 1', 'Basic 2', 'Basic 3', 'Basic 4', 'Basic 5', 'Basic 6', 'JHS 1', 'JHS 2', 'JHS 3'];
 

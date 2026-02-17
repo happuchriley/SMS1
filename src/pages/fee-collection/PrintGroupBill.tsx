@@ -38,11 +38,11 @@ const FeeCollectionPrintGroupBill: React.FC = () => {
   const classes: string[] = ['Basic 1', 'Basic 2', 'Basic 3', 'Basic 4', 'Basic 5', 'Basic 6', 'JHS 1', 'JHS 2', 'JHS 3'];
 
   // Sample bills
-  const allBills: BillItem[] = [
+  const allBills: BillItem[] = useMemo(() => [
     { id: 'BL001', studentId: 'STU001', studentName: 'John Doe', class: 'Basic 1', billDate: '2024-01-15', dueDate: '2024-02-15', amount: 1000, status: 'Pending' },
     { id: 'BL002', studentId: 'STU002', studentName: 'Jane Smith', class: 'Basic 1', billDate: '2024-01-15', dueDate: '2024-02-15', amount: 1200, status: 'Pending' },
     { id: 'BL003', studentId: 'STU003', studentName: 'Michael Johnson', class: 'Basic 1', billDate: '2024-01-20', dueDate: '2024-02-20', amount: 1000, status: 'Paid' },
-  ];
+  ], []);
 
   // Filter bills
   const filteredBills = useMemo<BillItem[]>(() => {

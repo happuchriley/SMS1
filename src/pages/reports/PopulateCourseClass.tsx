@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, FormEvent, ChangeEvent } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, FormEvent, ChangeEvent } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 import academicService from '../../services/academicService';
@@ -54,7 +54,7 @@ const PopulateCourseClass: React.FC = () => {
   useEffect(() => {
     loadClasses();
   }, [loadClasses]);
-  const defaultCourses: string[] = [
+  const defaultCourses: string[] = useMemo(() => [
     'English Language', 
     'Mathematics', 
     'Science', 
@@ -69,7 +69,7 @@ const PopulateCourseClass: React.FC = () => {
     'Home Economics',
     'Agricultural Science', 
     'Basic Design & Technology'
-  ];
+  ], []);
 
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
 

@@ -31,12 +31,12 @@ const FeeCollectionReport: React.FC = () => {
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
   // Sample fee collection data
-  const feeCollections: FeeCollectionItem[] = [
+  const feeCollections: FeeCollectionItem[] = useMemo(() => [
     { id: 1, date: '2024-01-15', studentId: 'STU001', studentName: 'John Doe', class: 'Basic 1', amount: 500, paymentMethod: 'Cash', receiptNumber: 'RCP001' },
     { id: 2, date: '2024-01-16', studentId: 'STU002', studentName: 'Jane Smith', class: 'Basic 1', amount: 600, paymentMethod: 'Bank Transfer', receiptNumber: 'RCP002' },
     { id: 3, date: '2024-01-17', studentId: 'STU003', studentName: 'Michael Johnson', class: 'Basic 2', amount: 550, paymentMethod: 'Mobile Money', receiptNumber: 'RCP003' },
     { id: 4, date: '2024-01-18', studentId: 'STU004', studentName: 'Emily Brown', class: 'Basic 1', amount: 700, paymentMethod: 'Cash', receiptNumber: 'RCP004' },
-  ];
+  ], []);
 
   const classes: string[] = ['Nursery 1', 'Nursery 2', 'Basic 1', 'Basic 2', 'Basic 3', 'Basic 4', 'Basic 5', 'Basic 6', 'JHS 1', 'JHS 2', 'JHS 3'];
 

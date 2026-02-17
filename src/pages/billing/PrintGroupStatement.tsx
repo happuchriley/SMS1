@@ -49,13 +49,13 @@ const PrintGroupStatement: React.FC = () => {
   }, [loadClasses]);
 
   // Sample students with statements
-  const allStudents: StudentItem[] = [
+  const allStudents: StudentItem[] = useMemo(() => [
     { id: 'STU001', name: 'John Doe', class: 'Basic 1', balance: 600, status: 'Outstanding' },
     { id: 'STU002', name: 'Jane Smith', class: 'Basic 1', balance: 700, status: 'Outstanding' },
     { id: 'STU003', name: 'Michael Johnson', class: 'Basic 1', balance: 0, status: 'Cleared' },
     { id: 'STU004', name: 'Emily Brown', class: 'Basic 1', balance: 500, status: 'Outstanding' },
     { id: 'STU005', name: 'David Wilson', class: 'Basic 1', balance: 0, status: 'Cleared' },
-  ];
+  ], []);
 
   // Filter students by selected class
   const filteredStudents = useMemo<StudentItem[]>(() => {

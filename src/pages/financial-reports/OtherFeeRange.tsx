@@ -28,12 +28,12 @@ const OtherFeeRange: React.FC = () => {
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
   // Sample other fee data
-  const otherFees: OtherFeeItem[] = [
+  const otherFees: OtherFeeItem[] = useMemo(() => [
     { id: 1, date: '2024-01-15', studentId: 'STU001', studentName: 'John Doe', feeType: 'Library Fine', amount: 50, paymentMethod: 'Cash', receiptNumber: 'RCP001' },
     { id: 2, date: '2024-01-16', studentId: 'STU002', studentName: 'Jane Smith', feeType: 'Late Registration', amount: 100, paymentMethod: 'Cash', receiptNumber: 'RCP002' },
     { id: 3, date: '2024-01-17', studentId: 'STU003', studentName: 'Michael Johnson', feeType: 'ID Card Replacement', amount: 30, paymentMethod: 'Mobile Money', receiptNumber: 'RCP003' },
     { id: 4, date: '2024-01-20', studentId: 'STU004', studentName: 'Emily Brown', feeType: 'Library Fine', amount: 50, paymentMethod: 'Cash', receiptNumber: 'RCP004' },
-  ];
+  ], []);
 
   const feeTypes: string[] = ['All Types', 'Library Fine', 'Late Registration', 'Examination Retake', 'ID Card Replacement'];
 

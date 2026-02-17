@@ -120,7 +120,7 @@ const TakeQuiz: React.FC = () => {
       console.error('Error submitting quiz:', error);
       toast.showError('Failed to submit quiz');
     }
-  }, [quiz, answers, id, toast]);
+  }, [quiz, answers, toast, timeRemaining]);
 
   // Timer countdown
   useEffect(() => {

@@ -31,13 +31,13 @@ const CreditorsReport: React.FC = () => {
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
   // Sample data - creditors are students who overpaid
-  const creditors: CreditorItem[] = [
+  const creditors: CreditorItem[] = useMemo(() => [
     { id: 'STU001', name: 'John Doe', class: 'Basic 1', paymentNumber: 'PY001', paymentDate: '2024-01-15', billAmount: 1000, paidAmount: 1200, overpaid: 200 },
     { id: 'STU002', name: 'Jane Smith', class: 'Basic 2', paymentNumber: 'PY002', paymentDate: '2024-01-20', billAmount: 1200, paidAmount: 1500, overpaid: 300 },
     { id: 'STU003', name: 'Michael Johnson', class: 'Basic 1', paymentNumber: 'PY003', paymentDate: '2024-01-25', billAmount: 1000, paidAmount: 1100, overpaid: 100 },
     { id: 'STU004', name: 'Emily Brown', class: 'Basic 3', paymentNumber: 'PY004', paymentDate: '2024-02-01', billAmount: 1500, paidAmount: 1600, overpaid: 100 },
     { id: 'STU005', name: 'David Wilson', class: 'Basic 2', paymentNumber: 'PY005', paymentDate: '2024-02-05', billAmount: 1200, paidAmount: 1400, overpaid: 200 },
-  ];
+  ], []);
 
   const classes: string[] = ['Nursery 1', 'Nursery 2', 'Basic 1', 'Basic 2', 'Basic 3', 'Basic 4', 'Basic 5', 'Basic 6', 'JHS 1', 'JHS 2', 'JHS 3'];
 

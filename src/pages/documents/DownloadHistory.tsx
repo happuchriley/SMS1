@@ -21,13 +21,13 @@ const DownloadHistory: React.FC = () => {
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
   // Sample download history data
-  const downloadHistory: DownloadHistoryItem[] = [
+  const downloadHistory: DownloadHistoryItem[] = useMemo(() => [
     { id: 1, documentName: 'Academic Transcript 2023', fileName: 'transcript_2023.pdf', category: 'Academic', downloadDate: '2024-01-20 10:30 AM', fileSize: '2.5 MB' },
     { id: 2, documentName: 'School Fee Receipt - January', fileName: 'receipt_jan2024.pdf', category: 'Financial', downloadDate: '2024-01-19 02:15 PM', fileSize: '0.5 MB' },
     { id: 3, documentName: 'Academic Calendar 2024', fileName: 'academic_calendar_2024.pdf', category: 'Academic', downloadDate: '2024-01-18 09:45 AM', fileSize: '1.2 MB' },
     { id: 4, documentName: 'School Policy Document', fileName: 'school_policy.pdf', category: 'Administrative', downloadDate: '2024-01-17 11:20 AM', fileSize: '3.5 MB' },
     { id: 5, documentName: 'Student Handbook', fileName: 'student_handbook.pdf', category: 'Academic', downloadDate: '2024-01-16 03:30 PM', fileSize: '5.2 MB' },
-  ];
+  ], []);
 
   // Filter history
   const filteredHistory = useMemo(() => {

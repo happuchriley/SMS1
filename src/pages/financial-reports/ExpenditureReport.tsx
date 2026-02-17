@@ -28,13 +28,13 @@ const ExpenditureReport: React.FC = () => {
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
   // Sample expenditure data
-  const expenditures: ExpenditureItem[] = [
+  const expenditures: ExpenditureItem[] = useMemo(() => [
     { id: 1, date: '2024-01-15', category: 'Salaries', description: 'Staff salaries for January', amount: 50000, paymentMethod: 'Bank Transfer', reference: 'REF001' },
     { id: 2, date: '2024-01-16', category: 'Utilities', description: 'Electricity bill', amount: 5000, paymentMethod: 'Bank Transfer', reference: 'REF002' },
     { id: 3, date: '2024-01-17', category: 'Maintenance', description: 'Building repairs', amount: 3000, paymentMethod: 'Cash', reference: 'REF003' },
     { id: 4, date: '2024-01-18', category: 'Stationery', description: 'Office supplies', amount: 2000, paymentMethod: 'Cash', reference: 'REF004' },
     { id: 5, date: '2024-01-20', category: 'Transportation', description: 'Fuel for school bus', amount: 1500, paymentMethod: 'Cash', reference: 'REF005' },
-  ];
+  ], []);
 
   const categories: string[] = ['All Categories', 'Salaries', 'Utilities', 'Maintenance', 'Stationery', 'Transportation', 'Communication', 'Insurance', 'Rent', 'Other Expenses'];
 
