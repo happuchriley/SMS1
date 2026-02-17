@@ -65,7 +65,7 @@ const ScholarshipList: React.FC = () => {
       const matchesClass = !selectedClass || sch.class === selectedClass;
       return matchesSearch && matchesClass;
     });
-  }, [searchTerm, selectedClass]);
+  }, [searchTerm, selectedClass, scholarships]);
 
   // Pagination
   const totalPages = Math.ceil(filteredScholarships.length / entriesPerPage);
@@ -83,7 +83,7 @@ const ScholarshipList: React.FC = () => {
       expired: scholarships.filter(s => s.status === 'Expired').length,
       totalAmount: scholarships.reduce((sum, s) => sum + s.amount, 0)
     };
-  }, []);
+  }, [scholarships]);
 
   const handleClearFilters = (): void => {
     setSearchTerm('');

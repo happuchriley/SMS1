@@ -67,7 +67,7 @@ const FeeCollectionPrintGroupStatement: React.FC = () => {
     }
     
     return students;
-  }, [formData.class, formData.statementType]);
+  }, [formData.class, formData.statementType, allStudents]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     setFormData({

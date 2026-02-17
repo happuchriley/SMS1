@@ -82,7 +82,7 @@ const PopulateCourseClass: React.FC = () => {
       // Fallback to default courses
       setAvailableCourses(defaultCourses);
     }
-  }, []);
+  }, [defaultCourses]);
 
   useEffect(() => {
     loadCourses();

@@ -55,7 +55,7 @@ const FinancialReportsDebtorsReport: React.FC = () => {
       
       return matchesSearch && matchesClass && matchesDate;
     });
-  }, [searchTerm, selectedClass, dateFrom, dateTo]);
+  }, [searchTerm, selectedClass, dateFrom, dateTo, debtors]);
 
   // Pagination
   const totalPages = Math.ceil(filteredDebtors.length / itemsPerPage);

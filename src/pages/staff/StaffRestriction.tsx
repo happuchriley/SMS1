@@ -113,16 +113,16 @@ const StaffRestriction: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const getStaffName = (staffId: string): string => {
+  const getStaffName = useCallback((staffId: string): string => {
     const staff = staffList.find(s => (s.id && s.id === staffId) || (s.staffId && s.staffId === staffId));
     if (!staff) return 'Unknown';
     return `${staff.firstName || ''} ${staff.surname || ''} ${staff.otherNames || ''}`.trim();
-  };
+  }, [staffList]);
 
-  const getStaffId = (staffId: string): string => {
+  const getStaffId = useCallback((staffId: string): string => {
     const staff = staffList.find(s => (s.id && s.id === staffId) || (s.staffId && s.staffId === staffId));
     return staff?.staffId || staff?.id || 'N/A';
-  };
+  }, [staffList]);
 
   const getRestrictionForStaff = (staffId: string): StaffRestrictionData | null => {
     return restrictions.find(r => r.staffId === staffId) || null;
@@ -239,7 +239,7 @@ const StaffRestriction: React.FC = () => {
       const staffId = getStaffId(restriction.staffId).toLowerCase();
       return staffName.includes(term) || staffId.includes(term);
     });
-  }, [restrictions, searchTerm, staffList]);
+  }, [restrictions, searchTerm, getStaffName, getStaffId]);
 
   // Pagination
   const totalPages = Math.ceil(filteredRestrictions.length / entriesPerPage);

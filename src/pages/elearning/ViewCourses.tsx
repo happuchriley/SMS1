@@ -23,12 +23,12 @@ const ViewCourses: React.FC = () => {
   const [itemsPerPage] = useState<number>(9);
 
   // Sample course data
-  const courses: Course[] = [
+  const courses: Course[] = useMemo(() => [
     { id: 1, courseCode: 'MATH101', courseTitle: 'Basic Mathematics', subject: 'Mathematics', class: 'Basic 1', term: '1st Term', academicYear: '2024/2025', instructor: 'Mr. John Teacher', studentsEnrolled: 45, lessons: 12, status: 'Published' },
     { id: 2, courseCode: 'ENG101', courseTitle: 'English Language', subject: 'English', class: 'Basic 1', term: '1st Term', academicYear: '2024/2025', instructor: 'Mrs. Jane Principal', studentsEnrolled: 42, lessons: 15, status: 'Published' },
     { id: 3, courseCode: 'SCI101', courseTitle: 'Introduction to Science', subject: 'Science', class: 'Basic 2', term: '1st Term', academicYear: '2024/2025', instructor: 'Mr. Michael Admin', studentsEnrolled: 38, lessons: 10, status: 'Published' },
     { id: 4, courseCode: 'SOC101', courseTitle: 'Social Studies Basics', subject: 'Social Studies', class: 'Basic 2', term: '1st Term', academicYear: '2024/2025', instructor: 'Ms. Sarah Teacher', studentsEnrolled: 35, lessons: 8, status: 'Published' },
-  ];
+  ], []);
 
   const subjects: string[] = ['All Subjects', 'Mathematics', 'English', 'Science', 'Social Studies', 'French', 'ICT', 'Religious Studies'];
   const classes: string[] = ['All Classes', 'Nursery 1', 'Nursery 2', 'Basic 1', 'Basic 2', 'Basic 3', 'Basic 4', 'Basic 5', 'Basic 6', 'JHS 1', 'JHS 2', 'JHS 3'];

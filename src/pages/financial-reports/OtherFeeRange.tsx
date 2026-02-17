@@ -54,7 +54,7 @@ const OtherFeeRange: React.FC = () => {
     }
     
     return fees;
-  }, [selectedFeeType, dateFrom, dateTo]);
+  }, [selectedFeeType, dateFrom, dateTo, otherFees]);
 
   // Pagination
   const totalPages = Math.ceil(filteredFees.length / itemsPerPage);

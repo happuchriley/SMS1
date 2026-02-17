@@ -55,7 +55,7 @@ const ExpenditureReport: React.FC = () => {
     }
     
     return expenses;
-  }, [selectedCategory, dateFrom, dateTo]);
+  }, [selectedCategory, dateFrom, dateTo, expenditures]);
 
   // Pagination
   const totalPages = Math.ceil(filteredExpenditures.length / itemsPerPage);

@@ -130,7 +130,7 @@ const PrintGroupReport: React.FC = () => {
     }
     
     return students;
-  }, [formData.class, formData.reportType]);
+  }, [formData.class, formData.reportType, allStudents]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     setFormData({

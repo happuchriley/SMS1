@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Layout from '../components/Layout';
 import { Link } from 'react-router-dom';
 import { useModal } from '../components/ModalProvider';
@@ -74,14 +74,17 @@ const Messages: React.FC = () => {
 
   const unreadCount = messages.filter(m => !m.read).length;
 
-  const markAsRead = (id: string): void => {
+  const markAsRead = useCallback((id: string): void => {
     setMessages(prev => prev.map(m => 
       m.id === id ? { ...m, read: true } : m
     ));
-    if (selectedMessage?.id === id) {
-      setSelectedMessage(prev => prev ? { ...prev, read: true } : null);
-    }
-  };
+    setSelectedMessage(prev => {
+      if (prev?.id === id) {
+        return { ...prev, read: true };
+      }
+      return prev;
+    });
+  }, []);
 
   const markAllAsRead = (): void => {
     setMessages(prev => prev.map(m => ({ ...m, read: true })));
@@ -130,7 +133,7 @@ const Messages: React.FC = () => {
     if (selectedMessage && !selectedMessage.read) {
       markAsRead(selectedMessage.id);
     }
-  }, [selectedMessage]);
+  }, [selectedMessage, markAsRead]);
 
   // Prevent body scroll when compose modal is open
   useEffect(() => {

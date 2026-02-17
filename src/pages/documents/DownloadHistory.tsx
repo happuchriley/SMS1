@@ -42,7 +42,7 @@ const DownloadHistory: React.FC = () => {
       
       return matchesSearch && matchesDate;
     });
-  }, [searchTerm, dateFrom, dateTo]);
+  }, [searchTerm, dateFrom, dateTo, downloadHistory]);
 
   // Pagination
   const totalPages = Math.ceil(filteredHistory.length / itemsPerPage);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Layout from '../components/Layout';
 import { Link } from 'react-router-dom';
 import { useModal } from '../components/ModalProvider';
@@ -21,11 +21,7 @@ const DemoCredentials: React.FC = () => {
     students: DemoCredential[];
   }>({ staff: [], students: [] });
 
-  useEffect(() => {
-    checkDataAndLoad();
-  }, []);
-
-  const checkDataAndLoad = async () => {
+  const checkDataAndLoad = useCallback(async () => {
     try {
       const hasStudents = await apiService.hasData('students');
       const hasStaff = await apiService.hasData('staff');
@@ -37,7 +33,11 @@ const DemoCredentials: React.FC = () => {
     } catch (error) {
       // Error checking data
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    checkDataAndLoad();
+  }, [checkDataAndLoad]);
 
   const loadCredentials = async () => {
     try {

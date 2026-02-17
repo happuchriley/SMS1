@@ -81,7 +81,7 @@ Thank you for your prompt payment.`;
       setSelectedStudents(filteredStudents.map(s => s.id));
       setFormData(prev => ({ ...prev, message: prev.message || defaultMessage }));
     }
-  }, [formData.class, filteredStudents.length]);
+  }, [formData.class, filteredStudents, defaultMessage]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>): void => {
     setFormData({

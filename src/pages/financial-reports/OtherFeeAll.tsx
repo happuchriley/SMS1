@@ -39,7 +39,7 @@ const OtherFeeAll: React.FC = () => {
   const filteredFees = useMemo<OtherFeeItem[]>(() => {
     if (!selectedFeeType || selectedFeeType === 'All Types') return otherFees;
     return otherFees.filter(fee => fee.feeType === selectedFeeType);
-  }, [selectedFeeType]);
+  }, [selectedFeeType, otherFees]);
 
   // Pagination
   const totalPages = Math.ceil(filteredFees.length / itemsPerPage);

@@ -53,7 +53,7 @@ const FeeCollectionPrintGroupBill: React.FC = () => {
     }
     
     return bills;
-  }, [formData.class, formData.billStatus]);
+  }, [formData.class, formData.billStatus, allBills]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     setFormData({

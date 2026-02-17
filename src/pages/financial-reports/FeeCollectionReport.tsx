@@ -47,7 +47,7 @@ const FeeCollectionReport: React.FC = () => {
       const matchesClass = !selectedClass || collection.class === selectedClass;
       return matchesDate && matchesClass;
     });
-  }, [dateFrom, dateTo, selectedClass]);
+  }, [dateFrom, dateTo, selectedClass, feeCollections]);
 
   // Pagination
   const totalPages = Math.ceil(filteredCollections.length / itemsPerPage);

@@ -78,7 +78,7 @@ const EnterAcademicResult: React.FC = () => {
       console.error('Error loading classes:', error);
       toast.showError('Failed to load classes');
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     loadClasses();

@@ -22,12 +22,12 @@ const MyCourses: React.FC = () => {
   const [itemsPerPage] = useState<number>(9);
 
   // Sample enrolled courses data
-  const myCourses: MyCourse[] = [
+  const myCourses: MyCourse[] = useMemo(() => [
     { id: 1, courseCode: 'MATH101', courseTitle: 'Basic Mathematics', subject: 'Mathematics', class: 'Basic 1', instructor: 'Mr. John Teacher', progress: 75, lessonsCompleted: 9, totalLessons: 12, status: 'Active', lastAccessed: '2024-01-20' },
     { id: 2, courseCode: 'ENG101', courseTitle: 'English Language', subject: 'English', class: 'Basic 1', instructor: 'Mrs. Jane Principal', progress: 60, lessonsCompleted: 9, totalLessons: 15, status: 'Active', lastAccessed: '2024-01-19' },
     { id: 3, courseCode: 'SCI101', courseTitle: 'Introduction to Science', subject: 'Science', class: 'Basic 2', instructor: 'Mr. Michael Admin', progress: 40, lessonsCompleted: 4, totalLessons: 10, status: 'Active', lastAccessed: '2024-01-18' },
     { id: 4, courseCode: 'SOC101', courseTitle: 'Social Studies Basics', subject: 'Social Studies', class: 'Basic 2', instructor: 'Ms. Sarah Teacher', progress: 100, lessonsCompleted: 8, totalLessons: 8, status: 'Completed', lastAccessed: '2024-01-17' },
-  ];
+  ], []);
 
   const statuses: string[] = ['All Status', 'Active', 'Completed', 'Not Started'];
 

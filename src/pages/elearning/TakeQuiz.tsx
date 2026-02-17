@@ -87,6 +87,41 @@ const TakeQuiz: React.FC = () => {
     loadQuiz();
   }, [loadQuiz]);
 
+  const handleSubmitQuiz = useCallback(async (): Promise<void> => {
+    if (!quiz) return;
+    
+    // Calculate score
+    let totalScore = 0;
+    let totalPoints = 0;
+    
+    quiz.questions.forEach(q => {
+      totalPoints += q.points;
+      if (q.type === 'multiple-choice' || q.type === 'true-false') {
+        if (answers[q.id] === q.correctAnswer) {
+          totalScore += q.points;
+        }
+      }
+      // Short answer questions would need manual grading
+    });
+    
+    const percentage = (totalScore / totalPoints) * 100;
+    setScore(percentage);
+    setQuizSubmitted(true);
+    
+    try {
+      await elearningService.submitQuizAttempt({
+        quizId: quiz.id,
+        answers,
+        score: percentage,
+        timeSpent: (quiz.duration * 60) - timeRemaining
+      });
+      toast.showSuccess(`Quiz submitted! Your score: ${percentage.toFixed(1)}%`);
+    } catch (error) {
+      console.error('Error submitting quiz:', error);
+      toast.showError('Failed to submit quiz');
+    }
+  }, [quiz, answers, id, toast]);
+
   // Timer countdown
   useEffect(() => {
     if (!quizStarted || timeRemaining <= 0 || quizSubmitted) return;
@@ -102,7 +137,7 @@ const TakeQuiz: React.FC = () => {
     }, 1000);
     
     return () => clearInterval(timer);
-  }, [quizStarted, timeRemaining, quizSubmitted]);
+  }, [quizStarted, timeRemaining, quizSubmitted, handleSubmitQuiz]);
 
   const handleStartQuiz = (): void => {
     if (!quiz) return;
@@ -133,43 +168,6 @@ const TakeQuiz: React.FC = () => {
   const handlePrevious = (): void => {
     if (currentQuestion > 0) {
       setCurrentQuestion(prev => prev - 1);
-    }
-  };
-
-  const handleSubmitQuiz = async (): Promise<void> => {
-    if (!quiz) return;
-    
-    // Calculate score
-    let totalScore = 0;
-    let totalPoints = 0;
-    
-    quiz.questions.forEach(q => {
-      totalPoints += q.points;
-      if (q.type === 'multiple-choice' || q.type === 'true-false') {
-        if (answers[q.id] === q.correctAnswer) {
-          totalScore += q.points;
-        }
-      }
-      // Short answer questions would need manual grading
-    });
-    
-    const percentage = (totalScore / totalPoints) * 100;
-    setScore(percentage);
-    setQuizSubmitted(true);
-    
-    try {
-      // Save quiz attempt
-      await elearningService.submitQuizAttempt({
-        quizId: quiz.id,
-        answers,
-        score: percentage,
-        timeSpent: (quiz.duration * 60) - timeRemaining
-      });
-      
-      toast.showSuccess(`Quiz submitted! Your score: ${percentage.toFixed(1)}%`);
-    } catch (error) {
-      console.error('Error submitting quiz:', error);
-      toast.showError('Failed to submit quiz');
     }
   };
 
