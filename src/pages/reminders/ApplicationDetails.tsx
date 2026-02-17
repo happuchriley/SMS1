@@ -44,7 +44,6 @@ const ApplicationDetails: React.FC = () => {
       setAllStudents(students);
       setAccessibleClasses(classes);
     } catch (error) {
-      console.error('Error loading data:', error);
       toast.showError('Failed to load data');
     }
   }, [toast]);

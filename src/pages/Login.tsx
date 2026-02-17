@@ -18,6 +18,7 @@ const Login: React.FC = () => {
   const [remember, setRemember] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
@@ -41,7 +42,12 @@ const Login: React.FC = () => {
           localStorage.setItem("username", formData.username);
           localStorage.setItem("userType", "administrator");
         }
-        navigate("/");
+        setLoading(false);
+        setShowSuccessModal(true);
+        // Auto-redirect after 3 seconds
+        setTimeout(() => {
+          navigate("/");
+        }, 3000);
         return;
       }
 
@@ -76,7 +82,12 @@ const Login: React.FC = () => {
           localStorage.setItem("username", staff.staffId || formData.username);
           localStorage.setItem("userType", userType);
         }
-        navigate("/teacher-dashboard");
+        setLoading(false);
+        setShowSuccessModal(true);
+        // Auto-redirect after 3 seconds
+        setTimeout(() => {
+          navigate("/teacher-dashboard");
+        }, 3000);
         return;
       }
 
@@ -109,12 +120,18 @@ const Login: React.FC = () => {
           localStorage.setItem("username", student.studentId || student.id || formData.username);
           localStorage.setItem("userType", "student");
         }
-        navigate("/student-dashboard");
+        setLoading(false);
+        setShowSuccessModal(true);
+        // Auto-redirect after 3 seconds
+        setTimeout(() => {
+          navigate("/student-dashboard");
+        }, 3000);
         return;
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Login error:", error);
-      setError("An error occurred during login. Please try again.");
+      const errorMessage = error instanceof Error ? error.message : "An error occurred during login. Please try again.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -165,12 +182,12 @@ const Login: React.FC = () => {
       >
         {/* Classroom Background Image Overlay */}
         <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] z-10"></div>
-        <div className="relative z-20">
+        <div className="relative z-20 flex flex-col justify-between h-full">
           <div className="text-3xl lg:text-4xl font-extrabold mb-5 drop-shadow-lg tracking-tight">
             Brainhub School Management System
           </div>
           <div className="text-xl lg:text-2xl font-semibold opacity-95 drop-shadow-md">
-            International College Academy
+            Excelz International School
           </div>
         </div>
       </div>
@@ -179,7 +196,7 @@ const Login: React.FC = () => {
       <div className="block md:hidden w-full relative h-32 sm:h-40 overflow-hidden">
         <img
           src="/images/classroom.jpg"
-          alt="International College Academy"
+          alt="Excelz International School"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-primary-600/30 to-primary-600/50"></div>
@@ -188,7 +205,7 @@ const Login: React.FC = () => {
             Brainhub School Management System
           </div>
           <div className="text-xs sm:text-sm font-semibold opacity-95 drop-shadow-md">
-            International College Academy
+            Excelz International School
           </div>
         </div>
       </div>
@@ -199,8 +216,8 @@ const Login: React.FC = () => {
         <div className="block md:hidden w-20 h-1 bg-primary-600 rounded-full mx-auto mb-3"></div>
 
         <div className="flex justify-between items-center mb-3 sm:mb-4 md:mb-8 flex-wrap gap-3">
-          <h2 className="text-primary-600 text-lg sm:text-xl md:text-2xl font-semibold">
-            Login
+          <h2 className="text-green-600 text-lg sm:text-xl md:text-2xl font-semibold">
+            Administrator
           </h2>
           <div className="flex gap-2.5">
             <a
@@ -223,11 +240,11 @@ const Login: React.FC = () => {
         </div>
 
         <div className="text-center mb-4 sm:mb-5 md:mb-8">
-          {/* School Crest Logo */}
-          <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-44 md:h-44 lg:w-52 lg:h-52 mx-auto mb-2 sm:mb-3 md:mb-6 flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl rounded-lg overflow-hidden bg-white p-2 sm:p-2.5 md:p-3">
+          {/* School Logo - Circular */}
+          <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 mx-auto mb-2 sm:mb-3 md:mb-6 flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl rounded-full overflow-hidden bg-white p-2 sm:p-2.5 md:p-3 border-4 border-gray-200">
             <img
               src="/images/crest.png"
-              alt="International College Academy Crest"
+              alt="Excelz International School Logo"
               className="w-full h-full object-contain max-w-full max-h-full"
             />
           </div>
@@ -247,12 +264,12 @@ const Login: React.FC = () => {
           
           <div>
             <label className="block mb-3 sm:mb-3.5 font-semibold text-slate-900 text-base sm:text-lg md:text-sm">
-              Select User Type
+              Administrator
             </label>
             <div className="relative">
-              <i className="fas fa-user absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-primary-600 z-10 transition-all duration-300 text-base sm:text-lg"></i>
+              <i className="fas fa-user absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gray-500 z-10 transition-all duration-300 text-base sm:text-lg"></i>
               <select
-                className="login-select-dropdown w-full pl-10 sm:pl-11 pr-10 sm:pr-11 md:pr-10 py-2.5 sm:py-3 md:py-2.5 border-2 border-primary-200 rounded-xl text-base sm:text-lg md:text-sm transition-all duration-300 bg-white hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-600 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.15)] min-h-[44px] sm:min-h-[48px] md:min-h-[44px] appearance-none cursor-pointer font-medium text-slate-900 active:bg-primary-50"
+                className="login-select-dropdown w-full pl-10 sm:pl-11 pr-10 sm:pr-11 md:pr-10 py-2.5 sm:py-3 md:py-2.5 border-2 border-gray-200 rounded-xl text-base sm:text-lg md:text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 focus:shadow-[0_0_0_4px_rgba(0,0,0,0.1)] min-h-[44px] sm:min-h-[48px] md:min-h-[44px] appearance-none cursor-pointer font-medium text-slate-900 active:bg-gray-50"
                 name="userType"
                 value={formData.userType}
                 title="Select User Type"
@@ -267,8 +284,8 @@ const Login: React.FC = () => {
               </select>
               {/* Custom dropdown arrow - Visible to differentiate from text inputs */}
               <div className="absolute right-2.5 sm:right-3 md:right-2.5 top-1/2 -translate-y-1/2 pointer-events-none z-30">
-                <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-primary-100 rounded-full border-2 border-primary-400 shadow-sm">
-                  <i className="fas fa-chevron-down text-primary-700 text-xs sm:text-sm font-extrabold"></i>
+                <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-gray-100 rounded-full border-2 border-gray-300 shadow-sm">
+                  <i className="fas fa-chevron-down text-gray-600 text-xs sm:text-sm font-extrabold"></i>
                 </div>
               </div>
             </div>
@@ -276,17 +293,17 @@ const Login: React.FC = () => {
 
           <div>
             <label className="block mb-3 sm:mb-3.5 font-semibold text-slate-900 text-base sm:text-lg md:text-sm">
-              Username
+              Username/ID
             </label>
             <div className="relative">
-              <i className="fas fa-user absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-primary-600 z-10 transition-all duration-300 text-lg sm:text-xl"></i>
+              <i className="fas fa-user absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-gray-500 z-10 transition-all duration-300 text-lg sm:text-xl"></i>
               <input
                 type="text"
-                className="w-full pl-12 sm:pl-14 pr-4 py-4 sm:py-4.5 md:py-3 border-2 border-primary-200 rounded-xl text-lg sm:text-xl md:text-sm transition-all duration-300 bg-white hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-600 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.15)] min-h-[52px] sm:min-h-[56px] md:min-h-[48px]"
+                className="w-full pl-12 sm:pl-14 pr-4 py-4 sm:py-4.5 md:py-3 border-2 border-gray-200 rounded-xl text-lg sm:text-xl md:text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 focus:shadow-[0_0_0_4px_rgba(0,0,0,0.1)] min-h-[52px] sm:min-h-[56px] md:min-h-[48px]"
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                placeholder="Enter username"
+                placeholder="Enter username/ID"
                 required
               />
             </div>
@@ -297,10 +314,10 @@ const Login: React.FC = () => {
               Password
             </label>
             <div className="relative">
-              <i className="fas fa-lock absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-primary-600 z-10 transition-all duration-300 text-lg sm:text-xl"></i>
+              <i className="fas fa-lock absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-gray-500 z-10 transition-all duration-300 text-lg sm:text-xl"></i>
               <input
                 type="password"
-                className="w-full pl-12 sm:pl-14 pr-4 py-4 sm:py-4.5 md:py-3 border-2 border-primary-200 rounded-xl text-lg sm:text-xl md:text-sm transition-all duration-300 bg-white hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-600 focus:shadow-[0_0_0_4px_rgba(37,99,235,0.15)] min-h-[52px] sm:min-h-[56px] md:min-h-[48px]"
+                className="w-full pl-12 sm:pl-14 pr-4 py-4 sm:py-4.5 md:py-3 border-2 border-gray-200 rounded-xl text-lg sm:text-xl md:text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 focus:shadow-[0_0_0_4px_rgba(0,0,0,0.1)] min-h-[52px] sm:min-h-[56px] md:min-h-[48px]"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
@@ -313,7 +330,7 @@ const Login: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4.5 sm:py-5 md:py-4 bg-primary-600 text-white rounded-xl text-lg sm:text-xl md:text-base font-bold cursor-pointer transition-all duration-300 mt-3 sm:mt-4 shadow-lg tracking-wide uppercase hover:bg-primary-700 hover:-translate-y-1 hover:shadow-xl active:-translate-y-0.5 active:bg-primary-800 min-h-[56px] sm:min-h-[60px] md:min-h-[48px] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-4.5 sm:py-5 md:py-4 bg-amber-600 text-white rounded-xl text-lg sm:text-xl md:text-base font-bold cursor-pointer transition-all duration-300 mt-3 sm:mt-4 shadow-lg tracking-wide uppercase hover:bg-amber-700 hover:-translate-y-1 hover:shadow-xl active:-translate-y-0.5 active:bg-amber-800 min-h-[56px] sm:min-h-[60px] md:min-h-[48px] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
@@ -342,7 +359,7 @@ const Login: React.FC = () => {
             </div>
             <Link
               to="/forgot-password"
-              className="text-primary-500 no-underline hover:text-primary-400 hover:underline text-sm transition-colors"
+              className="text-amber-600 no-underline hover:text-amber-700 hover:underline text-sm transition-colors"
             >
               Forgot Password?
             </Link>
@@ -353,6 +370,74 @@ const Login: React.FC = () => {
           Brainhub School Management System
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center">
+          {/* Backdrop overlay */}
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => {
+              setShowSuccessModal(false);
+              // Navigate based on user type
+              const userType = sessionStorage.getItem("userType");
+              if (userType === "staff") {
+                navigate("/teacher-dashboard");
+              } else if (userType === "student") {
+                navigate("/student-dashboard");
+              } else {
+                navigate("/");
+              }
+            }}
+          ></div>
+          
+          {/* Modal */}
+          <div className="relative bg-white rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full mx-4 z-10">
+            {/* Success Icon */}
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-green-100 rounded-full flex items-center justify-center">
+                <i className="fas fa-check text-green-600 text-3xl sm:text-4xl"></i>
+              </div>
+            </div>
+            
+            {/* Message */}
+            <div className="text-center mb-6">
+              <p className="text-blue-600 text-base sm:text-lg font-medium">
+                Success... You'll be redirected in some few seconds
+              </p>
+            </div>
+            
+            {/* Ok Button */}
+            <div className="flex justify-center mb-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowSuccessModal(false);
+                  // Navigate based on user type
+                  const userType = sessionStorage.getItem("userType");
+                  if (userType === "staff") {
+                    navigate("/teacher-dashboard");
+                  } else if (userType === "student") {
+                    navigate("/student-dashboard");
+                  } else {
+                    navigate("/");
+                  }
+                }}
+                className="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition-colors duration-300 shadow-md hover:shadow-lg"
+              >
+                Ok
+              </button>
+            </div>
+            
+            {/* Footer Text */}
+            <div className="text-center">
+              <p className="text-red-600 text-sm font-medium">
+                Sign in successful
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

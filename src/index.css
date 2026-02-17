@@ -518,4 +518,99 @@
   .section-subtitle {
     @apply text-sm text-slate-600;
   }
+
+  /* Responsive Table Wrapper */
+  .table-responsive {
+    @apply overflow-x-auto -mx-4 sm:mx-0;
+  }
+
+  .table-responsive table {
+    @apply min-w-full;
+  }
+
+  .table-responsive th,
+  .table-responsive td {
+    @apply px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4;
+    @apply text-xs sm:text-sm;
+    @apply whitespace-normal sm:whitespace-nowrap;
+  }
+
+  /* Responsive Card Grid */
+  .grid-responsive-2 {
+    @apply grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6;
+  }
+
+  .grid-responsive-3 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6;
+  }
+
+  .grid-responsive-4 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6;
+  }
+
+  /* Responsive Container */
+  .container-responsive {
+    @apply w-full max-w-full px-4 sm:px-5 md:px-6 lg:px-8;
+    @apply mx-auto;
+  }
+
+  /* Responsive Text */
+  .text-responsive-h1 {
+    @apply text-2xl sm:text-3xl md:text-4xl font-bold;
+  }
+
+  .text-responsive-h2 {
+    @apply text-xl sm:text-2xl md:text-3xl font-bold;
+  }
+
+  .text-responsive-h3 {
+    @apply text-lg sm:text-xl md:text-2xl font-semibold;
+  }
+
+  .text-responsive-body {
+    @apply text-sm sm:text-base;
+  }
+
+  /* Responsive Button */
+  .btn-responsive {
+    @apply px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3;
+    @apply text-sm sm:text-base;
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Responsive Form Group */
+  .form-group-responsive {
+    @apply flex flex-col sm:flex-row gap-4;
+  }
+
+  .form-input-responsive {
+    @apply w-full sm:w-auto sm:flex-1;
+    @apply min-h-[44px];
+  }
+
+  /* Hide on mobile, show on desktop */
+  .hide-mobile {
+    @apply hidden sm:block;
+  }
+
+  /* Show on mobile, hide on desktop */
+  .show-mobile {
+    @apply block sm:hidden;
+  }
+
+  /* Responsive Modal */
+  .modal-responsive {
+    @apply w-full h-full sm:w-auto sm:h-auto sm:max-w-2xl;
+    @apply p-4 sm:p-6 md:p-8;
+  }
+
+  /* Responsive Spacing */
+  .spacing-responsive {
+    @apply mb-6 sm:mb-8 md:mb-10;
+  }
+
+  /* Prevent horizontal scroll */
+  .no-horizontal-scroll {
+    @apply w-full max-w-full overflow-x-hidden;
+  }
 }

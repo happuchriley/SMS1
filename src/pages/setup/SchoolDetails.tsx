@@ -52,6 +52,7 @@ interface SchoolDetailsFormData {
   academicYearStart: string;
   academicYearEnd: string;
   term: string;
+  nextResumptionDate?: string;
   // Other Info
   currency: string;
   timezone: string;
@@ -106,10 +107,11 @@ const SchoolDetails: React.FC = () => {
     principalEmail: '',
     registrationNumber: '',
     // Current Period
-    currentAcademicYear: '',
+    currentAcademicYear: '2024/2025',
     academicYearStart: '',
     academicYearEnd: '',
-    term: 'First Term',
+    term: 'Term 3',
+    nextResumptionDate: '',
     // Other Info
     currency: 'GHS',
     timezone: 'Africa/Accra',
@@ -254,63 +256,102 @@ const SchoolDetails: React.FC = () => {
           {/* Current Period Info Section */}
           {activeSection === 'period' && (
             <div>
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Current Period Information</h2>
-              
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                 <div>
                   <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                    Current Academic Year
+                    Set Current Academic Year
                   </label>
-                  <input
-                    type="text"
-                    name="currentAcademicYear"
-                    value={formData.currentAcademicYear}
-                    onChange={handleChange}
-                    placeholder="e.g., 2024/2025"
-                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-                  />
+                  <div className="relative select-dropdown-wrapper">
+                    <select
+                      name="currentAcademicYear"
+                      value={formData.currentAcademicYear}
+                      onChange={handleChange}
+                      className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
+                    >
+                      <option value="">Select Academic Year</option>
+                      <option>2023/2024</option>
+                      <option>2024/2025</option>
+                      <option>2025/2026</option>
+                      <option>2026/2027</option>
+                    </select>
+                    <div className="select-dropdown-arrow">
+                      <div className="select-dropdown-arrow-icon">
+                        <i className="fas fa-chevron-down"></i>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div>
                   <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                    Academic Year Start Date
+                    Set Current Academic Term
                   </label>
-                  <input
-                    type="date"
-                    name="academicYearStart"
-                    value={formData.academicYearStart}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-                  />
+                  <div className="relative select-dropdown-wrapper">
+                    <select
+                      name="term"
+                      value={formData.term}
+                      onChange={handleChange}
+                      className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] min-h-[44px]"
+                    >
+                      <option value="">Select Term</option>
+                      {terms.map(term => (
+                        <option key={term} value={term}>{term}</option>
+                      ))}
+                    </select>
+                    <div className="select-dropdown-arrow">
+                      <div className="select-dropdown-arrow-icon">
+                        <i className="fas fa-chevron-down"></i>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div>
                   <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                    Academic Year End Date
+                    Set Current Academic Start Date
                   </label>
-                  <input
-                    type="date"
-                    name="academicYearEnd"
-                    value={formData.academicYearEnd}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-                  />
+                  <div className="relative">
+                    <input
+                      type="date"
+                      name="academicYearStart"
+                      value={formData.academicYearStart}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+                    />
+                    <i className="fas fa-calendar absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                  </div>
                 </div>
 
                 <div>
                   <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                    Current Term
+                    Set Current Academic End Date
                   </label>
-                  <select
-                    name="term"
-                    value={formData.term}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-                  >
-                    {terms.map(term => (
-                      <option key={term} value={term}>{term}</option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      name="academicYearEnd"
+                      value={formData.academicYearEnd}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+                    />
+                    <i className="fas fa-calendar absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                    Next Resumption Date
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      name="nextResumptionDate"
+                      value={formData.nextResumptionDate || ''}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
+                    />
+                    <i className="fas fa-calendar absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                  </div>
                 </div>
               </div>
             </div>
@@ -638,21 +679,43 @@ const SchoolDetails: React.FC = () => {
           )}
 
           {/* Action Buttons */}
-          <div className="flex flex-wrap items-center justify-end gap-3 pt-6 mt-6 border-t border-gray-200">
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-6 mt-6 border-t border-gray-200">
             <button
               type="button"
-              disabled={loading}
-              className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-all duration-300 disabled:opacity-50"
+              onClick={() => {
+                setFormData({
+                  ...formData,
+                  institutionNameFull: 'Excelz International School',
+                  institutionNameShort: 'Excelz Int. School',
+                  smsName: 'EIS',
+                  address: 'Est Legon View, Behind Me',
+                  contact: '(+233) 030',
+                  gpsAddress: 'GK-0049-',
+                  location: 'Est Legon View, Behind Me',
+                  googleMapAddress: 'https://g.co/kgs/oJ7EBDA',
+                  emailAddress: 'excelzintsch@gmail.com',
+                  facebookLink: 'https://www.excelzintsch.',
+                  instagramLink: '',
+                  twitterLink: '',
+                  currentAcademicYear: '2024/2025',
+                  term: 'Term 3',
+                  academicYearStart: '',
+                  academicYearEnd: '',
+                  nextResumptionDate: ''
+                });
+              }}
+              className="px-5 py-2.5 text-sm font-semibold text-white bg-green-500 rounded-md hover:bg-green-600 transition-all duration-300 flex items-center gap-2"
             >
-              Cancel
+              <i className="fas fa-redo"></i>
+              Clear All
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
+              className="px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 flex items-center gap-2"
             >
-              <i className="fas fa-save mr-2"></i>
-              {loading ? 'Saving...' : 'Save School Details'}
+              <i className="fas fa-save"></i>
+              {loading ? 'Saving...' : 'Save'}
             </button>
           </div>
         </form>

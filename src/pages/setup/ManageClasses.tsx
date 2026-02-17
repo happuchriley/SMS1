@@ -226,13 +226,11 @@ const ManageClasses: React.FC = () => {
       <div className="mb-5 sm:mb-6 md:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Manage Classes</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Stages/Class</h1>
             <div className="flex items-center gap-2 text-gray-600 text-xs sm:text-sm">
               <Link to="/" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">Home</Link>
               <span>/</span>
-              <Link to="/setup" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">School Setup</Link>
-              <span>/</span>
-              <span className="text-gray-900 font-medium">Manage Classes</span>
+              <span className="text-gray-900 font-medium">Stages/Class List</span>
             </div>
           </div>
           <button
@@ -337,7 +335,7 @@ const ManageClasses: React.FC = () => {
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase cursor-pointer hover:bg-blue-700">
                   <div className="flex items-center gap-1">
-                    Class/Stage Name (Short)
+                    Stage Name Short
                     <div className="flex flex-col">
                       <i className="fas fa-chevron-up text-xs"></i>
                       <i className="fas fa-chevron-down text-xs"></i>
@@ -346,7 +344,7 @@ const ManageClasses: React.FC = () => {
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase cursor-pointer hover:bg-blue-700">
                   <div className="flex items-center gap-1">
-                    Class/Stage Category
+                    Stage Category
                     <div className="flex flex-col">
                       <i className="fas fa-chevron-up text-xs"></i>
                       <i className="fas fa-chevron-down text-xs"></i>
@@ -355,7 +353,7 @@ const ManageClasses: React.FC = () => {
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase cursor-pointer hover:bg-blue-700">
                   <div className="flex items-center gap-1">
-                    Class/Stage Description
+                    Stage Description
                     <div className="flex flex-col">
                       <i className="fas fa-chevron-up text-xs"></i>
                       <i className="fas fa-chevron-down text-xs"></i>
@@ -364,7 +362,16 @@ const ManageClasses: React.FC = () => {
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase cursor-pointer hover:bg-blue-700">
                   <div className="flex items-center gap-1">
-                    Status
+                    Result Status
+                    <div className="flex flex-col">
+                      <i className="fas fa-chevron-up text-xs"></i>
+                      <i className="fas fa-chevron-down text-xs"></i>
+                    </div>
+                  </div>
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase cursor-pointer hover:bg-blue-700">
+                  <div className="flex items-center gap-1">
+                    Stage Status
                     <div className="flex flex-col">
                       <i className="fas fa-chevron-up text-xs"></i>
                       <i className="fas fa-chevron-down text-xs"></i>
@@ -377,7 +384,7 @@ const ManageClasses: React.FC = () => {
             <tbody className="divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
                     <div className="flex flex-col items-center justify-center">
                       <i className="fas fa-spinner fa-spin text-4xl mb-4 text-primary-500"></i>
                       <div className="text-lg font-semibold">Loading classes...</div>
@@ -386,7 +393,7 @@ const ManageClasses: React.FC = () => {
                 </tr>
               ) : paginatedClasses.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
                     <div className="flex flex-col items-center justify-center">
                       <i className="fas fa-inbox text-4xl mb-4 text-gray-300"></i>
                       <div className="text-lg font-semibold">No classes found</div>
@@ -401,6 +408,7 @@ const ManageClasses: React.FC = () => {
                     <td className="px-4 py-3 text-sm text-gray-900">{cls.code || cls.classCode || '-'}</td>
                     <td className="px-4 py-3 text-sm text-gray-900">{cls.category || '-'}</td>
                     <td className="px-4 py-3 text-sm text-gray-900">{cls.description || '-'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">Close</td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
                         cls.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'

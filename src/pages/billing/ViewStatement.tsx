@@ -32,7 +32,6 @@ const ViewStatement: React.FC = () => {
         bills
       });
     } catch (error) {
-      console.error('Error loading statement:', error);
       toast.showError('Failed to load statement');
     } finally {
       setLoading(false);

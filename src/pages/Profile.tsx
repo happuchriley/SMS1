@@ -238,13 +238,13 @@ const Profile: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Left Profile Card */}
+        {/* Left Profile Summary Card */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-            {/* Avatar */}
+            {/* Large User Icon */}
             <div className="flex justify-center mb-6">
               {profileImage ? (
-                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-gray-200">
+                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200">
                   <img 
                     src={profileImage} 
                     alt={fullName}
@@ -252,43 +252,47 @@ const Profile: React.FC = () => {
                   />
                 </div>
               ) : (
-                <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-300 rounded-full flex items-center justify-center">
-                  <i className="fas fa-user text-4xl sm:text-5xl text-gray-500"></i>
+                <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center">
+                  <i className="fas fa-user text-6xl text-gray-400"></i>
                 </div>
               )}
             </div>
 
-            {/* Name */}
+            {/* Name - Bold */}
             <div className="text-center mb-2">
-              <h2 className="text-xl sm:text-2xl font-bold text-primary-600 mb-1">{fullName}</h2>
-              <p className="text-sm sm:text-base text-primary-400 font-medium">{displayUsername.toUpperCase()}</p>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">{fullName}</h2>
+            </div>
+
+            {/* Username - Blue */}
+            <div className="text-center mb-2">
+              <p className="text-base text-primary-500 font-medium">{displayUsername.toUpperCase()}</p>
             </div>
 
             {/* Level */}
             <div className="text-center mb-6">
-              <p className="text-xs sm:text-sm text-gray-600 font-medium">LEVEL: {levelText}</p>
+              <p className="text-sm text-gray-600 font-medium">LEVEL: {levelText}</p>
             </div>
 
-            {/* Navigation Buttons */}
+            {/* Navigation Buttons - Small Rectangular */}
             {(userType === 'administrator' || userType === 'staff') && (
-              <div className="space-y-3 mb-6">
+              <div className="space-y-2 mb-6">
                 <Link
                   to="/staff/all"
-                  className="block w-full px-4 py-3 text-sm font-semibold text-white bg-green-500 rounded-md hover:bg-green-600 transition-all duration-300 text-center"
+                  className="flex items-center justify-center w-full px-3 py-2 text-xs font-semibold text-white bg-green-500 rounded hover:bg-green-600 transition-colors"
                 >
-                  <i className="fas fa-users mr-2"></i>
+                  <i className="fas fa-user mr-2"></i>
                   STAFFS
                 </Link>
                 <Link
                   to="/students/all"
-                  className="block w-full px-4 py-3 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-md hover:bg-gray-50 transition-all duration-300 text-center"
+                  className="flex items-center justify-center w-full px-3 py-2 text-xs font-semibold text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
                 >
-                  <i className="fas fa-user-graduate mr-2"></i>
+                  <i className="fas fa-users mr-2"></i>
                   STUDENTS
                 </Link>
                 <Link
                   to="/news/page"
-                  className="block w-full px-4 py-3 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-all duration-300 text-center"
+                  className="flex items-center justify-center w-full px-3 py-2 text-xs font-semibold text-white bg-primary-500 rounded hover:bg-primary-600 transition-colors"
                 >
                   <i className="fas fa-newspaper mr-2"></i>
                   NEWS
@@ -296,8 +300,17 @@ const Profile: React.FC = () => {
               </div>
             )}
 
-            {/* Account Settings */}
+            {/* Account Settings - Red Text */}
             <div className="text-center pt-4 border-t border-gray-200">
+              <button
+                onClick={() => {
+                  setShowAccountSettings(true);
+                  setAccountSettingsAction('image');
+                }}
+                className="block w-full px-3 py-2 text-sm font-medium text-white bg-primary-500 rounded hover:bg-primary-600 transition-colors mb-2"
+              >
+                Image/Password
+              </button>
               <button
                 onClick={() => {
                   setShowAccountSettings(true);
@@ -318,55 +331,55 @@ const Profile: React.FC = () => {
               About {fullName} ({displayUsername}) - {statusText}
             </h2>
 
-            {/* Information Table */}
+            {/* Information Table - Two Column Layout */}
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-500 border-b border-gray-200">Basic Information</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-500 border-b border-gray-200">Info</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b border-gray-200 bg-gray-50">Basic Information</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b border-gray-200 bg-gray-50">Info</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="border-b border-gray-200">
                     <td className="px-4 py-3">
-                      <div>
-                        <span className="text-sm font-semibold text-gray-700">First Name:</span>
-                        <span className="ml-2 text-sm text-gray-900">{userInfo.firstName || '-'}</span>
+                      <div className="mb-2">
+                        <span className="text-sm font-semibold text-gray-700 block mb-1">First Name</span>
+                        <span className="text-sm text-gray-900">{userInfo.firstName || ''}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <div>
-                        <span className="text-sm font-semibold text-gray-700">Other Name:</span>
-                        <span className="ml-2 text-sm text-gray-900">{userInfo.otherNames || userInfo.surname || '-'}</span>
+                      <div className="mb-2">
+                        <span className="text-sm font-semibold text-gray-700 block mb-1">Other Name</span>
+                        <span className="text-sm text-gray-900">{userInfo.otherNames || userInfo.surname || 'Teye'}</span>
                       </div>
                     </td>
                   </tr>
                   <tr className="border-b border-gray-200">
                     <td className="px-4 py-3">
-                      <div>
-                        <span className="text-sm font-semibold text-gray-700">User Name:</span>
-                        <span className="ml-2 text-sm text-gray-900">{displayUsername}</span>
+                      <div className="mb-2">
+                        <span className="text-sm font-semibold text-gray-700 block mb-1">User Name</span>
+                        <span className="text-sm text-gray-900">{displayUsername}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <div>
-                        <span className="text-sm font-semibold text-gray-700">Email:</span>
-                        <span className="ml-2 text-sm text-gray-900">{userInfo.email || '-'}</span>
+                      <div className="mb-2">
+                        <span className="text-sm font-semibold text-gray-700 block mb-1">Email</span>
+                        <span className="text-sm text-gray-900">{userInfo.email || `${displayUsername}@gmail.com`}</span>
                       </div>
                     </td>
                   </tr>
                   <tr>
                     <td className="px-4 py-3">
                       <div>
-                        <span className="text-sm font-semibold text-gray-700">Level:</span>
-                        <span className="ml-2 text-sm text-gray-900">{userInfo.level || userType}</span>
+                        <span className="text-sm font-semibold text-gray-700 block mb-1">Level</span>
+                        <span className="text-sm text-gray-900">{userInfo.level || userType}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <div>
-                        <span className="text-sm font-semibold text-gray-700">Date Registered:</span>
-                        <span className="ml-2 text-sm text-gray-900">{userInfo.dateRegistered || '-'}</span>
+                        <span className="text-sm font-semibold text-gray-700 block mb-1">Date Registered</span>
+                        <span className="text-sm text-gray-900">{userInfo.dateRegistered || '15-Jul-2018 10:30'}</span>
                       </div>
                     </td>
                   </tr>

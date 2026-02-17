@@ -28,6 +28,16 @@ interface StaffFormData {
   religion: string;
   category: string;
   photo: File | null;
+  // Next of Kin Info
+  contactPersonName: string;
+  relationToContact: string;
+  contactPersonAddress: string;
+  contactPersonTel: string;
+  // Admin Info
+  contractStartDate: string;
+  contractEndDate: string;
+  staffStatus: string;
+  currentClass: string;
 }
 
 const AddStaff: React.FC = () => {
@@ -55,7 +65,17 @@ const AddStaff: React.FC = () => {
     currentCity: '',
     religion: '',
     category: '',
-    photo: null
+    photo: null,
+    // Next of Kin Info
+    contactPersonName: '',
+    relationToContact: '',
+    contactPersonAddress: '',
+    contactPersonTel: '',
+    // Admin Info
+    contractStartDate: '',
+    contractEndDate: '',
+    staffStatus: '',
+    currentClass: 'Unallocated'
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
@@ -116,8 +136,9 @@ const AddStaff: React.FC = () => {
       const staffData = {
         ...formData,
         photo: photoData,
-        employmentDate: formData.employmentDate || new Date().toISOString().split('T')[0],
-        status: 'active'
+        employmentDate: formData.contractStartDate || formData.employmentDate || new Date().toISOString().split('T')[0],
+        status: formData.staffStatus || 'active',
+        class: formData.currentClass || 'Unallocated'
       };
 
       const createdStaff = await staffService.create(staffData);
@@ -128,15 +149,6 @@ const AddStaff: React.FC = () => {
         `Staff registered successfully! Password: ${generatedPassword}`,
         5000 // Show for 5 seconds
       );
-      
-      // Also log to console for admin reference
-      console.log(`Staff Registration Details:
-        Staff ID: ${createdStaff.staffId}
-        Name: ${createdStaff.firstName} ${createdStaff.surname}
-        Category: ${createdStaff.category}
-        Role: ${createdStaff.userType}
-        Password: ${generatedPassword}
-      `);
       
       // Reset form
       handleClear();
@@ -173,7 +185,17 @@ const AddStaff: React.FC = () => {
       currentCity: '',
       religion: '',
       category: '',
-      photo: null
+      photo: null,
+      // Next of Kin Info
+      contactPersonName: '',
+      relationToContact: '',
+      contactPersonAddress: '',
+      contactPersonTel: '',
+      // Admin Info
+      contractStartDate: '',
+      contractEndDate: '',
+      staffStatus: '',
+      currentClass: 'Unallocated'
     });
     setPhotoPreview(null);
     if (fileInputRef.current) {
@@ -609,62 +631,75 @@ const AddStaff: React.FC = () => {
       {activeTab === 'next-of-kin' && (
         <div className="bg-white rounded-lg p-5 md:p-7 shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
           <div className="flex justify-between items-center mb-5 pb-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Next of Kin Info</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Relative/Next of Kin Info</h3>
           </div>
           <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-              <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                  Next of Kin Name <span className="text-red-500">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  placeholder="Name *" 
-                  required 
-                />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+              {/* Left Column */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block mb-2 font-semibold text-gray-900 text-sm">Contact Person</label>
+                  <input 
+                    type="text" 
+                    name="contactPersonName"
+                    value={formData.contactPersonName}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
+                    placeholder="Contact person's Name *" 
+                    required 
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 font-semibold text-gray-900 text-sm">Relation Address</label>
+                  <input 
+                    type="text" 
+                    name="contactPersonAddress"
+                    value={formData.contactPersonAddress}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
+                    placeholder="Address of contact person" 
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                  Relationship <span className="text-red-500">*</span>
-                </label>
-                <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  required
-                >
-                  <option value="">Select Relationship</option>
-                  <option>Spouse</option>
-                  <option>Parent</option>
-                  <option>Sibling</option>
-                  <option>Other</option>
-                </select>
-              </div>
-              <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                  Contact <span className="text-red-500">*</span>
-                </label>
-                <input 
-                  type="tel" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  placeholder="Contact *" 
-                  required 
-                />
-              </div>
-              <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">Email</label>
-                <input 
-                  type="email" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  placeholder="Email" 
-                />
-              </div>
-              <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">Address</label>
-                <input 
-                  type="text" 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  placeholder="Address" 
-                />
+
+              {/* Right Column */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block mb-2 font-semibold text-gray-900 text-sm">Relationship</label>
+                  <div className="relative select-dropdown-wrapper">
+                    <select 
+                      name="relationToContact"
+                      value={formData.relationToContact}
+                      onChange={handleChange}
+                      className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]"
+                      required
+                    >
+                      <option value="">Relation to contact person *</option>
+                      <option>Spouse</option>
+                      <option>Parent</option>
+                      <option>Sibling</option>
+                      <option>Child</option>
+                      <option>Other</option>
+                    </select>
+                    <div className="select-dropdown-arrow">
+                      <div className="select-dropdown-arrow-icon">
+                        <i className="fas fa-chevron-down"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label className="block mb-2 font-semibold text-gray-900 text-sm">Relation Contact</label>
+                  <input 
+                    type="tel" 
+                    name="contactPersonTel"
+                    value={formData.contactPersonTel}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
+                    placeholder="Tel No. of contact person*" 
+                    required 
+                  />
+                </div>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 justify-between items-center mt-6 pt-6 border-t border-gray-200">
@@ -723,49 +758,114 @@ const AddStaff: React.FC = () => {
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                  Department <span className="text-red-500">*</span>
-                </label>
-                <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  required
-                >
-                  <option value="">Select Department</option>
-                  <option>Mathematics</option>
-                  <option>Science</option>
-                  <option>English</option>
-                  <option>Social Studies</option>
-                  <option>Administration</option>
-                </select>
-              </div>
-              <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">Employment Date</label>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">Contract Start Date</label>
                 <DateInput
-                  name="employmentDate"
-                  value={formData.employmentDate || ''}
+                  name="contractStartDate"
+                  value={formData.contractStartDate}
                   onChange={handleChange}
-                  placeholder="DD/MM/YYYY"
+                  placeholder="mm/dd/yyyy"
                   className="text-sm"
                 />
               </div>
               <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">Status</label>
-                <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5"
-                >
-                  <option>Active</option>
-                  <option>Inactive</option>
-                  <option>On Leave</option>
-                </select>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">Contract End Date</label>
+                <DateInput
+                  name="contractEndDate"
+                  value={formData.contractEndDate}
+                  onChange={handleChange}
+                  placeholder="mm/dd/yyyy"
+                  className="text-sm"
+                />
+              </div>
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                  Staff Status <span className="text-red-500">*</span>
+                </label>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    name="staffStatus"
+                    value={formData.staffStatus}
+                    onChange={handleChange}
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]"
+                    required
+                  >
+                    <option value="">Staff Status *</option>
+                    <option>Active</option>
+                    <option>Inactive</option>
+                    <option>On Leave</option>
+                    <option>Terminated</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">Current Class</label>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    name="currentClass"
+                    value={formData.currentClass}
+                    onChange={handleChange}
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]"
+                  >
+                    <option value="Unallocated">Unallocated</option>
+                    <option>Basic 1</option>
+                    <option>Basic 2</option>
+                    <option>Basic 3</option>
+                    <option>Basic 4</option>
+                    <option>Basic 5</option>
+                    <option>Basic 6</option>
+                    <option>Basic 7</option>
+                    <option>Basic 8</option>
+                    <option>Basic 9</option>
+                    <option>KG 1</option>
+                    <option>KG 2</option>
+                    <option>Nursery 1</option>
+                    <option>Nursery 2</option>
+                    <option>Creche</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 justify-end mt-6 pt-6 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row gap-3 justify-between items-center mt-6 pt-6 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button 
+                  type="button"
+                  onClick={() => navigate('/staff/all')}
+                  className="px-5 py-2.5 bg-red-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:bg-red-600"
+                >
+                  <i className="fas fa-times"></i> Close
+                </button>
+                <button 
+                  type="button"
+                  onClick={handleClear}
+                  className="px-5 py-2.5 bg-green-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:bg-green-600"
+                >
+                  <i className="fas fa-redo"></i> Clear All
+                </button>
+              </div>
               <button 
                 type="submit"
                 disabled={isSubmitting}
                 className="px-5 py-2.5 bg-primary-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 shadow-md hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <i className="fas fa-save"></i> {isSubmitting ? 'Saving...' : 'Save'}
+                {isSubmitting ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin"></i> Saving...
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-save"></i> Save
+                  </>
+                )}
               </button>
             </div>
           </form>

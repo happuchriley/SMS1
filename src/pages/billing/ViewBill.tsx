@@ -18,7 +18,6 @@ const ViewBill: React.FC = () => {
       const studentBills = await billingService.getBillsByStudent(studentId);
       setBills(studentBills);
     } catch (error) {
-      console.error('Error loading bills:', error);
       toast.showError('Failed to load bills');
     } finally {
       setLoading(false);

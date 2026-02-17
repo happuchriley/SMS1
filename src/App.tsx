@@ -146,6 +146,8 @@ import SystemSettings from "./pages/setup/SystemSettings";
 import AcademicSettings from "./pages/setup/AcademicSettings";
 import ManageSubjects from "./pages/setup/ManageSubjects";
 import ManageClasses from "./pages/setup/ManageClasses";
+import DemoCredentials from "./pages/DemoCredentials";
+import LoginDebug from "./pages/LoginDebug";
 import PrivateRoute from "./components/PrivateRoute";
 import { ModalProvider } from "./components/ModalProvider";
 
@@ -1148,6 +1150,26 @@ const App: React.FC = () => {
               </PrivateRoute>
             }
           />
+          {process.env.NODE_ENV === 'development' && (
+            <>
+              <Route
+                path="/demo-credentials"
+                element={
+                  <PrivateRoute>
+                    <DemoCredentials />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/login-debug"
+                element={
+                  <PrivateRoute>
+                    <LoginDebug />
+                  </PrivateRoute>
+                }
+              />
+            </>
+          )}
           {/* Documents */}
           <Route
             path="/documents"

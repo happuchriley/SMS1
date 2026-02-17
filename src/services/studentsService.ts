@@ -56,6 +56,11 @@ const studentsService = {
       studentData.status = 'active';
     }
 
+    // Generate password if not provided - use student ID as password for easy demo access
+    if (!studentData.password) {
+      studentData.password = studentData.studentId || `STU${String((await apiService.count(ENTITY_TYPE)) + 1).padStart(4, '0')}`;
+    }
+
     return await apiService.create<StudentData>(ENTITY_TYPE, studentData);
   },
 

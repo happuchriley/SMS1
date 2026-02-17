@@ -17,7 +17,6 @@ const ViewStudent: React.FC = () => {
       const studentData = await studentsService.getById(id);
       setStudent(studentData);
     } catch (error) {
-      console.error('Error loading student:', error);
       toast.showError('Failed to load student');
     } finally {
       setLoading(false);

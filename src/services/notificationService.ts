@@ -70,9 +70,6 @@ const notificationService = {
       
       // In a real implementation, this would call an SMS API
       // For now, we'll simulate the API call
-      console.log('Sending SMS to:', credentials.phone);
-      console.log('SMS Message:', message);
-      
       // Simulate API call
       // await fetch(settings.smsApiUrl || 'https://api.smsprovider.com/send', {
       //   method: 'POST',
@@ -88,7 +85,6 @@ const notificationService = {
 
       return true;
     } catch (error) {
-      console.error('Error sending SMS:', error);
       return false;
     }
   },
@@ -108,10 +104,6 @@ const notificationService = {
       
       // In a real implementation, this would call an Email API
       // For now, we'll simulate the API call
-      console.log('Sending Email to:', credentials.email);
-      console.log('Email Subject:', emailSubject);
-      console.log('Email Body:', emailBody);
-      
       // Simulate API call
       // await fetch(settings.emailService || 'https://api.emailprovider.com/send', {
       //   method: 'POST',
@@ -129,7 +121,6 @@ const notificationService = {
 
       return true;
     } catch (error) {
-      console.error('Error sending email:', error);
       return false;
     }
   },

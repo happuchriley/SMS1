@@ -1458,6 +1458,17 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, open = false, toggleSideba
                   Bill Item
                 </Link>
               </li>
+              <li>
+                <Link 
+                  to="/demo-credentials" 
+                  className={`block px-5 py-2 pl-10 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-white/70 text-sm flex items-center gap-2 hover:bg-white/5 hover:text-white/90 mx-2 ${
+                    isActive('/demo-credentials') ? 'bg-primary-500/10 text-white/90 border-l-2 border-primary-400/60 pl-[38px] font-medium rounded-lg' : ''
+                  }`}
+                  onClick={handleLinkClick}
+                >
+                  Demo Credentials
+                </Link>
+              </li>
             </ul>
           )}
         </li>

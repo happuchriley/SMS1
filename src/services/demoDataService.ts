@@ -46,8 +46,6 @@ const demoDataService: DemoDataService = {
    */
   async seedAll(): Promise<void> {
     try {
-      console.log('🌱 Seeding demo data...');
-      
       await this.seedSchoolInfo();
       await this.seedSystemSettings();
       await this.seedAcademicSettings();
@@ -62,10 +60,7 @@ const demoDataService: DemoDataService = {
       await this.seedNews();
       await this.seedDocuments();
       await this.seedCourses();
-      
-      console.log('✅ Demo data seeded successfully!');
     } catch (error) {
-      console.error('❌ Error seeding demo data:', error);
       throw error;
     }
   },
@@ -247,6 +242,8 @@ const demoDataService: DemoDataService = {
       const gender = genders[Math.floor(Math.random() * genders.length)];
       const status = statuses[Math.floor(Math.random() * statuses.length)];
       const studentId = `STU${String(i + 1).padStart(3, '0')}`;
+      // Generate password - use studentId as password for easy demo access
+      const password = studentId;
 
       return {
         id: `student_${i + 1}`,
@@ -264,6 +261,7 @@ const demoDataService: DemoDataService = {
         parentName: `Mr./Mrs. ${surnames[Math.floor(Math.random() * surnames.length)]}`,
         parentContact: `+233 24 ${Math.floor(Math.random() * 9000000) + 1000000}`,
         status,
+        password,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -293,6 +291,8 @@ const demoDataService: DemoDataService = {
                         position === 'Librarian' || position === 'Nurse' || position === 'Security' ? 'Support' : 'Academic';
       const status = statuses[Math.floor(Math.random() * statuses.length)];
       const staffId = `STAFF${String(i + 1).padStart(3, '0')}`;
+      // Generate password - use staffId as password for easy demo access
+      const password = staffId;
 
       return {
         id: `staff_${i + 1}`,
@@ -307,6 +307,8 @@ const demoDataService: DemoDataService = {
         email: `${firstName.toLowerCase()}.${surname.toLowerCase()}@brainhubacademy.edu.gh`,
         employmentDate: new Date(2015 + Math.floor(Math.random() * 9), Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
         status,
+        password,
+        userType: position === 'Headmaster' || position === 'Administrator' ? 'administrator' : 'staff',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -608,11 +610,8 @@ const demoDataService: DemoDataService = {
    */
   async clearAll(): Promise<void> {
     try {
-      console.log('🗑️ Clearing all demo data...');
       await apiService.clearAll();
-      console.log('✅ All demo data cleared!');
     } catch (error) {
-      console.error('❌ Error clearing demo data:', error);
       throw error;
     }
   }

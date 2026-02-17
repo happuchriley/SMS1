@@ -245,13 +245,11 @@ const CreateGroupBill: React.FC = () => {
       <div className="mb-5 sm:mb-6 md:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Create Group Bill</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Bill all Students (Group Billing)</h1>
             <div className="flex items-center gap-2 text-gray-600 text-xs sm:text-sm">
               <Link to="/" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">Home</Link>
               <span>/</span>
-              <Link to="/billing" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">Billing</Link>
-              <span>/</span>
-              <span className="text-gray-900 font-medium">Create Group Bill</span>
+              <span className="text-gray-900 font-medium">Bill for all Students (Group Billing)</span>
             </div>
           </div>
         </div>
@@ -259,9 +257,9 @@ const CreateGroupBill: React.FC = () => {
 
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Panel - Bill Details */}
+          {/* Left Panel - Step 1: Bill Details */}
           <div className="bg-white rounded-lg p-4 sm:p-5 md:p-6 shadow-md border border-gray-200">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Bill Details</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-green-600 mb-4">Step 1</h2>
             
             <div className="space-y-4">
               <div>
@@ -442,9 +440,10 @@ const CreateGroupBill: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Panel - Bill Items */}
+          {/* Right Panel - Step 2: Bill Items */}
           <div className="bg-white rounded-lg p-4 sm:p-5 md:p-6 shadow-md border border-gray-200">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Bill Items</h2>
+            <p className="text-sm text-gray-600 mb-2">Run Bill for students below</p>
+            <h2 className="text-lg sm:text-xl font-semibold text-green-600 mb-4">Step 2</h2>
             
             <div className="mb-4">
               <div className="overflow-x-auto">
@@ -497,14 +496,7 @@ const CreateGroupBill: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex gap-2 mb-4">
-              <button
-                type="button"
-                onClick={handleAddRow}
-                className="px-4 py-2 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-colors"
-              >
-                Add Row
-              </button>
+            <div className="flex justify-between items-center mb-4">
               <button
                 type="button"
                 onClick={() => {
@@ -517,6 +509,13 @@ const CreateGroupBill: React.FC = () => {
                 className="px-4 py-2 text-sm font-semibold text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors"
               >
                 Delete Row
+              </button>
+              <button
+                type="button"
+                onClick={handleAddRow}
+                className="px-4 py-2 text-sm font-semibold text-primary-600 hover:text-primary-700"
+              >
+                Add Row
               </button>
             </div>
 
@@ -535,21 +534,20 @@ const CreateGroupBill: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap items-center justify-end gap-3 pt-6 mt-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-6 mt-6">
           <button
             type="button"
             onClick={handleClear}
-            className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-all duration-300"
+            className="px-5 py-2.5 text-sm font-semibold text-white bg-red-500 rounded-md hover:bg-red-600 transition-all duration-300"
           >
-            Clear
+            Reset Bill Form
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
+            className="px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-600 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
           >
-            <i className="fas fa-save mr-2"></i>
-            {loading ? 'Creating...' : 'Create Group Bill'}
+            {loading ? 'Creating...' : 'Run Bill for All'}
           </button>
         </div>
       </form>

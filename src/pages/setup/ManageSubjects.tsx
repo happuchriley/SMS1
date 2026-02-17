@@ -131,143 +131,175 @@ const ManageSubjects: React.FC = () => {
       <div className="mb-5 sm:mb-6 md:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Manage Subjects</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Courses/Subjects List</h1>
             <div className="flex items-center gap-2 text-gray-600 text-xs sm:text-sm">
               <Link to="/" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">Home</Link>
               <span>/</span>
-              <Link to="/setup" className="text-gray-600 no-underline hover:text-primary-500 transition-colors">School Setup</Link>
-              <span>/</span>
-              <span className="text-gray-900 font-medium">Manage Subjects</span>
+              <span className="text-gray-900 font-medium">Courses/Subjects List</span>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Add/Edit Form */}
-      <div className="bg-white rounded-lg p-4 sm:p-5 md:p-6 shadow-md border border-gray-200 mb-4 sm:mb-5">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
-          {editingId ? 'Edit Subject' : 'Add New Subject'}
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Subject Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="subjectName"
-                value={formData.subjectName}
-                onChange={handleChange}
-                placeholder="e.g., Mathematics"
-                required
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-              />
-            </div>
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Subject Code <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="subjectCode"
-                value={formData.subjectCode}
-                onChange={handleChange}
-                placeholder="e.g., MATH"
-                required
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-              />
-            </div>
-            <div>
-              <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                Description
-              </label>
-              <input
-                type="text"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Enter description"
-                className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-              />
-            </div>
-            <div className="flex items-end gap-2">
-              <select
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)]"
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-              <button
-                type="submit"
-                className="px-4 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-md hover:bg-primary-700 transition-all duration-300"
-              >
-                {editingId ? 'Update' : 'Add'}
-              </button>
-              {editingId && (
-                <button
-                  type="button"
-                  onClick={handleClear}
-                  className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-all duration-300"
-                >
-                  Cancel
-                </button>
-              )}
-            </div>
-          </div>
-        </form>
       </div>
 
       {/* Subjects Table */}
       <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-        <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Subjects List</h2>
+        {/* Table Controls */}
+        <div className="p-4 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-700">Show</label>
+            <select
+              className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-primary-500"
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <label className="text-sm text-gray-700">entries</label>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              title="Excel"
+            >
+              Excel
+            </button>
+            <button
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              title="PDF"
+            >
+              PDF
+            </button>
+            <button
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              title="Print"
+            >
+              Print
+            </button>
+            <button
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              title="Column visibility"
+            >
+              Column visibility
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-700">Search:</label>
+            <input
+              type="text"
+              placeholder="Search..."
+              className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:border-primary-500 w-48"
+            />
+          </div>
         </div>
+
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-blue-600 text-white">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Subject Name</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Subject Code</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Description</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase cursor-pointer hover:bg-blue-700">
+                  <div className="flex items-center gap-1">
+                    No.
+                    <div className="flex flex-col">
+                      <i className="fas fa-chevron-up text-xs"></i>
+                      <i className="fas fa-chevron-down text-xs"></i>
+                    </div>
+                  </div>
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase cursor-pointer hover:bg-blue-700">
+                  <div className="flex items-center gap-1">
+                    Subject Name Full
+                    <div className="flex flex-col">
+                      <i className="fas fa-chevron-up text-xs"></i>
+                      <i className="fas fa-chevron-down text-xs"></i>
+                    </div>
+                  </div>
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase cursor-pointer hover:bg-blue-700">
+                  <div className="flex items-center gap-1">
+                    Subject Name Short
+                    <div className="flex flex-col">
+                      <i className="fas fa-chevron-up text-xs"></i>
+                      <i className="fas fa-chevron-down text-xs"></i>
+                    </div>
+                  </div>
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase cursor-pointer hover:bg-blue-700">
+                  <div className="flex items-center gap-1">
+                    Subject Code
+                    <div className="flex flex-col">
+                      <i className="fas fa-chevron-up text-xs"></i>
+                      <i className="fas fa-chevron-down text-xs"></i>
+                    </div>
+                  </div>
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase cursor-pointer hover:bg-blue-700">
+                  <div className="flex items-center gap-1">
+                    Subject Category 1
+                    <div className="flex flex-col">
+                      <i className="fas fa-chevron-up text-xs"></i>
+                      <i className="fas fa-chevron-down text-xs"></i>
+                    </div>
+                  </div>
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase cursor-pointer hover:bg-blue-700">
+                  <div className="flex items-center gap-1">
+                    Subject Category 2
+                    <div className="flex flex-col">
+                      <i className="fas fa-chevron-up text-xs"></i>
+                      <i className="fas fa-chevron-down text-xs"></i>
+                    </div>
+                  </div>
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase cursor-pointer hover:bg-blue-700">
+                  <div className="flex items-center gap-1">
+                    Subject Status
+                    <div className="flex flex-col">
+                      <i className="fas fa-chevron-up text-xs"></i>
+                      <i className="fas fa-chevron-down text-xs"></i>
+                    </div>
+                  </div>
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
                     Loading...
                   </td>
                 </tr>
               ) : subjects.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
-                    No subjects found. Add one above.
+                  <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
+                    No subjects found.
                   </td>
                 </tr>
               ) : (
-                subjects.map(subject => (
+                subjects.map((subject, index) => (
                   <tr key={subject.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 text-sm font-semibold text-gray-900">{subject.subjectName || subject.name}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{subject.subjectCode || subject.code}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{subject.description || '-'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{index + 1}</td>
+                    <td className="px-4 py-3 text-sm font-semibold text-gray-900">{subject.subjectName || subject.name || '-'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{subject.subjectName || subject.name || '-'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{subject.subjectCode || subject.code || '-'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">PRE SCHOOL</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">Creche</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                         subject.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                       }`}>
-                        {subject.status}
+                        {subject.status || 'Active'}
                       </span>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleEdit(subject)}
-                          className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                          className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                          title="Edit"
                         >
                           <i className="fas fa-edit"></i>
                         </button>
@@ -275,6 +307,7 @@ const ManageSubjects: React.FC = () => {
                           onClick={() => subject.id && handleDelete(subject.id)}
                           className="text-red-600 hover:text-red-700 text-sm font-medium"
                           disabled={!subject.id}
+                          title="Delete"
                         >
                           <i className="fas fa-trash"></i>
                         </button>
@@ -285,6 +318,26 @@ const ManageSubjects: React.FC = () => {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="p-4 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="text-sm text-gray-700">
+            Showing 1 to {subjects.length} of {subjects.length} entries
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Previous
+            </button>
+            <span className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md">1</span>
+            <button
+              className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </Layout>

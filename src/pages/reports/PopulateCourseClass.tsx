@@ -47,7 +47,7 @@ const PopulateCourseClass: React.FC = () => {
       const accessibleClasses = await getAccessibleClasses();
       setClasses(accessibleClasses);
     } catch (error) {
-      console.error('Error loading classes:', error);
+      // Error loading classes
     }
   }, []);
 

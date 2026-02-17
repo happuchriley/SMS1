@@ -29,12 +29,19 @@ interface StudentFormData {
   religion: string;
   feeType: string;
   photo: File | null;
-  guardianName: string;
-  guardianRelationship: string;
-  guardianContact: string;
-  guardianEmail: string;
-  guardianAddress: string;
-  guardianOccupation: string;
+  // Guardian Info - Father and Mother separately
+  fatherName: string;
+  motherName: string;
+  parentsAddress: string;
+  parentsEmail: string;
+  fatherContact: string;
+  motherContact: string;
+  // Admin Info
+  entryClass: string;
+  currentClass: string;
+  programCourse: string;
+  affiliateHouse: string;
+  studentStatus: string;
 }
 
 const AddStudent: React.FC = () => {
@@ -64,12 +71,19 @@ const AddStudent: React.FC = () => {
     religion: '',
     feeType: '',
     photo: null,
-    guardianName: '',
-    guardianRelationship: '',
-    guardianContact: '',
-    guardianEmail: '',
-    guardianAddress: '',
-    guardianOccupation: ''
+    // Guardian Info
+    fatherName: '',
+    motherName: '',
+    parentsAddress: '',
+    parentsEmail: '',
+    fatherContact: '',
+    motherContact: '',
+    // Admin Info
+    entryClass: '',
+    currentClass: '',
+    programCourse: 'General',
+    affiliateHouse: '',
+    studentStatus: ''
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
@@ -128,11 +142,12 @@ const AddStudent: React.FC = () => {
         ...formData,
         photo: photoData,
         admissionDate: formData.admissionDate || new Date().toISOString().split('T')[0],
-        status: 'active',
-        parentName: formData.guardianName,
-        parentContact: formData.guardianContact,
-        parentEmail: formData.guardianEmail,
-        parent: formData.guardianName
+        status: formData.studentStatus || 'active',
+        class: formData.currentClass || formData.entryClass,
+        parentName: formData.fatherName || formData.motherName,
+        parentContact: formData.fatherContact || formData.motherContact,
+        parentEmail: formData.parentsEmail,
+        parent: formData.fatherName || formData.motherName
       };
 
       await studentsService.create(studentData);
@@ -173,12 +188,19 @@ const AddStudent: React.FC = () => {
       religion: '',
       feeType: '',
       photo: null,
-      guardianName: '',
-      guardianRelationship: '',
-      guardianContact: '',
-      guardianEmail: '',
-      guardianAddress: '',
-      guardianOccupation: ''
+      // Guardian Info
+      fatherName: '',
+      motherName: '',
+      parentsAddress: '',
+      parentsEmail: '',
+      fatherContact: '',
+      motherContact: '',
+      // Admin Info
+      entryClass: '',
+      currentClass: '',
+      programCourse: 'General',
+      affiliateHouse: '',
+      studentStatus: ''
     });
     setPhotoPreview(null);
     if (fileInputRef.current) {
@@ -625,95 +647,88 @@ const AddStudent: React.FC = () => {
       {activeTab === 'guardian-info' && (
         <div className="bg-white rounded-lg p-5 md:p-7 shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
           <div className="flex justify-between items-center mb-5 pb-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Guardian Info</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Parents/Guardian Info</h3>
           </div>
           <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-              <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                  Guardian Name <span className="text-red-500">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  name="guardianName"
-                  value={formData.guardianName}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  placeholder="Guardian Name *" 
-                  required 
-                />
-              </div>
-              <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                  Relationship <span className="text-red-500">*</span>
-                </label>
-                <div className="relative select-dropdown-wrapper">
-                  <select 
-                    name="guardianRelationship"
-                    value={formData.guardianRelationship}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+              {/* Left Column */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block mb-2 font-semibold text-gray-900 text-sm">Father</label>
+                  <input 
+                    type="text" 
+                    name="fatherName"
+                    value={formData.fatherName}
                     onChange={handleChange}
-                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]" 
-                    required
-                  >
-                    <option value="">Select Relationship</option>
-                    <option>Father</option>
-                    <option>Mother</option>
-                    <option>Guardian</option>
-                    <option>Other</option>
-                  </select>
-                  <div className="select-dropdown-arrow">
-                    <div className="select-dropdown-arrow-icon">
-                      <i className="fas fa-chevron-down"></i>
-                    </div>
-                  </div>
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
+                    placeholder="Father's Name *" 
+                    required 
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 font-semibold text-gray-900 text-sm">Address</label>
+                  <input 
+                    type="text" 
+                    name="parentsAddress"
+                    value={formData.parentsAddress}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
+                    placeholder="Parents' Address *" 
+                    required 
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 font-semibold text-gray-900 text-sm">Father's Contact</label>
+                  <input 
+                    type="tel" 
+                    name="fatherContact"
+                    value={formData.fatherContact}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
+                    placeholder="Father's Contact *" 
+                    required 
+                  />
                 </div>
               </div>
-              <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                  Contact <span className="text-red-500">*</span>
-                </label>
-                <input 
-                  type="tel" 
-                  name="guardianContact"
-                  value={formData.guardianContact}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  placeholder="Contact *" 
-                  required 
-                />
-              </div>
-              <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">Email</label>
-                <input 
-                  type="email" 
-                  name="guardianEmail"
-                  value={formData.guardianEmail}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  placeholder="Email" 
-                />
-              </div>
-              <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">Address</label>
-                <input 
-                  type="text" 
-                  name="guardianAddress"
-                  value={formData.guardianAddress}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  placeholder="Address" 
-                />
-              </div>
-              <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">Occupation</label>
-                <input 
-                  type="text" 
-                  name="guardianOccupation"
-                  value={formData.guardianOccupation}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  placeholder="Occupation" 
-                />
+
+              {/* Right Column */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block mb-2 font-semibold text-gray-900 text-sm">Mother</label>
+                  <input 
+                    type="text" 
+                    name="motherName"
+                    value={formData.motherName}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
+                    placeholder="Mother's Name *" 
+                    required 
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 font-semibold text-gray-900 text-sm">Email</label>
+                  <input 
+                    type="email" 
+                    name="parentsEmail"
+                    value={formData.parentsEmail}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
+                    placeholder="Parents' Email *" 
+                    required 
+                  />
+                </div>
+                <div>
+                  <label className="block mb-2 font-semibold text-gray-900 text-sm">Mother's Contact</label>
+                  <input 
+                    type="tel" 
+                    name="motherContact"
+                    value={formData.motherContact}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
+                    placeholder="Mother's Contact *" 
+                    required 
+                  />
+                </div>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 justify-between items-center mt-6 pt-6 border-t border-gray-200">
@@ -779,49 +794,171 @@ const AddStudent: React.FC = () => {
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">
-                  Class <span className="text-red-500">*</span>
-                </label>
-                <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5" 
-                  required
-                >
-                  <option value="">Select Class</option>
-                  <option>Basic 1</option>
-                  <option>Basic 2</option>
-                  <option>Basic 3</option>
-                  <option>Basic 4</option>
-                  <option>Basic 5</option>
-                  <option>Basic 6</option>
-                  <option>Basic 7</option>
-                  <option>Basic 8</option>
-                  <option>Basic 9</option>
-                  <option>KG 2</option>
-                  <option>Nursery 2</option>
-                </select>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">Entry Class</label>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    name="entryClass"
+                    value={formData.entryClass}
+                    onChange={handleChange}
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]"
+                  >
+                    <option value="">Select class group</option>
+                    <option>Basic 1</option>
+                    <option>Basic 2</option>
+                    <option>Basic 3</option>
+                    <option>Basic 4</option>
+                    <option>Basic 5</option>
+                    <option>Basic 6</option>
+                    <option>Basic 7</option>
+                    <option>Basic 8</option>
+                    <option>Basic 9</option>
+                    <option>KG 1</option>
+                    <option>KG 2</option>
+                    <option>Nursery 1</option>
+                    <option>Nursery 2</option>
+                    <option>Creche</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">Admission Date</label>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">Current Class</label>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    name="currentClass"
+                    value={formData.currentClass}
+                    onChange={handleChange}
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]"
+                  >
+                    <option value="">Select class group</option>
+                    <option>Basic 1</option>
+                    <option>Basic 2</option>
+                    <option>Basic 3</option>
+                    <option>Basic 4</option>
+                    <option>Basic 5</option>
+                    <option>Basic 6</option>
+                    <option>Basic 7</option>
+                    <option>Basic 8</option>
+                    <option>Basic 9</option>
+                    <option>KG 1</option>
+                    <option>KG 2</option>
+                    <option>Nursery 1</option>
+                    <option>Nursery 2</option>
+                    <option>Creche</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">Program/Course</label>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    name="programCourse"
+                    value={formData.programCourse}
+                    onChange={handleChange}
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]"
+                  >
+                    <option value="General">General</option>
+                    <option>Science</option>
+                    <option>Arts</option>
+                    <option>Business</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                  Affiliate House/Section <span className="text-red-500">*</span>
+                </label>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    name="affiliateHouse"
+                    value={formData.affiliateHouse}
+                    onChange={handleChange}
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]"
+                    required
+                  >
+                    <option value="">Affiliate House/Section *</option>
+                    <option>House A</option>
+                    <option>House B</option>
+                    <option>House C</option>
+                    <option>House D</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                  Admission Date <span className="text-red-500">*</span>
+                </label>
                 <DateInput
                   name="admissionDate"
                   value={formData.admissionDate || ''}
                   onChange={handleChange}
-                  placeholder="DD/MM/YYYY"
+                  placeholder="mm/dd/yyyy"
                   className="text-sm"
+                  required
                 />
               </div>
               <div>
-                <label className="block mb-2 font-semibold text-gray-900 text-sm">Status</label>
-                <select 
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5"
-                >
-                  <option>Active</option>
-                  <option>Inactive</option>
-                  <option>Graduated</option>
-                </select>
+                <label className="block mb-2 font-semibold text-gray-900 text-sm">
+                  Student Status <span className="text-red-500">*</span>
+                </label>
+                <div className="relative select-dropdown-wrapper">
+                  <select 
+                    name="studentStatus"
+                    value={formData.studentStatus}
+                    onChange={handleChange}
+                    className="select-dropdown w-full px-4 py-2.5 border-2 border-gray-200 rounded-md text-sm transition-all duration-300 bg-white hover:border-gray-300 focus:outline-none focus:border-primary-500 focus:shadow-[0_0_0_4px_rgba(16,185,129,0.1)] focus:-translate-y-0.5 min-h-[44px]"
+                    required
+                  >
+                    <option value="">Student Status *</option>
+                    <option>Active</option>
+                    <option>Inactive</option>
+                    <option>Graduated</option>
+                    <option>Left</option>
+                  </select>
+                  <div className="select-dropdown-arrow">
+                    <div className="select-dropdown-arrow-icon">
+                      <i className="fas fa-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 justify-end mt-6 pt-6 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row gap-3 justify-between items-center mt-6 pt-6 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button 
+                  type="button"
+                  onClick={() => navigate('/students/all')}
+                  className="px-5 py-2.5 bg-red-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:bg-red-600"
+                >
+                  <i className="fas fa-times"></i> X Close
+                </button>
+                <button 
+                  type="button"
+                  onClick={handleClear}
+                  className="px-5 py-2.5 bg-green-500 text-white rounded-md text-sm font-semibold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 hover:bg-green-600"
+                >
+                  <i className="fas fa-redo"></i> Clear All
+                </button>
+              </div>
               <button 
                 type="submit"
                 disabled={isSubmitting}
