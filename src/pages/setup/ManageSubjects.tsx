@@ -4,13 +4,6 @@ import { Link } from 'react-router-dom';
 import setupService from '../../services/setupService';
 import { useModal } from '../../components/ModalProvider';
 
-interface SubjectFormData {
-  subjectName: string;
-  subjectCode: string;
-  description: string;
-  status: string;
-}
-
 interface SubjectItem {
   id?: string;
   name?: string;
@@ -26,15 +19,6 @@ const ManageSubjects: React.FC = () => {
   const { toast, showDeleteModal } = useModal();
   const [subjects, setSubjects] = useState<SubjectItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
-  const [formData, setFormData] = useState<SubjectFormData>({
-    subjectName: '',
-    subjectCode: '',
-    description: '',
-    status: 'Active'
-  });
-
-  const [editingId, setEditingId] = useState<string | null>(null);
 
   const loadSubjects = useCallback(async (): Promise<void> => {
     try {
@@ -54,13 +38,8 @@ const ManageSubjects: React.FC = () => {
   }, [loadSubjects]);
 
   const handleEdit = (subject: SubjectItem): void => {
-    setFormData({
-      subjectName: subject.name || subject.subjectName || '',
-      subjectCode: subject.code || subject.subjectCode || '',
-      description: subject.description || '',
-      status: subject.status || 'Active'
-    });
-    setEditingId(subject.id || null);
+    // Edit functionality can be implemented here if needed
+    toast.showInfo('Edit functionality coming soon');
   };
 
   const handleDelete = (id: string): void => {
@@ -79,11 +58,6 @@ const ManageSubjects: React.FC = () => {
         }
       }
     });
-  };
-
-  const handleClear = (): void => {
-    setFormData({ subjectName: '', subjectCode: '', description: '', status: 'Active' });
-    setEditingId(null);
   };
 
   return (

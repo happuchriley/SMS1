@@ -31,7 +31,7 @@ const Profile: React.FC = () => {
   const username = sessionStorage.getItem('username') || 'Admin';
   const userType = sessionStorage.getItem('userType') || 'administrator';
   const [userInfo, setUserInfo] = useState<UserInfo>({});
-  const [loading, setLoading] = useState<boolean>(true);
+  const [, setLoading] = useState<boolean>(true);
   const [showAccountSettings, setShowAccountSettings] = useState<boolean>(false);
   const [accountSettingsAction, setAccountSettingsAction] = useState<'image' | 'password' | null>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);

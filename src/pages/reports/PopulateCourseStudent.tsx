@@ -24,7 +24,7 @@ interface FormData {
 
 const PopulateCourseStudent: React.FC = () => {
   const { toast } = useModal();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [, setLoading] = useState<boolean>(false);
   const [allStudents, setAllStudents] = useState<any[]>([]);
   const [formData, setFormData] = useState<FormData>({
     academicYear: '',

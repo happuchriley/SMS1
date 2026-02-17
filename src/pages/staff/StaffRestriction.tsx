@@ -22,7 +22,7 @@ interface FeatureAccess {
   allowed: boolean;
 }
 
-interface StaffRestriction {
+interface StaffRestrictionData {
   id?: string;
   staffId: string;
   features: string[]; // Array of allowed feature names
@@ -33,7 +33,7 @@ interface StaffRestriction {
 const StaffRestriction: React.FC = () => {
   const { toast, showDeleteModal } = useModal();
   const [staffList, setStaffList] = useState<StaffInfo[]>([]);
-  const [restrictions, setRestrictions] = useState<StaffRestriction[]>([]);
+  const [restrictions, setRestrictions] = useState<StaffRestrictionData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedStaff, setSelectedStaff] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -41,7 +41,7 @@ const StaffRestriction: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
   const actionMenuRef = useRef<HTMLDivElement>(null);
-  const [editingRestriction, setEditingRestriction] = useState<StaffRestriction | null>(null);
+  const [editingRestriction, setEditingRestriction] = useState<StaffRestrictionData | null>(null);
   const [showForm, setShowForm] = useState<boolean>(false);
   const [formFeatures, setFormFeatures] = useState<Record<string, boolean>>({});
 
@@ -72,7 +72,7 @@ const StaffRestriction: React.FC = () => {
       ]);
       
       // Map restrictions
-      const mappedRestrictions: StaffRestriction[] = restrictionsData.map((item: any) => ({
+      const mappedRestrictions: StaffRestrictionData[] = restrictionsData.map((item: any) => ({
         id: item.id,
         staffId: item.staffId,
         features: item.features || [],
@@ -124,7 +124,7 @@ const StaffRestriction: React.FC = () => {
     return staff?.staffId || staff?.id || 'N/A';
   };
 
-  const getRestrictionForStaff = (staffId: string): StaffRestriction | null => {
+  const getRestrictionForStaff = (staffId: string): StaffRestrictionData | null => {
     return restrictions.find(r => r.staffId === staffId) || null;
   };
 
@@ -135,7 +135,7 @@ const StaffRestriction: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleEdit = (restriction: StaffRestriction): void => {
+  const handleEdit = (restriction: StaffRestrictionData): void => {
     setEditingRestriction(restriction);
     setSelectedStaff(restriction.staffId);
     // Initialize form features based on restriction
@@ -209,7 +209,7 @@ const StaffRestriction: React.FC = () => {
         .filter(f => formFeatures[f.feature])
         .map(f => f.feature);
 
-      const restrictionData: StaffRestriction = {
+      const restrictionData: StaffRestrictionData = {
         staffId: selectedStaff,
         features: allowedFeatures,
         notes: '',
