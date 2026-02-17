@@ -118,11 +118,8 @@ const SchoolDetails: React.FC = () => {
     language: 'en'
   });
 
-  const regions: string[] = ['Greater Accra', 'Ashanti', 'Western', 'Eastern', 'Central', 'Volta', 'Northern', 'Upper East', 'Upper West', 'Brong Ahafo', 'Western North', 'Ahafo', 'Bono', 'Bono East', 'Oti', 'North East', 'Savannah'];
-  const schoolTypes: string[] = ['Private', 'Public', 'International', 'Mission'];
   const terms: string[] = ['First Term', 'Second Term', 'Third Term'];
   const currencies: string[] = ['GHS', 'USD', 'EUR', 'GBP'];
-  const languages: string[] = ['en', 'fr', 'es', 'ar'];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>): void => {
     const { name, value } = e.target;

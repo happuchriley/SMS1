@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 import setupService from '../../services/setupService';
@@ -26,7 +26,7 @@ interface ClassItem {
 }
 
 const ManageClasses: React.FC = () => {
-  const { toast, showDeleteModal } = useModal();
+  const { toast } = useModal();
   const [classes, setClasses] = useState<ClassItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);

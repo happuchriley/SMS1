@@ -27,7 +27,7 @@ const ManageCourses: React.FC = () => {
   const [selectedSubject, setSelectedSubject] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [itemsPerPage] = useState<number>(10);
 
   const loadCourses = useCallback(async () => {
     try {

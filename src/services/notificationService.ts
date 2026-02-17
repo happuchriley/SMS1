@@ -66,7 +66,8 @@ const notificationService = {
         return false;
       }
 
-      const message = this.formatSMSMessage(credentials);
+      // Format message for future API implementation
+      // const message = this.formatSMSMessage(credentials);
       
       // In a real implementation, this would call an SMS API
       // For now, we'll simulate the API call
@@ -99,8 +100,9 @@ const notificationService = {
         return false;
       }
 
-      const emailSubject = this.getEmailSubject(credentials.role);
-      const emailBody = this.formatEmailMessage(credentials);
+      // Format email for future API implementation
+      // const emailSubject = this.getEmailSubject(credentials.role);
+      // const emailBody = this.formatEmailMessage(credentials);
       
       // In a real implementation, this would call an Email API
       // For now, we'll simulate the API call

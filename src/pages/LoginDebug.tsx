@@ -3,15 +3,11 @@ import Layout from '../components/Layout';
 import staffService from '../services/staffService';
 import studentsService from '../services/studentsService';
 import { Link } from 'react-router-dom';
-import { setAllDemoPasswords } from '../utils/demoCredentials';
-import { useModal } from '../components/ModalProvider';
 
 const LoginDebug: React.FC = () => {
-  const { toast } = useModal();
   const [staff, setStaff] = useState<any[]>([]);
   const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     loadData();

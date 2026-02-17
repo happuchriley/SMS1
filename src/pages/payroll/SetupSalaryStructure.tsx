@@ -679,7 +679,6 @@ const SetupSalaryStructure: React.FC = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {structures.map((structure) => {
-                    const gross = salaryStructureService.calculateGrossSalary(structure);
                     const net = salaryStructureService.calculateNetSalary(structure);
                     return (
                       <tr key={structure.id} className="hover:bg-gray-50">

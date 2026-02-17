@@ -113,7 +113,6 @@ const TeacherDashboard: React.FC = () => {
       // Get results data for pending/completed counts
       const allResults = await academicService.getAllResults();
       const currentYear = new Date().getFullYear().toString();
-      const currentTerm = 'First Term'; // You can make this dynamic
       
       const pendingResults = allResults.filter((r: any) => 
         !r.completed && r.academicYear === currentYear

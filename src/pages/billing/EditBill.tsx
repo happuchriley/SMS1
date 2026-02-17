@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams, Link, useNavigate } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import billingService from '../../services/billingService';
 import studentsService from '../../services/studentsService';
@@ -8,8 +8,6 @@ import { useModal } from '../../components/ModalProvider';
 const EditBill: React.FC = () => {
   const [searchParams] = useSearchParams();
   const studentId = searchParams.get('student');
-  const billId = searchParams.get('bill');
-  const navigate = useNavigate();
   const { toast, showDeleteConfirm } = useModal();
   const [bills, setBills] = useState<any[]>([]);
   const [student, setStudent] = useState<any>(null);

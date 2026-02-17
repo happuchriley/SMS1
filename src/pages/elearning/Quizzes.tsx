@@ -24,7 +24,6 @@ const Quizzes: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [courses, setCourses] = useState<Array<{ id: string; title: string }>>([]);
 
   const loadQuizzes = useCallback(async () => {
     try {

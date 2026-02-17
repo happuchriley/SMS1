@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import Layout from '../../components/Layout';
 import { Link } from 'react-router-dom';
 import academicService from '../../services/academicService';

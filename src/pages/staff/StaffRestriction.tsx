@@ -553,10 +553,6 @@ const StaffRestriction: React.FC = () => {
                 </tr>
               ) : (
                 paginatedRestrictions.map((restriction, index) => {
-                  const featureLabels = restriction.features
-                    .map(f => allFeatures.find(af => af.feature === f)?.label || f)
-                    .join(', ') || 'None';
-                  
                   return (
                     <tr key={restriction.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3 relative">

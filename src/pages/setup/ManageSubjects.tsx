@@ -53,46 +53,6 @@ const ManageSubjects: React.FC = () => {
     loadSubjects();
   }, [loadSubjects]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault();
-    if (!formData.subjectName || !formData.subjectCode) {
-      toast.showError('Please fill in all required fields.');
-      return;
-    }
-
-    try {
-      if (editingId) {
-        await setupService.updateSubject(editingId, {
-          name: formData.subjectName,
-          code: formData.subjectCode,
-          description: formData.description || '',
-          status: formData.status || 'Active'
-        });
-        toast.showSuccess('Subject updated successfully');
-      } else {
-        await setupService.createSubject({
-          name: formData.subjectName,
-          code: formData.subjectCode,
-          description: formData.description || '',
-          status: formData.status || 'Active'
-        });
-        toast.showSuccess('Subject created successfully');
-      }
-      await loadSubjects();
-      handleClear();
-    } catch (error: any) {
-      console.error('Error saving subject:', error);
-      toast.showError(error.message || 'Failed to save subject');
-    }
-  };
-
   const handleEdit = (subject: SubjectItem): void => {
     setFormData({
       subjectName: subject.name || subject.subjectName || '',

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import { Link } from "react-router-dom";
-import academicService from "../services/academicService";
 import elearningService from "../services/elearningService";
 
 interface DashboardStats {

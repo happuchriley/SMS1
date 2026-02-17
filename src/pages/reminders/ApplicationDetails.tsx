@@ -6,7 +6,6 @@ import notificationService from '../../services/notificationService';
 import { useModal } from '../../components/ModalProvider';
 import { generateNumericPassword } from '../../utils/passwordGenerator';
 import { getAccessibleClasses } from '../../utils/classRestriction';
-import setupService from '../../services/setupService';
 
 interface StudentItem {
   id: string;

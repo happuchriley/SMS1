@@ -32,7 +32,6 @@ interface ReportType {
 const PrintGroupReport: React.FC = () => {
   const { toast } = useModal();
   const printRef = useRef<HTMLDivElement>(null);
-  const [loading, setLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>({
     academicYear: '',
     term: '',

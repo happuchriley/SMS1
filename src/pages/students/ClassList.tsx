@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Layout from '../../components/Layout';
 import { Link, useNavigate } from 'react-router-dom';
-import studentsService from '../../services/studentsService';
 import { useModal } from '../../components/ModalProvider';
 
 interface ClassData {
@@ -13,7 +12,7 @@ const ClassList: React.FC = () => {
   const { toast } = useModal();
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
-  const [classes, setClasses] = useState<ClassData[]>([
+  const [classes] = useState<ClassData[]>([
     { className: 'Basic 1', studentCount: 30 },
     { className: 'Basic 2', studentCount: 25 },
     { className: 'Basic 3', studentCount: 24 },
