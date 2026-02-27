@@ -40,7 +40,7 @@ export default function AcademicRecordsPage() {
         : fromList === 'students-inactive'
           ? 'Go back to Inactive Students'
           : 'Go back to Students List'
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const viewParam = searchParams.get('view') as ViewId | null
   const activeView: ViewId =
     viewParam && VIEWS.some((v) => v.id === viewParam) ? viewParam : 'results'

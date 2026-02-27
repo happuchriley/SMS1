@@ -300,17 +300,16 @@ export default function ClassListPage() {
                                   </Link>
                                 )
                               }
-                              const fallback = item as { id: string; label: string }
                               return (
                                 <button
-                                  key={fallback.id}
+                                  key={item.id}
                                   type="button"
                                   role="menuitem"
                                   className="class-list-action-menu-item"
                                   onClick={() => setOpenActionId(null)}
                                 >
                                   <Icon />
-                                  <span>{fallback.label}</span>
+                                  <span>{item.label}</span>
                                 </button>
                               )
                             })}
