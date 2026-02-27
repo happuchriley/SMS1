@@ -1,37 +1,48 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { FeedbackProvider } from './contexts/FeedbackContext'
-import Login from './pages/Login'
-import AdminLayout from './layouts/AdminLayout'
-import AdminDashboard from './pages/AdminDashboard'
-import ManageStudentsPage from './pages/ManageStudentsPage'
-import AddNewStudentPage from './pages/AddNewStudentPage'
-import StudentsListAllPage from './pages/StudentsListAllPage'
-import StudentsListActivePage from './pages/StudentsListActivePage'
-import StudentsListFreshPage from './pages/StudentsListFreshPage'
-import StudentsListInactivePage from './pages/StudentsListInactivePage'
-import StudentProfilePage from './pages/StudentProfilePage'
-import AcademicRecordsPage from './pages/AcademicRecordsPage'
-import AccountSettingsPage from './pages/AccountSettingsPage'
-import EditStudentPage from './pages/EditStudentPage'
-import ClassListPage from './pages/ClassListPage'
-import GetClassListPage from './pages/GetClassListPage'
-import ParentsListPage from './pages/ParentsListPage'
-import ManageStaffPage from './pages/ManageStaffPage'
-import StaffPlaceholderPage from './pages/StaffPlaceholderPage'
-import AttendanceRegisterPage from './pages/AttendanceRegisterPage'
-import TeachingLearningMaterialsPage from './pages/TeachingLearningMaterialsPage'
-import TLMUploadPage from './pages/TLMUploadPage'
-import MediaLibraryPage from './pages/MediaLibraryPage'
-import StudentPromotionPage from './pages/StudentPromotionPage'
-import TestsAndQuizzesPage from './pages/TestsAndQuizzesPage'
-import TeacherDashboard from './pages/TeacherDashboard'
-import StudentDashboard from './pages/StudentDashboard'
+
+const Login = lazy(() => import('./pages/Login'))
+const AdminLayout = lazy(() => import('./layouts/AdminLayout'))
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
+const ManageStudentsPage = lazy(() => import('./pages/ManageStudentsPage'))
+const AddNewStudentPage = lazy(() => import('./pages/AddNewStudentPage'))
+const StudentsListAllPage = lazy(() => import('./pages/StudentsListAllPage'))
+const StudentsListActivePage = lazy(() => import('./pages/StudentsListActivePage'))
+const StudentsListFreshPage = lazy(() => import('./pages/StudentsListFreshPage'))
+const StudentsListInactivePage = lazy(() => import('./pages/StudentsListInactivePage'))
+const StudentProfilePage = lazy(() => import('./pages/StudentProfilePage'))
+const AcademicRecordsPage = lazy(() => import('./pages/AcademicRecordsPage'))
+const AccountSettingsPage = lazy(() => import('./pages/AccountSettingsPage'))
+const EditStudentPage = lazy(() => import('./pages/EditStudentPage'))
+const ClassListPage = lazy(() => import('./pages/ClassListPage'))
+const GetClassListPage = lazy(() => import('./pages/GetClassListPage'))
+const ParentsListPage = lazy(() => import('./pages/ParentsListPage'))
+const ManageStaffPage = lazy(() => import('./pages/ManageStaffPage'))
+const StaffPlaceholderPage = lazy(() => import('./pages/StaffPlaceholderPage'))
+const AttendanceRegisterPage = lazy(() => import('./pages/AttendanceRegisterPage'))
+const TeachingLearningMaterialsPage = lazy(() => import('./pages/TeachingLearningMaterialsPage'))
+const TLMUploadPage = lazy(() => import('./pages/TLMUploadPage'))
+const MediaLibraryPage = lazy(() => import('./pages/MediaLibraryPage'))
+const StudentPromotionPage = lazy(() => import('./pages/StudentPromotionPage'))
+const TestsAndQuizzesPage = lazy(() => import('./pages/TestsAndQuizzesPage'))
+const TeacherDashboard = lazy(() => import('./pages/TeacherDashboard'))
+const StudentDashboard = lazy(() => import('./pages/StudentDashboard'))
+
+function PageFallback() {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+      Loading…
+    </div>
+  )
+}
 
 export default function App() {
   return (
     <FeedbackProvider>
       <BrowserRouter>
-        <Routes>
+        <Suspense fallback={<PageFallback />}>
+          <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<AdminLayout />}>
@@ -66,7 +77,8 @@ export default function App() {
         <Route path="/teacher" element={<TeacherDashboard />} />
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </FeedbackProvider>
   )
