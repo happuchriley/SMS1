@@ -1,0 +1,194 @@
+.get-class-list-page {
+  padding: 1.25rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.get-class-list-header {
+  margin-bottom: 1.25rem;
+}
+
+.get-class-list-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+}
+
+.get-class-list-title {
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.get-class-list-breadcrumb {
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.get-class-list-breadcrumb a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.get-class-list-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.get-class-list-goback {
+  margin-left: auto;
+}
+
+.get-class-list-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
+  padding: 1.25rem;
+  overflow: hidden;
+}
+
+.get-class-list-select-hint {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0 0 1rem 0;
+}
+
+.get-class-list-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.get-class-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.get-class-list-table th,
+.get-class-list-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.get-class-list-table th {
+  font-weight: 600;
+  color: #fff;
+  background: #1e3a5f;
+  white-space: nowrap;
+}
+
+.get-class-list-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.get-class-list-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.get-class-list-roll-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.get-class-list-roll-link:hover {
+  text-decoration: underline;
+}
+
+.get-class-list-td-action {
+  position: relative;
+  vertical-align: middle;
+}
+
+.get-class-list-action-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.get-class-list-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #fff;
+  background: #1e3a5f;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.get-class-list-action-btn:hover {
+  background: #1f2937;
+}
+
+.get-class-list-action-menu {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: 0.25rem;
+  min-width: 200px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 50;
+  padding: 0.25rem 0;
+}
+
+.get-class-list-action-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: #374151;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.get-class-list-action-menu-item:hover {
+  background: #f3f4f6;
+}
+
+.get-class-list-action-menu-item svg {
+  flex-shrink: 0;
+  color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  .get-class-list-page {
+    padding: 1rem;
+  }
+
+  .get-class-list-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .get-class-list-goback {
+    margin-left: 0;
+  }
+
+  .get-class-list-table th,
+  .get-class-list-table td {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .get-class-list-action-btn {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.75rem;
+  }
+}

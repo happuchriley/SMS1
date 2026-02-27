@@ -1,0 +1,55 @@
+.staff-placeholder-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem;
+}
+
+.staff-placeholder-header {
+  margin-bottom: 1.5rem;
+}
+
+.staff-placeholder-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.35rem 0;
+}
+
+.staff-placeholder-breadcrumb {
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.staff-placeholder-breadcrumb a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.staff-placeholder-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.staff-placeholder-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.staff-placeholder-message {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0 0 1rem 0;
+}
+
+.staff-placeholder-back {
+  display: inline-block;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.staff-placeholder-back:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,266 @@
+.edit-student-page {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 1.25rem 2rem;
+  box-sizing: border-box;
+}
+
+.edit-student-empty {
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.edit-student-header {
+  margin-bottom: 1.25rem;
+}
+
+.edit-student-heading {
+  flex: 1;
+  min-width: 0;
+}
+
+.edit-student-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.edit-student-breadcrumb {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  margin-bottom: 0.35rem;
+}
+
+.edit-student-breadcrumb a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.edit-student-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.edit-student-goback {
+  margin-top: 0.5rem;
+}
+
+.edit-student-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f3f4f6;
+  overflow: hidden;
+}
+
+.edit-student-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  border-bottom: 1px solid #e5e7eb;
+  background: #fafafa;
+  scrollbar-width: thin;
+}
+
+.edit-student-tab {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #6b7280;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.edit-student-tab:hover {
+  color: #374151;
+  background: #f3f4f6;
+}
+
+.edit-student-tab--active {
+  color: #fff;
+  background: #2563eb;
+  border-bottom-color: #2563eb;
+}
+
+.edit-student-tabpanel {
+  padding: 1.5rem;
+}
+
+.edit-student-section-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #374151;
+  margin: 0 0 1rem 0;
+}
+
+.edit-student-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.edit-student-fields--grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem 1.25rem;
+}
+
+.edit-student-fields--grid-three {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.edit-student-fields--two-col {
+  flex-direction: row;
+  gap: 2rem;
+}
+
+.edit-student-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.edit-student-field label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.35rem;
+}
+
+.edit-student-field .required {
+  color: #dc2626;
+}
+
+.edit-student-field input,
+.edit-student-field select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  color: #111827;
+}
+
+.edit-student-field input:focus,
+.edit-student-field select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.edit-student-input--readonly {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: default;
+}
+
+.edit-student-field input[type="file"] {
+  padding: 0.35rem 0;
+  font-size: 0.8125rem;
+}
+
+.edit-student-field--photo .edit-student-photo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.edit-student-photo-preview {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.edit-student-photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.edit-student-photo-placeholder {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #e5e7eb;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-student-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  background: #fafafa;
+}
+
+.edit-student-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.edit-student-btn:hover {
+  transform: translateY(-1px);
+}
+
+.edit-student-btn--clear {
+  background: #059669;
+  color: #fff;
+}
+
+.edit-student-btn--clear:hover {
+  background: #047857;
+}
+
+.edit-student-btn--save {
+  background: #2563eb;
+  color: #fff;
+}
+
+.edit-student-btn--save:hover {
+  background: #1d4ed8;
+}
+
+@media (max-width: 768px) {
+  .edit-student-fields--grid {
+    grid-template-columns: 1fr;
+  }
+
+  .edit-student-fields--two-col {
+    flex-direction: column;
+  }
+}

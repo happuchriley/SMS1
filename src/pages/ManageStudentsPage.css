@@ -1,0 +1,231 @@
+.manage-students-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.manage-students-header {
+  margin-bottom: 1.5rem;
+}
+
+.manage-students-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.manage-students-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.manage-students-breadcrumb {
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.manage-students-breadcrumb a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.manage-students-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+/* Stats row – cards like main dashboard KPI */
+.manage-students-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.manage-students-stat-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.25rem 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f3f4f6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  border-left: 4px solid #3498db;
+}
+
+.manage-students-stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #e5e7eb;
+}
+
+.manage-students-stat-card--total {
+  border-left-color: #3498db;
+}
+
+.manage-students-stat-card--total .manage-students-stat-card__value {
+  color: #2563eb;
+}
+
+.manage-students-stat-card--active {
+  border-left-color: #e67e22;
+}
+
+.manage-students-stat-card--active .manage-students-stat-card__value {
+  color: #ea580c;
+}
+
+.manage-students-stat-card--inactive {
+  border-left-color: #94a3b8;
+}
+
+.manage-students-stat-card--new {
+  border-left-color: #2d7a4f;
+}
+
+.manage-students-stat-card--new .manage-students-stat-card__value {
+  color: #15803d;
+}
+
+.manage-students-stat-card__value {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.manage-students-stat-card__label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+/* Action cards grid */
+.manage-students-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.manage-students-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 1.25rem;
+  background: #fff;
+  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.manage-students-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #e5e7eb;
+}
+
+.manage-students-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.manage-students-card__icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.manage-students-card__icon--add,
+.manage-students-card__icon--group,
+.manage-students-card__icon--new,
+.manage-students-card__icon--parents {
+  background: #f0f9ff;
+  color: #0284c7;
+}
+
+.manage-students-card__icon--active {
+  background: #374151;
+  color: #fff;
+}
+
+.manage-students-card__icon--inactive {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.manage-students-card__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #15803d;
+  margin: 0 0 0.35rem 0;
+  line-height: 1.3;
+}
+
+.manage-students-card__desc {
+  font-size: 0.8125rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+  .manage-students-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .manage-students-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .manage-students-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .manage-students-title {
+    font-size: 1.25rem;
+  }
+
+  .manage-students-stats {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .manage-students-stat-card__value {
+    font-size: 1.5rem;
+  }
+
+  .manage-students-cards {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .manage-students-card {
+    padding: 1rem;
+  }
+
+  .manage-students-card__icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .manage-students-card__icon svg {
+    width: 24px;
+    height: 24px;
+  }
+}
