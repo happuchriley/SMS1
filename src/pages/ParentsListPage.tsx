@@ -336,16 +336,17 @@ export default function ParentsListPage() {
                                   </Link>
                                 )
                               }
+                              const fallback = item as { id: string; label: string }
                               return (
                                 <button
-                                  key={item.id}
+                                  key={fallback.id}
                                   type="button"
                                   role="menuitem"
                                   className="students-list-all-action-menu-item"
                                   onClick={() => closeActionMenu()}
                                 >
                                   <Icon />
-                                  <span>{item.label}</span>
+                                  <span>{fallback.label}</span>
                                 </button>
                               )
                             })}
