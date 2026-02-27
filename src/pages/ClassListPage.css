@@ -1,6 +1,8 @@
 .class-list-page {
-  max-width: 1400px;
+  max-width: min(1400px, 100%);
   margin: 0 auto;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .class-list-header {
@@ -163,6 +165,7 @@
 
 .class-list-table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .class-list-table {
@@ -334,10 +337,71 @@
   .class-list-toolbar {
     flex-direction: column;
     align-items: stretch;
+    gap: 1rem;
+  }
+
+  .class-list-toolbar-left,
+  .class-list-toolbar-right {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  .class-list-entries-select,
+  .class-list-search-input,
+  .class-list-export-btn,
+  .class-list-visibility-btn {
+    min-height: 44px;
   }
 
   .class-list-footer {
     flex-direction: column;
     align-items: stretch;
+    gap: 1rem;
+  }
+
+  /* Export & visibility: stack and keep dropdowns in viewport */
+  .class-list-export-btns {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .class-list-export-btn {
+    min-height: 44px;
+    padding: 0.5rem 0.85rem;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .class-list-visibility-dropdown {
+    right: 0;
+    left: auto;
+    max-width: min(260px, calc(100vw - 2rem));
+    max-height: 60vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 480px) {
+  .class-list-title {
+    font-size: 1.25rem;
+  }
+
+  .class-list-toolbar,
+  .class-list-footer {
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .class-list-title {
+    font-size: 1.1rem;
+  }
+
+  .class-list-toolbar,
+  .class-list-footer {
+    padding: 0.6rem 0.75rem;
   }
 }

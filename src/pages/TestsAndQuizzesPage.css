@@ -1,7 +1,8 @@
 .tests-quizzes-page {
-  max-width: 1400px;
+  max-width: min(1400px, 100%);
   margin: 0 auto;
   padding: 0 1rem;
+  min-width: 0;
   box-sizing: border-box;
 }
 
@@ -145,6 +146,7 @@
 
 .tests-quizzes-export-btn {
   padding: 0.4rem 0.65rem;
+  min-height: 44px;
   font-size: 0.8125rem;
   font-weight: 500;
   color: #374151;
@@ -176,6 +178,7 @@
 
 .tests-quizzes-table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .tests-quizzes-table {
@@ -465,6 +468,7 @@
 
 .create-quiz-questions-scroll {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
 }

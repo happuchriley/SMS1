@@ -1,6 +1,8 @@
 .attendance-page {
-  max-width: 1400px;
+  max-width: min(1400px, 100%);
   margin: 0 auto;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .attendance-header {
@@ -202,6 +204,7 @@
 
 .attendance-table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .attendance-table {
@@ -327,10 +330,24 @@
   .attendance-toolbar {
     flex-direction: column;
     align-items: stretch;
+    gap: 1rem;
+  }
+
+  .attendance-export-btns {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .attendance-export-btn {
+    min-height: 44px;
+    padding: 0.5rem 0.85rem;
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .attendance-footer {
     flex-direction: column;
     align-items: stretch;
+    gap: 1rem;
   }
 }

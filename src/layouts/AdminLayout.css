@@ -1,6 +1,10 @@
 .admin-layout {
-  --admin-header-height: 56px;
+  --admin-header-height: calc(56px + env(safe-area-inset-top, 0px));
+  flex: 1 1 0;
+  min-height: 0;
   min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
   display: flex;
   flex-direction: column;
   background: #f0f2f5;
@@ -18,7 +22,8 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem max(1.5rem, env(safe-area-inset-right)) 0.75rem max(1.5rem, env(safe-area-inset-left));
+  padding-top: max(0.75rem, env(safe-area-inset-top));
   background: #fff;
   border-bottom: 1px solid #e0e0e0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -113,8 +118,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  min-width: 44px;
+  min-height: 44px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: none;
   background: transparent;
@@ -151,6 +158,8 @@
   min-height: 0;
   min-width: 0;
   padding-top: var(--admin-header-height);
+  height: calc(100vh - var(--admin-header-height));
+  height: calc(100dvh - var(--admin-header-height));
 }
 
 .admin-sidebar {
@@ -397,70 +406,36 @@
   margin-left: 260px;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 1.5rem;
+  padding: 1.5rem max(1.5rem, env(safe-area-inset-right)) 1.5rem max(1.5rem, env(safe-area-inset-left));
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
   min-width: 0;
+  min-height: 0;
   width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Tablet: narrow sidebar with icons only */
+/* Page content fills width and doesn't overflow */
+.admin-main > * {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Large tablet / small desktop: slightly reduce padding */
+@media (max-width: 1024px) {
+  .admin-main {
+    padding: 1.35rem max(1.25rem, env(safe-area-inset-right)) max(1.35rem, env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
+  }
+}
+
+/* Tablet: sidebar as overlay drawer (same as mobile so submenus are accessible) */
 @media (max-width: 900px) {
   .admin-header-nav {
     display: none;
   }
 
-  .admin-sidebar {
-    width: 72px;
-  }
-
-  .admin-user span,
-  .admin-nav-item span,
-  .admin-nav-group-label {
-    display: none;
-  }
-
-  .admin-nav-submenu {
-    display: none !important;
-  }
-
-  .admin-nav-item--parent,
-  .admin-nav-item {
-    justify-content: center;
-    padding: 0.75rem;
-    margin: 0;
-    border-radius: 8px;
-    border-left: none;
-  }
-
-  .admin-nav-item--parent .admin-nav-chevron {
-    display: none;
-  }
-
-  .admin-nav-item svg:last-child {
-    display: none;
-  }
-
-  .admin-main {
-    margin-left: 72px;
-    padding: 1.25rem;
-  }
-}
-
-/* Mobile: sidebar as overlay drawer + menu button */
-@media (max-width: 768px) {
   .admin-menu-btn {
     display: flex;
-  }
-
-  .admin-school-name {
-    max-width: 140px;
-  }
-
-  .admin-header {
-    padding: 0.6rem 1rem;
-  }
-
-  .admin-header-icons .admin-icon-btn:nth-child(n + 5) {
-    display: none;
   }
 
   .admin-sidebar-overlay {
@@ -484,6 +459,26 @@
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
   }
 
+  .admin-main {
+    margin-left: 0;
+    padding: 1.25rem max(1.25rem, env(safe-area-inset-right)) max(1.25rem, env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
+  }
+}
+
+/* Mobile: tighten header and main padding */
+@media (max-width: 768px) {
+  .admin-school-name {
+    max-width: 140px;
+  }
+
+  .admin-header {
+    padding: 0.6rem max(1rem, env(safe-area-inset-right)) 0.6rem max(1rem, env(safe-area-inset-left));
+  }
+
+  .admin-header-icons .admin-icon-btn:nth-child(n + 5) {
+    display: none;
+  }
+
   .admin-user span,
   .admin-nav-item span {
     display: inline;
@@ -500,7 +495,7 @@
 
   .admin-main {
     margin-left: 0;
-    padding: 1rem;
+    padding: 1rem max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
   }
 }
 
@@ -525,27 +520,33 @@
     display: none;
   }
 
-  .admin-icon-btn {
-    width: 40px;
-    height: 40px;
-  }
-
   .admin-sidebar {
     width: 260px;
   }
 
   .admin-main {
-    padding: 0.75rem;
+    padding: 0.75rem max(0.75rem, env(safe-area-inset-right)) max(0.75rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
   }
 }
 
 @media (max-width: 360px) {
   .admin-header {
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem max(0.75rem, env(safe-area-inset-right)) 0.5rem max(0.75rem, env(safe-area-inset-left));
   }
 
   .admin-school-name {
     max-width: 80px;
     font-size: 0.9rem;
+  }
+
+  .admin-main {
+    padding: 0.5rem max(0.5rem, env(safe-area-inset-right)) max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left));
+  }
+}
+
+/* Extra small: ensure no overflow and safe area */
+@media (max-width: 320px) {
+  .admin-main {
+    padding: 0.5rem max(0.5rem, env(safe-area-inset-right)) max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left));
   }
 }

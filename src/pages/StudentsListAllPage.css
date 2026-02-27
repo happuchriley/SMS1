@@ -1,7 +1,9 @@
 .students-list-all-page {
   --students-list-alt-bg: #f9fafb;
-  max-width: 1400px;
+  max-width: min(1400px, 100%);
   margin: 0 auto;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .students-list-all-header {
@@ -256,6 +258,7 @@
 
 .students-list-all-table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .students-list-all-table {
@@ -469,14 +472,92 @@
   .students-list-all-toolbar {
     flex-direction: column;
     align-items: stretch;
+    gap: 1rem;
   }
 
+  .students-list-all-toolbar-left,
   .students-list-all-toolbar-right {
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  .students-list-all-entries-label {
+    width: 100%;
+  }
+
+  .students-list-all-entries-select {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+  }
+
+  .students-list-all-search-label {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .students-list-all-search-input {
+    width: 100%;
+    min-width: 0;
   }
 
   .students-list-all-footer {
     flex-direction: column;
     align-items: stretch;
+    gap: 1rem;
+  }
+
+  /* Export & visibility: stack/wrap and keep dropdowns in viewport */
+  .students-list-all-export-btns {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .students-list-all-export-btn {
+    min-height: 44px;
+    padding: 0.5rem 0.85rem;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .students-list-all-visibility-btn {
+    min-height: 44px;
+    padding: 0.5rem 0.85rem;
+  }
+
+  .students-list-all-visibility-dropdown {
+    max-width: min(260px, calc(100vw - 2rem));
+    max-height: 60vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 480px) {
+  .students-list-all-title {
+    font-size: 1.25rem;
+  }
+
+  .students-list-all-toolbar,
+  .students-list-all-footer {
+    padding: 0.75rem 1rem;
+  }
+
+  .students-list-all-add-btn {
+    min-height: 44px;
+    padding: 0.6rem 1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .students-list-all-title {
+    font-size: 1.1rem;
+  }
+
+  .students-list-all-toolbar,
+  .students-list-all-footer {
+    padding: 0.6rem 0.75rem;
   }
 }

@@ -1,7 +1,8 @@
 .tlm-page {
-  max-width: 1400px;
+  max-width: min(1400px, 100%);
   margin: 0 auto;
   padding: 0 1rem;
+  min-width: 0;
   box-sizing: border-box;
 }
 
@@ -338,6 +339,11 @@
   .tlm-search-label input {
     width: 100%;
     min-width: 0;
+  }
+
+  .tlm-export-btn {
+    min-height: 44px;
+    padding: 0.5rem 0.85rem;
   }
 
   .tlm-footer {

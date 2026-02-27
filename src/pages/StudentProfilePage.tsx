@@ -191,20 +191,24 @@ export default function StudentProfilePage() {
                 <h2 id="basic-heading" className="student-profile-section-title">
                   Basic Information
                 </h2>
-                <dl className="student-profile-dl">
-                  <Row label="First Name" value={profile.basic.firstName} />
-                  <Row label="Surname" value={profile.basic.surname} />
-                  <Row label="Other Names" value={profile.basic.otherNames} />
-                  <Row label="Student ID" value={profile.studentId} />
-                  <Row label="Gender" value={profile.gender} />
-                  <Row label="Date of Birth" value={profile.basic.dateOfBirth} />
-                  <Row label="National" value={profile.basic.national} />
-                  <Row label="Home Town" value={profile.basic.homeTown} />
-                  <Row label="Current Country" value={profile.basic.currentCountry} />
-                  <Row label="Current City" value={profile.basic.currentCity} />
-                  <Row label="Religion" value={profile.basic.religion} />
-                  <Row label="Current Class" value={profile.currentClass} />
-                </dl>
+                <div className="student-profile-table-wrap">
+                  <table className="student-profile-info-table">
+                    <tbody>
+                      <InfoRow label="First Name" value={profile.basic.firstName} />
+                      <InfoRow label="Surname" value={profile.basic.surname} />
+                      <InfoRow label="Other Names" value={profile.basic.otherNames} />
+                      <InfoRow label="Student ID" value={profile.studentId} />
+                      <InfoRow label="Gender" value={profile.gender} />
+                      <InfoRow label="Date of Birth" value={profile.basic.dateOfBirth} />
+                      <InfoRow label="National" value={profile.basic.national} />
+                      <InfoRow label="Home Town" value={profile.basic.homeTown} />
+                      <InfoRow label="Current Country" value={profile.basic.currentCountry} />
+                      <InfoRow label="Current City" value={profile.basic.currentCity} />
+                      <InfoRow label="Religion" value={profile.basic.religion} />
+                      <InfoRow label="Current Class" value={profile.currentClass} />
+                    </tbody>
+                  </table>
+                </div>
               </section>
             )}
 
@@ -213,11 +217,15 @@ export default function StudentProfilePage() {
                 <h2 id="contact-heading" className="student-profile-section-title">
                   Contact Details
                 </h2>
-                <dl className="student-profile-dl">
-                  <Row label="Phone" value={profile.contact.phone || 'N/A'} />
-                  <Row label="Email" value={profile.contact.email || 'N/A'} />
-                  <Row label="Address" value={profile.contact.address || 'N/A'} />
-                </dl>
+                <div className="student-profile-table-wrap">
+                  <table className="student-profile-info-table">
+                    <tbody>
+                      <InfoRow label="Phone" value={profile.contact.phone || 'N/A'} />
+                      <InfoRow label="Email" value={profile.contact.email || 'N/A'} />
+                      <InfoRow label="Address" value={profile.contact.address || 'N/A'} />
+                    </tbody>
+                  </table>
+                </div>
               </section>
             )}
 
@@ -226,14 +234,18 @@ export default function StudentProfilePage() {
                 <h2 id="guardian-heading" className="student-profile-section-title">
                   Guardian Info
                 </h2>
-                <dl className="student-profile-dl">
-                  <Row label="Father's Name" value={profile.guardian.fatherName || 'N/A'} />
-                  <Row label="Father's Contact" value={profile.guardian.fatherContact || 'N/A'} />
-                  <Row label="Mother's Name" value={profile.guardian.motherName || 'N/A'} />
-                  <Row label="Mother's Contact" value={profile.guardian.motherContact || 'N/A'} />
-                  <Row label="Parents Address" value={profile.guardian.parentsAddress || 'N/A'} />
-                  <Row label="Parents Email" value={profile.guardian.parentsEmail || 'N/A'} />
-                </dl>
+                <div className="student-profile-table-wrap">
+                  <table className="student-profile-info-table">
+                    <tbody>
+                      <InfoRow label="Father's Name" value={profile.guardian.fatherName || 'N/A'} />
+                      <InfoRow label="Father's Contact" value={profile.guardian.fatherContact || 'N/A'} />
+                      <InfoRow label="Mother's Name" value={profile.guardian.motherName || 'N/A'} />
+                      <InfoRow label="Mother's Contact" value={profile.guardian.motherContact || 'N/A'} />
+                      <InfoRow label="Parents Address" value={profile.guardian.parentsAddress || 'N/A'} />
+                      <InfoRow label="Parents Email" value={profile.guardian.parentsEmail || 'N/A'} />
+                    </tbody>
+                  </table>
+                </div>
               </section>
             )}
 
@@ -242,12 +254,16 @@ export default function StudentProfilePage() {
                 <h2 id="admin-heading" className="student-profile-section-title">
                   Admin Info
                 </h2>
-                <dl className="student-profile-dl">
-                  <Row label="Entry Class" value={profile.admin.entryClass || 'N/A'} />
-                  <Row label="Admin Date" value={profile.admin.adminDate || 'N/A'} />
-                  <Row label="Program / Course" value={profile.admin.programCourse || 'N/A'} />
-                  <Row label="Affiliate House" value={profile.admin.affiliateHouse || 'N/A'} />
-                </dl>
+                <div className="student-profile-table-wrap">
+                  <table className="student-profile-info-table">
+                    <tbody>
+                      <InfoRow label="Entry Class" value={profile.admin.entryClass || 'N/A'} />
+                      <InfoRow label="Admin Date" value={profile.admin.adminDate || 'N/A'} />
+                      <InfoRow label="Program / Course" value={profile.admin.programCourse || 'N/A'} />
+                      <InfoRow label="Affiliate House" value={profile.admin.affiliateHouse || 'N/A'} />
+                    </tbody>
+                  </table>
+                </div>
               </section>
             )}
 
@@ -337,12 +353,12 @@ export default function StudentProfilePage() {
   )
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <>
-      <dt className="student-profile-dt">{label}</dt>
-      <dd className="student-profile-dd">{value}</dd>
-    </>
+    <tr>
+      <th scope="row" className="student-profile-info-th">{label}</th>
+      <td className="student-profile-info-td">{value}</td>
+    </tr>
   )
 }
 

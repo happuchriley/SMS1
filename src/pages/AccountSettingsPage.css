@@ -1,7 +1,9 @@
 .account-settings-page {
-  max-width: 800px;
+  max-width: min(800px, 100%);
   margin: 0 auto;
   padding: 0 1.25rem 2rem;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .account-settings-empty {
@@ -153,6 +155,7 @@
   align-items: center;
   justify-content: center;
   padding: 0.6rem 1.25rem;
+  min-height: 44px;
   font-size: 0.875rem;
   font-weight: 600;
   border-radius: 8px;

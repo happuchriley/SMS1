@@ -1,7 +1,9 @@
 .student-profile-page {
-  max-width: 1200px;
+  max-width: min(1200px, 100%);
   margin: 0 auto;
   padding: 0 1.25rem 2rem;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .student-profile-breadcrumb {
@@ -160,6 +162,7 @@
   border-bottom: 1px solid #e5e7eb;
   padding: 0 1rem;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   background: #fafafa;
 }
 
@@ -195,26 +198,47 @@
   font-size: 1rem;
   font-weight: 600;
   color: #059669;
-  margin: 0 0 1.25rem 0;
+  margin: 0 0 1rem 0;
 }
 
-.student-profile-dl {
-  display: grid;
-  grid-template-columns: 200px 1fr;
-  gap: 0.6rem 2rem;
-  margin: 0;
+.student-profile-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
 }
 
-.student-profile-dt {
+.student-profile-info-table {
+  width: 100%;
+  border-collapse: collapse;
   font-size: 0.875rem;
+}
+
+.student-profile-info-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.student-profile-info-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.student-profile-info-th {
+  text-align: left;
+  font-weight: 500;
   color: #6b7280;
-  margin: 0;
+  background: #f9fafb;
+  padding: 0.6rem 0.85rem;
+  width: 38%;
+  max-width: 200px;
+  border-right: 1px solid #e5e7eb;
+  vertical-align: top;
 }
 
-.student-profile-dd {
-  font-size: 0.875rem;
+.student-profile-info-td {
+  padding: 0.6rem 0.85rem;
   color: #111827;
-  margin: 0;
+  vertical-align: top;
 }
 
 .student-profile-empty-tab {
@@ -350,23 +374,129 @@
 }
 
 @media (max-width: 768px) {
+  .student-profile-page {
+    padding: 0 1rem 1.5rem;
+  }
+
+  .student-profile-title {
+    font-size: 1.2rem;
+    margin-bottom: 1.25rem;
+  }
+
   .student-profile-layout {
     grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
 
   .student-profile-sidebar {
     position: static;
+    padding: 1.25rem 1rem;
   }
 
-  .student-profile-dl {
-    grid-template-columns: 1fr;
+  .student-profile-avatar {
+    width: 96px;
+    height: 96px;
+  }
+
+  .student-profile-actions {
+    gap: 0.5rem;
+  }
+
+  .student-profile-btn {
+    min-height: 44px;
+    padding: 0.65rem 1rem;
+  }
+
+  .student-profile-tabs {
+    padding: 0 0.5rem;
+  }
+
+  .student-profile-tab {
+    padding: 0.75rem 0.85rem;
+    font-size: 0.8125rem;
+  }
+
+  .student-profile-content {
+    padding: 1rem;
+    min-height: 200px;
+  }
+
+  .student-profile-info-th {
+    width: 36%;
+    max-width: 140px;
+    padding: 0.55rem 0.75rem;
+  }
+
+  .student-profile-info-td {
+    padding: 0.55rem 0.75rem;
   }
 
   .student-profile-notify-fields {
     grid-template-columns: 1fr;
   }
 
+  .student-profile-notify-block {
+    padding: 1rem;
+  }
+
+  .student-profile-notify-actions {
+    gap: 0.5rem;
+  }
+
+  .student-profile-send-btn {
+    min-height: 44px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .student-profile-page {
+    padding: 0 0.75rem 1.25rem;
+  }
+
+  .student-profile-title {
+    font-size: 1.05rem;
+    margin-bottom: 1rem;
+  }
+
+  .student-profile-sidebar {
+    padding: 1rem 0.75rem;
+  }
+
+  .student-profile-avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .student-profile-name {
+    font-size: 1rem;
+  }
+
   .student-profile-content {
-    padding: 1.25rem;
+    padding: 0.875rem 0.75rem;
+  }
+
+  .student-profile-section-title {
+    font-size: 0.9375rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .student-profile-info-table {
+    font-size: 0.8125rem;
+  }
+
+  .student-profile-info-th,
+  .student-profile-info-td {
+    padding: 0.5rem 0.65rem;
+  }
+
+  .student-profile-info-th {
+    width: 40%;
+    max-width: none;
+  }
+
+  .student-profile-notify-block {
+    padding: 0.875rem;
   }
 }

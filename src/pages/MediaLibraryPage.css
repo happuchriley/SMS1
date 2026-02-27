@@ -1,6 +1,8 @@
 .media-library-page {
-  max-width: 1400px;
+  max-width: min(1400px, 100%);
   margin: 0 auto;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .media-library-header {

@@ -29,8 +29,8 @@ const MANAGE_STAFF_SUBMENU = [
 export default function AdminLayout() {
   const { showFeedback } = useFeedback()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [manageStudentsExpanded, setManageStudentsExpanded] = useState(true)
-  const [manageStaffExpanded, setManageStaffExpanded] = useState(true)
+  const [manageStudentsExpanded, setManageStudentsExpanded] = useState(false)
+  const [manageStaffExpanded, setManageStaffExpanded] = useState(false)
   const location = useLocation()
   const ariaExpanded = sidebarOpen ? 'true' : 'false'
   const ariaOverlayHidden = sidebarOpen ? 'false' : 'true'

@@ -1,6 +1,8 @@
 .promotion-page {
-  max-width: 1400px;
+  max-width: min(1400px, 100%);
   margin: 0 auto;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .promotion-header {
@@ -163,6 +165,7 @@
 
 .promotion-table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .promotion-table {
@@ -281,10 +284,38 @@
   .promotion-toolbar {
     flex-direction: column;
     align-items: stretch;
+    gap: 1rem;
+  }
+
+  .promotion-export-btns {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .promotion-export-btn {
+    min-height: 44px;
+    padding: 0.5rem 0.85rem;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .promotion-visibility-btn {
+    min-height: 44px;
+    padding: 0.5rem 0.85rem;
+  }
+
+  .promotion-visibility-dropdown {
+    right: 0;
+    left: auto;
+    max-width: min(260px, calc(100vw - 2rem));
+    max-height: 60vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .promotion-footer {
     flex-direction: column;
     align-items: stretch;
+    gap: 1rem;
   }
 }

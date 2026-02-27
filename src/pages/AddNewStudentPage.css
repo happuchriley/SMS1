@@ -1,7 +1,8 @@
 .add-student-page {
-  max-width: 920px;
+  max-width: min(920px, 100%);
   margin: 0 auto;
   padding: 0 1.25rem;
+  min-width: 0;
   box-sizing: border-box;
 }
 
